@@ -1,17 +1,15 @@
-﻿namespace SimpleSocialApp.Data.Models
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+
+namespace SimpleSocialApp.Data.Models
 {
-    public class Friendship
+    public class FriendShip
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
 
-        public string User1Id { get; set; } // First user in the friendship
-        public User User1 { get; set; }
+        public string user1Id { get; set; }
 
-        public string User2Id { get; set; } // Second user in the friendship
-        public User User2 { get; set; }
+        public string user2Id { get; set; }
 
-        public bool IsAccepted { get; set; } // Whether the friend request is accepted
-        public DateTime CreatedOn { get; set; }
-        
+
     }
 }

@@ -9,13 +9,11 @@
         public DateTime PostedOn { get; set; }
 
         public string UserId { get; set; }
-        public User Poster { get; set; }
+        public User User { get; set; }
 
+        public ICollection<React> Reacts; 
 
-
-
-
-
+        public ICollection<Comment> Comments;
 
     }
 }

@@ -2,16 +2,17 @@
 {
     public class User
     {
-        Guid id;
+        public string Id;
         public string Name { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
 
-        public DateTime createOn;
+        public string Bio { get; set; }
+        public DateTime CreatedOn { get; set; }
 
-        public string Bio;
-
-        public ICollection<Friendship> friends;
+        
+        public virtual ICollection<Conversation> Conversations { get; set; }
+        public virtual ICollection<Post> Posts { get; set; }
 
     }
 }
