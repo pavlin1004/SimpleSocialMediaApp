@@ -1,16 +1,17 @@
-﻿namespace SimpleSocialApp.Data.Models
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace SimpleSocialApp.Data.Models
 {
-    public class User
+    public class User :  IdentityUser
     {
-        public string Id;
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
+        public User()
+        {
+            this.Id = Guid.NewGuid().ToString();
+        }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
 
-        public string Bio { get; set; }
-        public DateTime CreatedOn { get; set; }
-
-        
+        public virtual ICollection<Friendship> Friendships { get; set; }
         public virtual ICollection<Conversation> Conversations { get; set; }
         public virtual ICollection<Post> Posts { get; set; }
 
