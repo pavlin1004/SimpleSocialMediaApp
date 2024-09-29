@@ -13,6 +13,8 @@ namespace SimpleSocialApp.Data.Models
         [Key]
         [Required]
         public string Id { get; set; }
+
+        public ReactType ReactType { get; set; }
    
         public string? CommentId { get; set; }
        

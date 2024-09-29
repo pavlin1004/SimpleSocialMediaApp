@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Formatters;
+﻿using SimpleSocialApp.Data.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace SimpleSocialApp.Data.Models

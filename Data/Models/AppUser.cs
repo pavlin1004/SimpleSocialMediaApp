@@ -3,11 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SimpleSocialApp.Data.Models
 {
-    public class AppUser :  IdentityUser
+    public class AppUser : IdentityUser
     {
 #pragma warning disable CS8618
         public AppUser()
         {
+            this.Id = Guid.NewGuid().ToString();
             this.Friendships = new HashSet<Friendship>();
             this.Conversations = new HashSet<Conversation>();
             this.Posts = new HashSet<Post>();

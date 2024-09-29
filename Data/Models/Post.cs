@@ -28,9 +28,9 @@ namespace SimpleSocialApp.Data.Models
 
         public virtual ICollection<Media> Media { get; set; }
 
-        public ICollection<Reaction> Reacts; 
+        public virtual ICollection<Reaction> Reacts { get; set; } 
 
-        public ICollection<Comment> Comments;
-
+        public virtual ICollection<Comment> Comments { get; set; }
+         
     }
 }
