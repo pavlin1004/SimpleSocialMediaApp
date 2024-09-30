@@ -6,11 +6,14 @@ namespace SimpleSocialApp.Services
     { 
         public interface IPostService
         {
-            Task<Post> GetPostByIdAsync(string id);
-            Task<IEnumerable<Post>> GetAllPostsAsync();
-            Task AddPostAsync(Post post);
-            Task UpdatePostAsync(Post post);
-            Task DeletePostAsync(string id);
+            public Task<Post> GetPostByIdAsync(string id);
+            public Task<IEnumerable<Post>> GetAllPostsAsync();
+            public Task AddPostAsync(Post post);
+            public Task UpdatePostAsync(Post post);
+            public Task DeletePostAsync(string id);
+            public Task<ICollection<Post>> GetAllFriendsPostsByIdAsync(string id);
+
+
         }
     }
 }

@@ -6,13 +6,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SimpleSocialApp.Services
 {
-    public class PostService
+    public class PostService : IPostService
     {
         private readonly SocialDbContext _dbContext;
-
-        public PostService(SocialDbContext dbContext)
+        private readonly IFriendService _freindShipService;
+        public PostService(SocialDbContext dbContext, IFriendService freindShipService)
         {
             _dbContext = dbContext;
+            _freindShipService = freindShipService;
         }
         public async Task<Post?> GetPostByIdAsync(string id)
         {
@@ -53,6 +54,19 @@ namespace SimpleSocialApp.Services
                 _dbContext.Posts.Remove(post);
                 await _dbContext.SaveChangesAsync();
             }
+        }
+
+        public async Task<ICollection<Post>> GetAllFriendsPostsByIdAsync(string id)
+        {
+            var ids = await _freindShipService.GetAllFriendsIdsAsync(id);
+
+            return await _dbContext.Posts
+                .Where(u => ids.Contains(u.UserId))
+                .Include(p => p.Comments)
+                .Include(p => p.Reacts)
+                .Include(p => p.Media)
+                .OrderByDescending(x => x.PostedOn)
+                .ToListAsync();
         }
     }
 }
