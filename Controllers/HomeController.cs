@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SimpleSocialApp.Models;
+using SimpleSocialApp.Models.ViewModels;
 using System.Diagnostics;
 
 namespace SimpleSocialApp.Controllers

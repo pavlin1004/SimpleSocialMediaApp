@@ -11,10 +11,10 @@ namespace SimpleSocialApp.Data.Models
             this.Media = new HashSet<Media>();
             this.Reacts = new HashSet<Reaction>(); 
             this.Comments = new HashSet<Comment>();
-
         }
         [Key]
         public string Id { get; set; }
+     
 
         [StringLength(40, ErrorMessage = "Last Name can't be longer than 40 characters")]
         public string Text { get; set; }

@@ -9,6 +9,17 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+
+@* @if (!Model.Any())  // Check if there are no posts
+{
+    <p>No posts available from friends.</p>
+    // Display message if no posts
+}
+else
+{ *@
+    
+
 <table class="table">
     <thead>
         <tr>
@@ -45,3 +56,4 @@
 }
     </tbody>
 </table>
+@* } *@

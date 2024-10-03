@@ -2,8 +2,6 @@
 using SimpleSocialApp.Data;
 using Microsoft.EntityFrameworkCore;
 
-
-
 namespace SimpleSocialApp.Services
 {
     public class PostService : IPostService
@@ -46,14 +44,10 @@ namespace SimpleSocialApp.Services
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task DeletePostAsync(string id)
+        public async Task DeletePostAsync(Post post)
         {
-            var post = await _dbContext.Posts.FindAsync(id);
-            if (post != null)
-            {
-                _dbContext.Posts.Remove(post);
-                await _dbContext.SaveChangesAsync();
-            }
+            _dbContext.Posts.Remove(post);
+            await _dbContext.SaveChangesAsync();      
         }
 
         public async Task<ICollection<Post>> GetAllFriendsPostsByIdAsync(string id)

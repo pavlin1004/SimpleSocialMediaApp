@@ -68,8 +68,6 @@ namespace SimpleSocialApp.Services
         private async Task<ICollection<AppUser>> FindFriendsByIds(ICollection<string> ids)
         {
             return await _dbContext.Users.Where(u => ids.Contains(u.Id)).ToListAsync();
-        }
-
-        
+        }      
     }
 }
