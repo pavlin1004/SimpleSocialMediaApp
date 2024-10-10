@@ -31,6 +31,5 @@ namespace SimpleSocialApp.Data.Models
         public virtual ICollection<Reaction> Reacts { get; set; } 
 
         public virtual ICollection<Comment> Comments { get; set; }
-         
     }
 }

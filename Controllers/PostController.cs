@@ -44,7 +44,7 @@ namespace SimpleSocialApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Post post, List<Media> MediaFiles)
+        public async Task<IActionResult> Create(Post post, List<Data.Models.Media> MediaFiles)
         {
             if (ModelState.IsValid)
             {

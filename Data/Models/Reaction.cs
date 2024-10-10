@@ -22,5 +22,11 @@ namespace SimpleSocialApp.Data.Models
         [Required]
         public string UserId { get; set; }
 
+        public virtual AppUser User { get; set; }
+
+        public virtual Post Post { get; set; }
+
+        public virtual Comment Comment { get; set; }
+
     }
 }

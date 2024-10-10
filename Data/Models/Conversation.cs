@@ -9,18 +9,18 @@ namespace SimpleSocialApp.Data.Models
         {
             this.Id = Guid.NewGuid().ToString();
             this.Messages = new HashSet<Message>();
-            this.Friends = new HashSet<AppUser>();
+            this.Users = new HashSet<AppUser>();
         }
         [Key]
         public string Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Title is required.")]
+        [StringLength(100, ErrorMessage = "Title can't be longer than 100 characters.")]
         public string Title { get; set; }
-        [Required]
         public DateTime CreatedOn { get; set; }
 
         public virtual ICollection<Message> Messages { get; set;}
 
-        public virtual ICollection<AppUser> Friends  { get; set;}
+        public virtual ICollection<AppUser> Users  { get; set;}
     }
 }

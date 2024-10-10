@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+using SimpleSocialApp.Data.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
@@ -17,14 +18,13 @@ namespace SimpleSocialApp.Data.Models
         [Key]
         public string Id { get; set; }
 
-        [Required]
+        public FriendshipType Type { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+
         public string User1Id { get; set; }
 
-        [Required]
         public string User2Id { get; set; }
-
-        [Required]
-        public DateTime CreatedAt { get; set; }
    
         public virtual AppUser User { get; set; }
   

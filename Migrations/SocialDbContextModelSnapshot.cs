@@ -27,12 +27,12 @@ namespace SimpleSocialApp.Migrations
                     b.Property<string>("ConversationsId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("FriendsId")
+                    b.Property<string>("UsersId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("ConversationsId", "FriendsId");
+                    b.HasKey("ConversationsId", "UsersId");
 
-                    b.HasIndex("FriendsId");
+                    b.HasIndex("UsersId");
 
                     b.ToTable("UserConversation", (string)null);
                 });
@@ -254,16 +254,30 @@ namespace SimpleSocialApp.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedOnDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("ParentCommentId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("PostId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ParentCommentId");
+
                     b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Comments");
                 });
@@ -278,7 +292,8 @@ namespace SimpleSocialApp.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
@@ -292,6 +307,9 @@ namespace SimpleSocialApp.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.Property<string>("User1Id")
                         .IsRequired()
@@ -316,21 +334,33 @@ namespace SimpleSocialApp.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("PostId")
-                        .IsRequired()
+                    b.Property<string>("CommentId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                    b.Property<string>("MessageId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("PostId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Url")
                         .IsRequired()
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CommentId");
+
+                    b.HasIndex("MessageId");
+
                     b.HasIndex("PostId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Media");
                 });
@@ -348,17 +378,12 @@ namespace SimpleSocialApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("SenderId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime>("TimeSent")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ConversationId");
-
-                    b.HasIndex("SenderId");
 
                     b.ToTable("Messages");
                 });
@@ -403,13 +428,15 @@ namespace SimpleSocialApp.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CommentId");
 
                     b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Reactions");
                 });
@@ -424,7 +451,7 @@ namespace SimpleSocialApp.Migrations
 
                     b.HasOne("SimpleSocialApp.Data.Models.AppUser", null)
                         .WithMany()
-                        .HasForeignKey("FriendsId")
+                        .HasForeignKey("UsersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -482,11 +509,27 @@ namespace SimpleSocialApp.Migrations
 
             modelBuilder.Entity("SimpleSocialApp.Data.Models.Comment", b =>
                 {
-                    b.HasOne("SimpleSocialApp.Data.Models.Post", null)
+                    b.HasOne("SimpleSocialApp.Data.Models.Comment", "ParentComment")
+                        .WithMany("Comments")
+                        .HasForeignKey("ParentCommentId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("SimpleSocialApp.Data.Models.Post", "Post")
                         .WithMany("Comments")
                         .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("SimpleSocialApp.Data.Models.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ParentComment");
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SimpleSocialApp.Data.Models.Friendship", b =>
@@ -494,13 +537,13 @@ namespace SimpleSocialApp.Migrations
                     b.HasOne("SimpleSocialApp.Data.Models.AppUser", "User")
                         .WithMany("Friendships")
                         .HasForeignKey("User1Id")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SimpleSocialApp.Data.Models.AppUser", "Friend")
                         .WithMany()
                         .HasForeignKey("User2Id")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Friend");
@@ -510,28 +553,41 @@ namespace SimpleSocialApp.Migrations
 
             modelBuilder.Entity("SimpleSocialApp.Data.Models.Media", b =>
                 {
+                    b.HasOne("SimpleSocialApp.Data.Models.Comment", "Comment")
+                        .WithMany("Media")
+                        .HasForeignKey("CommentId");
+
+                    b.HasOne("SimpleSocialApp.Data.Models.Message", null)
+                        .WithMany("Media")
+                        .HasForeignKey("MessageId");
+
                     b.HasOne("SimpleSocialApp.Data.Models.Post", "Post")
                         .WithMany("Media")
                         .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("SimpleSocialApp.Data.Models.AppUser", "User")
+                        .WithOne("Media")
+                        .HasForeignKey("SimpleSocialApp.Data.Models.Media", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Comment");
+
                     b.Navigation("Post");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SimpleSocialApp.Data.Models.Message", b =>
                 {
-                    b.HasOne("SimpleSocialApp.Data.Models.Conversation", null)
+                    b.HasOne("SimpleSocialApp.Data.Models.Conversation", "Conversation")
                         .WithMany("Messages")
                         .HasForeignKey("ConversationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SimpleSocialApp.Data.Models.AppUser", "Sender")
-                        .WithMany()
-                        .HasForeignKey("SenderId");
-
-                    b.Navigation("Sender");
+                    b.Navigation("Conversation");
                 });
 
             modelBuilder.Entity("SimpleSocialApp.Data.Models.Post", b =>
@@ -547,31 +603,55 @@ namespace SimpleSocialApp.Migrations
 
             modelBuilder.Entity("SimpleSocialApp.Data.Models.Reaction", b =>
                 {
-                    b.HasOne("SimpleSocialApp.Data.Models.Comment", null)
+                    b.HasOne("SimpleSocialApp.Data.Models.Comment", "Comment")
                         .WithMany("Reacts")
-                        .HasForeignKey("CommentId");
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("SimpleSocialApp.Data.Models.Post", null)
+                    b.HasOne("SimpleSocialApp.Data.Models.Post", "Post")
                         .WithMany("Reacts")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("SimpleSocialApp.Data.Models.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Comment");
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SimpleSocialApp.Data.Models.AppUser", b =>
                 {
                     b.Navigation("Friendships");
 
+                    b.Navigation("Media");
+
                     b.Navigation("Posts");
                 });
 
             modelBuilder.Entity("SimpleSocialApp.Data.Models.Comment", b =>
                 {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Media");
+
                     b.Navigation("Reacts");
                 });
 
             modelBuilder.Entity("SimpleSocialApp.Data.Models.Conversation", b =>
                 {
                     b.Navigation("Messages");
+                });
+
+            modelBuilder.Entity("SimpleSocialApp.Data.Models.Message", b =>
+                {
+                    b.Navigation("Media");
                 });
 
             modelBuilder.Entity("SimpleSocialApp.Data.Models.Post", b =>

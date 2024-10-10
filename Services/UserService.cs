@@ -1,5 +1,6 @@
 ﻿
 
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using SimpleSocialApp.Data;
 using SimpleSocialApp.Data.Models;
@@ -18,13 +19,15 @@ namespace SimpleSocialApp.Services
 
         public async Task UpdateAsync(AppUser user)
         {
+            
             _dbContext.Users.Update(user);
             await _dbContext.SaveChangesAsync();
         }
 
         public async Task AddAsync(AppUser user)
         {
-            this._dbContext.Users.Add(user);
+            
+            _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync();
         }
 

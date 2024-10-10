@@ -10,17 +10,25 @@ namespace SimpleSocialApp.Data.Models
         {
             this.Id = Guid.NewGuid().ToString();
         }
+
+
+
         [Key]
         public string Id { get; set; }
+
         [Required]
-        [StringLength(2048, ErrorMessage = "Url Name can't be longer than 2048 characters")]
+        [Url(ErrorMessage = "Invalid URL.")]
         public string Url { get; set; }
 
-        [Required]
-        public MediaType Type { get; set; }
 
-        public string PostId { get; set; }
+
+        public string? PostId { get; set; }
+        public string? CommentId { get; set; }
+        public string UserId { get; set; }
+
+        public virtual AppUser User { get; set; }
         public virtual Post Post { get; set; }
+        public virtual Comment Comment { get; set; }
 
     }
 }
