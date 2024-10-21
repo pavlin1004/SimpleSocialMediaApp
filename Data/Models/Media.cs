@@ -24,8 +24,10 @@ namespace SimpleSocialApp.Data.Models
 
         public string? PostId { get; set; }
         public string? CommentId { get; set; }
+        public string? MessageId { get; set; }
         public string UserId { get; set; }
 
+        public virtual Message Message { get; set; }
         public virtual AppUser User { get; set; }
         public virtual Post Post { get; set; }
         public virtual Comment Comment { get; set; }

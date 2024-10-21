@@ -12,8 +12,8 @@ using SimpleSocialApp.Data;
 namespace SimpleSocialApp.Migrations
 {
     [DbContext(typeof(SocialDbContext))]
-    [Migration("20241010143822_Initial")]
-    partial class Initial
+    [Migration("20241019120133_C")]
+    partial class C
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -211,6 +211,9 @@ namespace SimpleSocialApp.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("MediaId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -515,7 +518,7 @@ namespace SimpleSocialApp.Migrations
                     b.HasOne("SimpleSocialApp.Data.Models.Comment", "ParentComment")
                         .WithMany("Comments")
                         .HasForeignKey("ParentCommentId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("SimpleSocialApp.Data.Models.Post", "Post")
                         .WithMany("Comments")
@@ -525,7 +528,7 @@ namespace SimpleSocialApp.Migrations
                     b.HasOne("SimpleSocialApp.Data.Models.AppUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("ParentComment");
@@ -540,13 +543,13 @@ namespace SimpleSocialApp.Migrations
                     b.HasOne("SimpleSocialApp.Data.Models.AppUser", "User")
                         .WithMany("Friendships")
                         .HasForeignKey("User1Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("SimpleSocialApp.Data.Models.AppUser", "Friend")
                         .WithMany()
                         .HasForeignKey("User2Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Friend");
@@ -558,24 +561,28 @@ namespace SimpleSocialApp.Migrations
                 {
                     b.HasOne("SimpleSocialApp.Data.Models.Comment", "Comment")
                         .WithMany("Media")
-                        .HasForeignKey("CommentId");
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("SimpleSocialApp.Data.Models.Message", null)
+                    b.HasOne("SimpleSocialApp.Data.Models.Message", "Message")
                         .WithMany("Media")
-                        .HasForeignKey("MessageId");
+                        .HasForeignKey("MessageId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("SimpleSocialApp.Data.Models.Post", "Post")
                         .WithMany("Media")
                         .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("SimpleSocialApp.Data.Models.AppUser", "User")
                         .WithOne("Media")
                         .HasForeignKey("SimpleSocialApp.Data.Models.Media", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Comment");
+
+                    b.Navigation("Message");
 
                     b.Navigation("Post");
 
@@ -609,17 +616,17 @@ namespace SimpleSocialApp.Migrations
                     b.HasOne("SimpleSocialApp.Data.Models.Comment", "Comment")
                         .WithMany("Reacts")
                         .HasForeignKey("CommentId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("SimpleSocialApp.Data.Models.Post", "Post")
                         .WithMany("Reacts")
                         .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("SimpleSocialApp.Data.Models.AppUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Comment");

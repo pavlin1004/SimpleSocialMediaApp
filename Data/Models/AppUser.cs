@@ -19,6 +19,8 @@ namespace SimpleSocialApp.Data.Models
         [Required(ErrorMessage = "Last name is required")]
         [StringLength(40, ErrorMessage = "Last Name can't be longer than 40 characters")]
         public string LastName { get; set; }
+
+        public string? MediaId { get; set; }
         public virtual Media? Media { get; set; }
         public virtual ICollection<Friendship> Friendships { get; set; }
         public virtual ICollection<Conversation> Conversations { get; set; }

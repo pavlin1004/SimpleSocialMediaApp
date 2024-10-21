@@ -1,10 +1,11 @@
 ﻿using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
+using SimpleSocialApp.Services.Interfaces;
 
 
-namespace SimpleSocialApp.Services
+namespace SimpleSocialApp.Services.Implementations
 {
-    public class CloudinaryService: ICloudinaryService
+    public class CloudinaryService : ICloudinaryService
     {
 
         private readonly Cloudinary _cloudinary;
@@ -14,7 +15,7 @@ namespace SimpleSocialApp.Services
             _cloudinary = cloudinary;
         }
 
-  
+
         public async Task<string> UploadImageAsync(IFormFile image)
         {
             if (image.Length > 0)
@@ -27,16 +28,16 @@ namespace SimpleSocialApp.Services
                         Transformation = new Transformation()
                             .Width(500)
                             .Height(500)
-                            .Crop("fill")  
-                            .Gravity("face")  
+                            .Crop("fill")
+                            .Gravity("face")
                     };
 
                     var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-                    return uploadResult.SecureUrl.ToString(); 
+                    return uploadResult.SecureUrl.ToString();
                 }
             }
 
-            return String.Empty;
+            return string.Empty;
         }
 
         public async Task<string> UploadVideoAsync(IFormFile video)
@@ -51,11 +52,11 @@ namespace SimpleSocialApp.Services
                     };
 
                     var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-                    return uploadResult.SecureUrl.ToString(); 
+                    return uploadResult.SecureUrl.ToString();
                 }
             }
 
-            return String.Empty;
+            return string.Empty;
         }
     }
 }

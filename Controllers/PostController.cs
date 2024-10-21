@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SimpleSocialApp.Data;
 using SimpleSocialApp.Data.Models;
-using SimpleSocialApp.Services;
+using SimpleSocialApp.Services.Interfaces;
 
 namespace SimpleSocialApp.Controllers
 {
@@ -30,7 +30,7 @@ namespace SimpleSocialApp.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId != null)
             {
-                var posts = await _postService.GetAllPostsAsync();
+                var posts = await _postService.GetAllUserFriendsPostsAsync("a");
 
                 return View(posts);
             }

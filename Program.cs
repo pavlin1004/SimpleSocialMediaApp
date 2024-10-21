@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SimpleSocialApp.Data;
 using SimpleSocialApp.Data.Models;
-using SimpleSocialApp.Services;
+using SimpleSocialApp.Services.Implementations;
+using SimpleSocialApp.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,14 +25,20 @@ var cloudinary = new Cloudinary(new Account(
 
 builder.Services.AddSingleton(cloudinary);
 
-builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<SocialDbContext>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPostService, PostService>();
-builder.Services.AddScoped<IFriendService, FriendService>();
+builder.Services.AddScoped<IFriendshipService, FriendshipsService>();
 builder.Services.AddScoped<IMediaService, MediaService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+
+builder.Services.AddAuthentication()
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login"; // Change to your login page
+    });
 
 
 var app = builder.Build();

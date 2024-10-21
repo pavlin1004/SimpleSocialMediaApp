@@ -1,4 +1,4 @@
-﻿namespace SimpleSocialApp.Services
+﻿namespace SimpleSocialApp.Services.Interfaces
 {
     public interface ICloudinaryService
     {

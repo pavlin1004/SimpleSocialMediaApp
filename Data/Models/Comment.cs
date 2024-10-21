@@ -10,7 +10,8 @@ namespace SimpleSocialApp.Data.Models
         public Comment()
         {
             this.Id = Guid.NewGuid().ToString();
-           this.Comments = new HashSet<Comment>();
+            this.Media = new HashSet<Media>();
+            this.Comments = new HashSet<Comment>();
             this.Reacts = new HashSet<Reaction>();
         }
         [Key]
@@ -30,8 +31,7 @@ namespace SimpleSocialApp.Data.Models
 
         public virtual AppUser User { get; set; }
 
-        public virtual ICollection<Media> Media { get; set; } 
-
+        public virtual ICollection<Media> Media { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
 
         public virtual ICollection<Reaction> Reacts { get; set; }
