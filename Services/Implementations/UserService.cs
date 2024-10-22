@@ -49,7 +49,7 @@ namespace SimpleSocialApp.Services.Implementations
             if (user != null)
             {
                 await _media.DeleteMediaUserAsync(id);
-                await _friendships.DeleteUserFriendshipsAsync(id);
+                await _friendships.RejectUserFriendshipsAsync(id);
                 _context.Users.Remove(user);
                 await _context.SaveChangesAsync();
             }
@@ -58,19 +58,19 @@ namespace SimpleSocialApp.Services.Implementations
 
         public async Task<IEnumerable<AppUser>> GetAllUserFriendsAsync(string userId)
         {
-            var friendships = await _friendships.GetUserFriendshipsAsync(userId);
+            var friendships = await _friendships.GetUserAcceptedFriendshipsAsync(userId);
 
             if (friendships != null && friendships.Any())
             {
                 
-                var friendIds = friendships.Select(x => x.User1Id != userId ? x.User1Id : x.User2Id).ToList();
+                var friendIds = friendships.Select(x => x.SenderId != userId ? x.SenderId : x.ReceiverId).ToList();
 
                 return await _context.Users
                     .Where(u => friendIds.Contains(u.Id))
                     .ToListAsync();
             }
 
-            return new List<AppUser>();
+            return Enumerable.Empty<AppUser>();
         }
     }
 }

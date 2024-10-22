@@ -18,8 +18,8 @@ namespace SimpleSocialApp.Data.Models
    
         public string? CommentId { get; set; }
        
-        public string? PostId  { get; set; }
-        [Required]
+        public string? PostId  { get; set; }  
+
         public string UserId { get; set; }
 
         public virtual AppUser User { get; set; }

@@ -25,5 +25,7 @@ namespace SimpleSocialApp.Data.Models
         public virtual ICollection<Friendship> Friendships { get; set; }
         public virtual ICollection<Conversation> Conversations { get; set; }
         public virtual ICollection<Post> Posts { get; set; }
+
+        public virtual ICollection<Notification> Notifications { get; set; }
     }
 }

@@ -15,6 +15,7 @@ namespace SimpleSocialApp.Data
         public virtual DbSet<Comment> Comments { get; set; }
         public virtual DbSet<Reaction> Reactions { get; set; }
         public virtual DbSet<Media> Media { get; set; }
+        public virtual DbSet<Notification> Notifications { get; set; }
 
 
 
@@ -35,13 +36,11 @@ namespace SimpleSocialApp.Data
                 .WithOne(p => p.User)
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-
            
             builder.Entity<AppUser>()
                 .HasMany(u => u.Conversations)
                 .WithMany(c => c.Users)
                 .UsingEntity(j => j.ToTable("UserConversation"));
-
   
             builder.Entity<AppUser>()
                 .HasOne(u => u.Media)
@@ -50,21 +49,30 @@ namespace SimpleSocialApp.Data
                 .OnDelete(DeleteBehavior.NoAction);  
 
             builder.Entity<Friendship>()
-                .HasOne(f => f.User)
+                .HasOne(f => f.Sender)
                 .WithMany(au => au.Friendships)
-                .HasForeignKey(f => f.User1Id)
+                .HasForeignKey(f => f.SenderId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Friendship>()
-                .HasOne(f => f.Friend)
+                .HasOne(f => f.Receiver)
                 .WithMany()
-                .HasForeignKey(f => f.User2Id)
+                .HasForeignKey(f => f.ReceiverId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Friendship>()
-                .HasIndex(f => new { f.User1Id, f.User2Id })
+                .HasIndex(f => new { f.SenderId, f.ReceiverId })
                 .IsUnique();
 
+            builder.Entity<Notification>()
+                .HasOne(n => n.UserTo)
+                .WithMany(u => u.Notifications)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Notification>()
+                .HasOne(n => n.UserFrom)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Restrict);
             
             builder.Entity<Post>()
                 .HasMany(p => p.Reacts)

@@ -22,12 +22,12 @@ namespace SimpleSocialApp.Data.Models
 
         public DateTime CreatedAt { get; set; }
 
-        public string User1Id { get; set; }
+        public string SenderId { get; set; }
 
-        public string User2Id { get; set; }
+        public string ReceiverId { get; set; }
    
-        public virtual AppUser User { get; set; }
+        public virtual AppUser Sender { get; set; }
   
-        public virtual AppUser Friend { get; set; }
+        public virtual AppUser Receiver { get; set; }
     }
 }

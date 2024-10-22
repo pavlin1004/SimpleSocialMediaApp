@@ -12,8 +12,8 @@ using SimpleSocialApp.Data;
 namespace SimpleSocialApp.Migrations
 {
     [DbContext(typeof(SocialDbContext))]
-    [Migration("20241019120133_C")]
-    partial class C
+    [Migration("20241022110351_UpdateNotifications")]
+    partial class UpdateNotifications
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -394,6 +394,37 @@ namespace SimpleSocialApp.Migrations
                     b.ToTable("Messages");
                 });
 
+            modelBuilder.Entity("SimpleSocialApp.Data.Models.Notification", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserFromId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserToId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserFromId");
+
+                    b.HasIndex("UserToId");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("SimpleSocialApp.Data.Models.Post", b =>
                 {
                     b.Property<string>("Id")
@@ -600,6 +631,24 @@ namespace SimpleSocialApp.Migrations
                     b.Navigation("Conversation");
                 });
 
+            modelBuilder.Entity("SimpleSocialApp.Data.Models.Notification", b =>
+                {
+                    b.HasOne("SimpleSocialApp.Data.Models.AppUser", "UserFrom")
+                        .WithMany()
+                        .HasForeignKey("UserFromId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SimpleSocialApp.Data.Models.AppUser", "UserTo")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserToId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserFrom");
+
+                    b.Navigation("UserTo");
+                });
+
             modelBuilder.Entity("SimpleSocialApp.Data.Models.Post", b =>
                 {
                     b.HasOne("SimpleSocialApp.Data.Models.AppUser", "User")
@@ -641,6 +690,8 @@ namespace SimpleSocialApp.Migrations
                     b.Navigation("Friendships");
 
                     b.Navigation("Media");
+
+                    b.Navigation("Notifications");
 
                     b.Navigation("Posts");
                 });
