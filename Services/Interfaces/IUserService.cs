@@ -4,15 +4,15 @@ namespace SimpleSocialApp.Services.Interfaces
 {
     public interface IUserService
     {
-        public Task<AppUser?> GetUserByIdAsync(string id);
+        public Task<AppUser?> GetUserByIdAsync(string userId);
 
+        public Task<AppUser?> GetUserWithCommunicationDetailsAsync(string userId);
         public Task<IEnumerable<AppUser>> GetAllUserFriendsAsync(string userId);
-
-        public Task AddAsync(AppUser user);
-
+        public Task CreateAsync(AppUser user);
         public Task UpdateAsync(AppUser user);
+        public Task RemoveAsync(string id);
 
-        public Task DeleteAsync(string id);
+        public Task<IEnumerable<AppUser>> GetAllConversationUsersAsync(string userId);
 
     }
 }

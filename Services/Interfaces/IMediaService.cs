@@ -4,6 +4,6 @@ namespace SimpleSocialApp.Services.Interfaces
 {
     public interface IMediaService
     {
-        public Task DeleteMediaUserAsync(string id);
+        public Task RemoveUserMediaAsync(string mediaId);
     }
 }

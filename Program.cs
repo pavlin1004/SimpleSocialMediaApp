@@ -33,7 +33,11 @@ builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IFriendshipService, FriendshipsService>();
 builder.Services.AddScoped<IMediaService, MediaService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
-builder.Services.AddScoped<INotificationService, NotificationService> ();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<IConversationService, ConversationService>();
+builder.Services.AddScoped<IReactionService, ReactionService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddAuthentication()
     .AddCookie(options =>
     {
