@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SimpleSocialApp.Data;
 using SimpleSocialApp.Data.Models;
+using SimpleSocialApp.Models.InputModels;
 using SimpleSocialApp.Services.Interfaces;
 
 namespace SimpleSocialApp.Controllers
@@ -18,11 +19,15 @@ namespace SimpleSocialApp.Controllers
     {
         private readonly IPostService _postService;
         private readonly IUserService _userService;
+        private readonly ICloudinaryService _cloudinaryService;
+        private readonly IMediaService _mediaService;
 
-        public PostController(IUserService userService,IPostService postService) 
+        public PostController(IUserService userService, IPostService postService, ICloudinaryService cloudinaryService, IMediaService mediaService)
         {
-                _postService = postService;
-                _userService = userService;
+            _postService = postService;
+            _userService = userService;
+            _cloudinaryService = cloudinaryService;
+            _mediaService = mediaService;
         }
 
         public async Task<IActionResult> Index()
@@ -34,46 +39,64 @@ namespace SimpleSocialApp.Controllers
 
                 return View(posts);
             }
-            return  View();
+            return View();
         }
 
-        public  IActionResult Create()
+        public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Post post, List<Data.Models.Media> MediaFiles)
+        public async Task<IActionResult> Create(PostInputModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (userId != null)
-                {
-                    post.UserId = userId;
-                    post.PostedOn = DateTime.UtcNow;
-
-                    if (MediaFiles != null && MediaFiles.Count > 0)
-                    {
-                        foreach (var file in MediaFiles)
-                        {                         
-                                post.Media.Add(file);                         
-                        }
-                    }
-
-                    await _postService.AddPostAsync(post);
-                    return RedirectToAction("Index", "Post");
-                }
+                return View(model);  // Return the view with validation errors if any
             }
+            
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId != null)
+            {
+                Post p = new Post
+                {
+                    UserId = userId,
+                    PostedOn = DateTime.UtcNow
+                };
 
-            return View(post);
+                if (!String.IsNullOrEmpty(model.Text))
+                {
+                    p.Text = model.Text;
+                }
+                var uploadedFiles = Request.Form.Files;
+                if (uploadedFiles != null && uploadedFiles.Count > 0)
+                {
+                    foreach (var media in uploadedFiles)
+                    {
+                        var mediaUrl = await _cloudinaryService.UploadMediaFileAsync(media);
+                        if(!String.IsNullOrEmpty(mediaUrl))
+                        {
+                            p.Media.Add(new Media { Url = mediaUrl});
+                        }
+                        else
+                        {
+                            // Log or throw an error if media URL is empty
+                            Console.WriteLine("Media upload failed for file: " + media.FileName);
+                        }
+                    }            
+                }
+               
+                await _postService.AddPostAsync(p);
+                return RedirectToAction("Index", "Home");
+            }       
+            return View(model);
         }
 
         public IActionResult Edit(string id)
         {
             var post = _postService.GetPostByIdAsync(id);
-            if(post==null)
+            if (post == null)
             {
                 RedirectToAction("Post", "Index");
             }
@@ -81,25 +104,25 @@ namespace SimpleSocialApp.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken] 
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, Post post)
         {
             if (id != post.Id)
             {
-                return BadRequest(); 
+                return BadRequest();
             }
 
             if (ModelState.IsValid)
             {
-         
-                post.PostedOn = DateTime.UtcNow; 
 
-                await _postService.UpdatePostAsync(post); 
-                return RedirectToAction("Post","Index"); 
+                post.PostedOn = DateTime.UtcNow;
+
+                await _postService.UpdatePostAsync(post);
+                return RedirectToAction("Post", "Index");
             }
 
-            return View(post); 
+            return View(post);
         }
-      
+
     }
 }

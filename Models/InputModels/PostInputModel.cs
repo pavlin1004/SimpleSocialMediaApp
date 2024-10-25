@@ -1,14 +1,12 @@
-﻿using SimpleSocialApp.Models.Validation;
+﻿using Microsoft.AspNetCore.Mvc;
+using SimpleSocialApp.Models.Validation;
+using System.ComponentModel.DataAnnotations;
 
 namespace SimpleSocialApp.Models.InputModels
 {
 
     public class PostInputModel
-    {
-        [EnsureOneRequired("Data", "Media")]
-        public string? Data { get; set; }
-
-        public ICollection<IFormFile>? Media;
-
+    {    
+        public string? Text { get; set; }      
     }
 }

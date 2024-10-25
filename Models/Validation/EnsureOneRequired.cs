@@ -44,7 +44,7 @@ namespace SimpleSocialApp.Models.Validation
             {
                 return !String.IsNullOrEmpty(str);
             }
-            else if (value is ICollection<object> collection)
+            else if (value is ICollection<IFormFile> collection)
             {
                 return collection!=null && collection.Count > 0;
             }

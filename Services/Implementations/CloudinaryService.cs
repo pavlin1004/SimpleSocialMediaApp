@@ -1,5 +1,6 @@
 ﻿using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Http.Metadata;
 using SimpleSocialApp.Services.Interfaces;
 
 
@@ -15,8 +16,25 @@ namespace SimpleSocialApp.Services.Implementations
             _cloudinary = cloudinary;
         }
 
+        public async Task<string> UploadMediaFileAsync(IFormFile file)
+        {
+            if (file.ContentType.StartsWith("image/"))
+            {
+                return await UploadImageAsync(file);
+            }
+            if(file.ContentType.StartsWith("video/"))
+            {
+                return await UploadVideoAsync(file);
+            }
+         
+            return String.Empty;
+        }
 
-        public async Task<string> UploadImageAsync(IFormFile image)
+
+
+
+
+        private async Task<string> UploadImageAsync(IFormFile image)
         {
             if (image.Length > 0)
             {
@@ -36,11 +54,10 @@ namespace SimpleSocialApp.Services.Implementations
                     return uploadResult.SecureUrl.ToString();
                 }
             }
-
+            
             return string.Empty;
         }
-
-        public async Task<string> UploadVideoAsync(IFormFile video)
+        private async Task<string> UploadVideoAsync(IFormFile video)
         {
             if (video.Length > 0)
             {
@@ -55,7 +72,7 @@ namespace SimpleSocialApp.Services.Implementations
                     return uploadResult.SecureUrl.ToString();
                 }
             }
-
+            
             return string.Empty;
         }
     }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SimpleSocialApp.Data;
 
@@ -11,9 +12,11 @@ using SimpleSocialApp.Data;
 namespace SimpleSocialApp.Migrations
 {
     [DbContext(typeof(SocialDbContext))]
-    partial class SocialDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241025122510_fr")]
+    partial class fr
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -351,6 +354,7 @@ namespace SimpleSocialApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -362,8 +366,7 @@ namespace SimpleSocialApp.Migrations
                     b.HasIndex("PostId");
 
                     b.HasIndex("UserId")
-                        .IsUnique()
-                        .HasFilter("[UserId] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Media");
                 });
@@ -605,7 +608,8 @@ namespace SimpleSocialApp.Migrations
                     b.HasOne("SimpleSocialApp.Data.Models.AppUser", "User")
                         .WithOne("Media")
                         .HasForeignKey("SimpleSocialApp.Data.Models.Media", "UserId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("Comment");
 
