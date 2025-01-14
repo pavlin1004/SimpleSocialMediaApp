@@ -24,7 +24,11 @@ namespace SimpleSocialApp.Services.Implementations
 
         public async Task<ICollection<Comment>> GetAllPostComments(string postId)
         {
-            return await _context.Comments.Where(c => c.PostId == postId).ToListAsync();
+            return await _context.Comments.
+                Include(c =>c.User).
+                Include(c => c.Reacts).
+                Where(c => c.PostId == postId).
+                ToListAsync();
         }
 
         public async Task<ICollection<Comment>> GetAllCommentChildComments(string commentId)
@@ -49,7 +53,7 @@ namespace SimpleSocialApp.Services.Implementations
             var comment = await FindCommentToDelete(commentId);
             await DeleteCommentAsync(comment);
         }
-        private async Task DeleteCommentAsync(Comment comment)
+        public async Task DeleteCommentAsync(Comment comment)
         {       
             var comments = comment.Comments.ToList();
             foreach (var child in comments)

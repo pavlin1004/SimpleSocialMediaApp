@@ -1,0 +1,41 @@
+﻿@model IEnumerable<SimpleSocialApp.Data.Models.AppUser>
+
+@{
+    ViewData["Title"] = "Search Results";
+}
+
+<h3>Search Results</h3>
+
+@if (Model != null && Model.Any())
+{
+    <div class="user-results">
+        @foreach (var user in Model)
+        {
+
+            <div class="user-card" style="border: 1px solid #ddd; padding: 10px; margin: 10px 0;">
+                <div class="user-info">
+                    <!-- You can use the user's profile picture, or a placeholder if it's missing -->
+                    @* @if (string.IsNullOrEmpty(user.Media.Url))
+                    {
+                        <img src="https://via.placeholder.com/50" alt="@user.FirstName @user.LastName" class="rounded-circle" />
+                    }
+                    else
+                    {
+                        <img src="@user.Media.Url" alt="@user.FirstName @user.LastName" class="rounded-circle" style="width: 50px; height: 50px;" />
+                    } *@
+                    <div style="display: inline-block; margin-left: 10px;">
+                        <h5>@user.FirstName @user.LastName</h5>
+                        <p>@user.UserName</p>
+                    </div>
+                </div>
+
+                <!-- Button to go to the user's profile -->
+                <a href="@Url.Action("Profile", "User", new { userId = user.Id })" class="btn btn-primary">Go to Profile</a>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>No users found matching your search.</p>
+}

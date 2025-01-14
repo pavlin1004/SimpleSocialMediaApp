@@ -5,12 +5,12 @@ namespace SimpleSocialApp.Data.Models
 {
     public class AppUser : IdentityUser
     {
-#pragma warning disable CS8618
+    #pragma warning disable CS8618
         public AppUser()
         {
             this.Id = Guid.NewGuid().ToString();
             this.Friendships = new HashSet<Friendship>();
-            this.Conversations = new HashSet<Conversation>();
+            this.Chats = new HashSet<Chat>();
             this.Posts = new HashSet<Post>();
         }
         [Required(ErrorMessage = "First name is required")]
@@ -23,7 +23,7 @@ namespace SimpleSocialApp.Data.Models
         public string? MediaId { get; set; }
         public virtual Media? Media { get; set; }
         public virtual ICollection<Friendship> Friendships { get; set; }
-        public virtual ICollection<Conversation> Conversations { get; set; }
+        public virtual ICollection<Chat> Chats { get; set; }
         public virtual ICollection<Post> Posts { get; set; }
 
         public virtual ICollection<Notification> Notifications { get; set; }

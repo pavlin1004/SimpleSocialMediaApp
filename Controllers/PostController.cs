@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -10,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using SimpleSocialApp.Data;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Models.InputModels;
+using SimpleSocialApp.Models.ViewModels;
+using SimpleSocialApp.Services.Implementations;
 using SimpleSocialApp.Services.Interfaces;
 
 namespace SimpleSocialApp.Controllers
@@ -21,13 +24,16 @@ namespace SimpleSocialApp.Controllers
         private readonly IUserService _userService;
         private readonly ICloudinaryService _cloudinaryService;
         private readonly IMediaService _mediaService;
-
-        public PostController(IUserService userService, IPostService postService, ICloudinaryService cloudinaryService, IMediaService mediaService)
+        private readonly IReactionService _reactionService;
+        private readonly ICommentService _commentService;
+        public PostController(IUserService userService, IPostService postService, ICloudinaryService cloudinaryService, IMediaService mediaService, IReactionService reactionService, ICommentService commentService)
         {
             _postService = postService;
             _userService = userService;
             _cloudinaryService = cloudinaryService;
             _mediaService = mediaService;
+            _reactionService = reactionService;
+            _commentService = commentService;
         }
 
         public async Task<IActionResult> Index()
@@ -49,79 +55,121 @@ namespace SimpleSocialApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(PostInputModel model)
+        public async Task<IActionResult> Create(ContentInputModel model)
         {
             if (!ModelState.IsValid)
             {
                 return View(model);  // Return the view with validation errors if any
             }
-            
+
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId != null)
             {
                 Post p = new Post
                 {
                     UserId = userId,
-                    PostedOn = DateTime.UtcNow
+                    PostedOn = DateTime.UtcNow,
+                    Media = new Collection<Media>(),
+                    LikesCount = 0,
+                    CommentCount = 0
                 };
 
                 if (!String.IsNullOrEmpty(model.Text))
                 {
                     p.Text = model.Text;
                 }
-                var uploadedFiles = Request.Form.Files;
-                if (uploadedFiles != null && uploadedFiles.Count > 0)
+                foreach (var media in model.MediaFiles)
                 {
-                    foreach (var media in uploadedFiles)
+                    var mediaUrl = await _cloudinaryService.UploadMediaFileAsync(media);
+                    if (!String.IsNullOrEmpty(mediaUrl))
                     {
-                        var mediaUrl = await _cloudinaryService.UploadMediaFileAsync(media);
-                        if(!String.IsNullOrEmpty(mediaUrl))
-                        {
-                            p.Media.Add(new Media { Url = mediaUrl});
-                        }
-                        else
-                        {
-                            // Log or throw an error if media URL is empty
-                            Console.WriteLine("Media upload failed for file: " + media.FileName);
-                        }
-                    }            
+                        p.Media.Add(new Media { Url = mediaUrl });
+                    }
+                    else
+                    {
+                        // Log or throw an error if media URL is empty
+                        Console.WriteLine("Media upload failed for file: " + media.FileName);
+                    }
                 }
-               
                 await _postService.AddPostAsync(p);
-                return RedirectToAction("Index", "Home");
-            }       
-            return View(model);
-        }
+            }
+            return RedirectToAction("Index", "Home");
+        }       
 
-        public IActionResult Edit(string id)
+        [HttpGet]
+        public async Task<IActionResult> Details(string postId)
         {
-            var post = _postService.GetPostByIdAsync(id);
+
+            var post = await _postService.GetPostByIdAsync(postId);
+            var comments = await _commentService.GetAllPostComments(postId);
             if (post == null)
             {
-                RedirectToAction("Post", "Index");
+                throw new ArgumentNullException("");
             }
-            return View();
-        }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, Post post)
-        {
-            if (id != post.Id)
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (currentUserId == null)
             {
                 return BadRequest();
             }
-
-            if (ModelState.IsValid)
+            var hasReacted = false;
+            if (await _reactionService.SearchPostReactionAsync(postId, currentUserId) != null)
             {
-
-                post.PostedOn = DateTime.UtcNow;
-
-                await _postService.UpdatePostAsync(post);
-                return RedirectToAction("Post", "Index");
+                hasReacted = true;
             }
 
-            return View(post);
+            var viewModel = new PostViewModel
+            {
+                Post = post,
+                Comments = comments,
+                HasReacted = hasReacted
+            };
+
+            return View(viewModel);
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> Edit(string postId)
+        {
+            var post = await _postService.GetPostByIdAsync(postId);
+            if (post == null) return NotFound();
+
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (post.UserId != currentUserId)
+            {
+                return Unauthorized(); 
+            }  
+            var viewModel = new EditPostViewModel
+            {
+                PostId = post.Id,
+                Text = post.Text
+            };
+            return View(viewModel);
+        }
+
+        
+        [HttpPost]
+        public async Task<IActionResult> Edit(EditPostViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model); 
+            }
+
+            var post = await _postService.GetPostByIdAsync(model.PostId);
+            if (post == null) return NotFound();
+
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (post.UserId != currentUserId)
+            {
+                return Unauthorized(); 
+            }
+         
+            post.Text = model.Text;
+
+            await _postService.UpdatePostAsync(post);
+
+            return RedirectToAction("Details", "Post", new { postId = post.Id });
         }
 
     }

@@ -1,10 +1,54 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using SimpleSocialApp.Data.Enums
+@using System.Security.Claims
+@model SimpleSocialApp.Models.ViewModels.HomeIndexViewModel
+
+@{
+    var isUserLoggedIn = User.Identity.IsAuthenticated;
+    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@if (isUserLoggedIn)
+{
+    <div class="posts-section">
+        <h3>Posts</h3>
+        @foreach (var post in Model.Posts)
+        {
+            <div class="post">
+                <div class="post-header">
+                    <h4>@post.User.UserName</h4>
+                    <span>@post.PostedOn.ToString("MMM dd, yyyy")</span>
+                </div>
+                <div class="post-content">
+                    <p>@post.Text</p>
+                    @foreach (var media in post.Media)
+                    {
+                        @if (media.Type == MediaType.Image)
+                        {
+                            <img src="@media.Url" alt="Post Image" class="post-image" />
+                        }
+                        else if (media.Type == MediaType.Video)
+                        {
+                            <video controls>
+                                <source src="@media.Url" type="video/mp4" />
+                            </video>
+                        }
+                    }
+                </div>
+                <div class="post-footer">
+                    <span>0</span>
+                    <button class="btn btn-outline-primary">Like</button>
+                    <a href="@Url.Action("Details", "Post", new { postId = post.Id })" class="btn btn-outline-secondary">Comments</a>
+                </div>
+            </div>
+        }
+    </div>
 
+}
+else
+{
+    <div class="welcome-message">
+        <h3>Welcome to SimpleSocialApp!</h3>
+        <p>Please log in to view and interact with posts.</p>
+    </div>
+}
 

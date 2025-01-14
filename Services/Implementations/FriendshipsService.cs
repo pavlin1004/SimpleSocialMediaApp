@@ -15,15 +15,15 @@ namespace SimpleSocialApp.Services.Implementations
             _context = context;
         }
 
-        public async Task<Friendship?> GetFriendshipById(string Id)
+        public async Task<Friendship?> GetFriendshipById(string senderId, string receiverId)
         {
-            return await _context.Friendships.FindAsync(Id); 
+            return await CheckFriendship(senderId, receiverId);
         }
 
         public async Task<IEnumerable<Friendship>> GetUserAcceptedFriendshipsAsync(string userId)
         {
             return await _context.Friendships
-                .Where(f => f.SenderId == userId || f.ReceiverId == userId && f.Type == FriendshipType.Accepted)
+                .Where(f => (f.SenderId == userId || f.ReceiverId == userId) && f.Type == FriendshipType.Accepted)
                 .ToListAsync();
         }
 
@@ -34,40 +34,53 @@ namespace SimpleSocialApp.Services.Implementations
                 .Where(f => f.SenderId == userId || f.ReceiverId == userId && f.Type == FriendshipType.Pending)
                 .ToListAsync();
         }
-        public async Task CreateFriendshipRequestAsync(Friendship f)
+        public async Task SendFriendshipRequestAsync(string senderId, string receiverId)
         {
-            _context.Friendships.Add(f);
-            await _context.SaveChangesAsync();
-        }
-        public async Task<bool> RejectUserFriendshipsAsync(string userId)
-        {
-            var friendships = await _context.Friendships.Where(x => x.SenderId == userId || x.ReceiverId == userId).ToListAsync();
-            if (friendships.Any())
+            if (CheckFriendship(senderId, receiverId) != null)
             {
-                _context.RemoveRange(friendships);
+                var friendship = new Friendship
+                {
+                    SenderId = senderId,
+                    ReceiverId = receiverId,
+                    Type = FriendshipType.Pending
+
+                };
+                _context.Friendships.Add(friendship);
                 await _context.SaveChangesAsync();
-                return true;
             }
-            return false;
         }
-
-        public async Task<bool> AcceptUserFriendshipAsync(string friendshipid)
+        public async Task RemoveUserFriendshipsAsync(string senderId, string receiverId)
         {
-            var friendship = await GetFriendshipById(friendshipid);
-            if (friendship == null)
+            var friendship = await CheckFriendship(senderId, receiverId);
+            if (friendship != null)
             {
-                return false;
+                _context.RemoveRange(friendship);
+                await _context.SaveChangesAsync();
             }
-
-            friendship.Type = FriendshipType.Accepted;
-
-            _context.Friendships.Update(friendship);
-            await _context.SaveChangesAsync();
-
-            return true;
         }
 
-        
+        public async Task AcceptUserFriendshipAsync(string senderId, string receiverId)
+        {
+            var friendship = await GetFriendshipById(senderId, receiverId);
+            if (friendship != null)
+            {
+
+                friendship.Type = FriendshipType.Accepted;
+                _context.Friendships.Update(friendship);
+                await _context.SaveChangesAsync();
+            }
+        } 
+
+        public async Task<Friendship?> CheckFriendship(string user1Id, string user2Id)
+        {
+            var friendship = await _context.Friendships
+                .Where(f => (f.SenderId == user1Id && f.ReceiverId == user2Id) || (f.SenderId == user2Id && f.ReceiverId == user1Id))
+                .FirstOrDefaultAsync();
+
+            return friendship;
+        }
+
+     
 
 
     }

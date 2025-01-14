@@ -1,36 +1,74 @@
-﻿@model SimpleSocialApp.Data.Models.Post
+﻿@using System.Security.Claims
+@model SimpleSocialApp.Models.ViewModels.PostViewModel
 
-@{
-    ViewData["Title"] = "Details";
-}
 
-<h1>Details</h1>
 
-<div>
-    <h4>Post</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Text)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Text)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PostedOn)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PostedOn)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.User)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.User.Id)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<div class="post-details">
+    <!-- Post Content -->
+    <div class="post">
+        <div class="post-header">
+            <h4>@Model.Post.User.FirstName @Model.Post.User.LastName</h4>
+            <span>@Model.Post.PostedOn.ToString("MMM dd, yyyy")</span>
+        </div>
+        <div class="post-content">
+            <p>@Model.Post.Text</p>
+
+            @foreach (var media in Model.Post.Media)
+            {
+                @if (media.Type == SimpleSocialApp.Data.Enums.MediaType.Image)
+                {
+                    <img src="@media.Url" alt="Post Image" class="post-image" />
+                }
+                else if (media.Type == SimpleSocialApp.Data.Enums.MediaType.Video)
+                {
+                    <video controls>
+                        <source src="@media.Url" type="video/mp4" />
+                    </video>
+                }
+            }
+        </div>
+            <div class="post-footer">
+                <span>@Model.Post.LikesCount</span>
+                <form asp-action="ToggleReaction" asp-controller="Reaction" method="post">
+                    <input type="hidden" name="postId" value="@Model.Post.Id" />
+                    <button type="submit" class="btn btn-outline-primary">
+                        @(Model.HasReacted ? "Unlike" : "Like")
+                    </button>
+                </form>
+                <span>@Model.Post.CommentCount</span>
+            </div> 
+    </div>
+
+    <!-- Comments Section -->
+    <div class="comments-section">
+        <h5>Comments (@Model.Post.CommentCount)</h5>
+
+        <!-- Existing Comments -->
+        @if (Model.Comments != null && Model.Comments.Any())
+        {
+            @foreach (var comment in Model.Comments)
+            {
+                <div class="comment">
+                    <p><strong>@comment.User.FirstName @comment.User.LastName:</strong> @comment.Content</p>
+                    <span>@comment.CreatedOnDate.ToString("MMM dd, yyyy HH:mm")</span>
+                    @if (comment.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                    {
+                        <a href="@Url.Action("Edit", "Comment", new { commentId = comment.Id })" class="btn btn-outline-secondary">Edit</a>
+                        <a href="@Url.Action("Delete", "Comment", new { commentId = comment.Id })" class="btn btn-outline-danger">Delete</a>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <p>No comments yet. Be the first to comment!</p>
+        }
+
+        <!-- Add Comment Form -->
+        <form asp-action="AddComment" asp-controller="Comment" method="post" class="add-comment-form">
+            <input type="hidden" name="PostId" value="@Model.Post.Id" />
+            <textarea name="Content" class="form-control" rows="3" placeholder="Write your comment here..." required></textarea>
+            <button type="submit" class="btn btn-primary mt-2">Add Comment</button>
+        </form>
+    </div>
 </div>

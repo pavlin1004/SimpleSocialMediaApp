@@ -2,10 +2,10 @@
 
 namespace SimpleSocialApp.Data.Models
 {
-    public class Conversation
+    public class Chat
     {
 #pragma warning disable CS8618
-        public Conversation()
+        public Chat()
         {
             this.Id = Guid.NewGuid().ToString();
             this.Messages = new HashSet<Message>();

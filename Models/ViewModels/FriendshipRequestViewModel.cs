@@ -8,7 +8,6 @@ namespace SimpleSocialApp.Models.ViewModels
 {
     public class FriendshipRequestViewModel
     {
-        
         public required string FriendshipId { get; set; }
         public required string UserFromName { get; set; }
         public required DateTime DateSent { get; set; }

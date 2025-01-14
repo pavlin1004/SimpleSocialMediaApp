@@ -1,7 +1,8 @@
 ﻿namespace SimpleSocialApp.Data.Enums
 {
-    public enum NotificationType
+    public enum MediaType
     {
-       
+        Image,
+        Video
     }
 }

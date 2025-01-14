@@ -24,7 +24,7 @@ namespace SimpleSocialApp.Services.Implementations
 
         public async Task<IEnumerable<Message>> GetConversationMessagesAsync(string conversationId)
         {
-            return await _context.Messages.Include(m => m.Media).Where(m => m.ConversationId==conversationId).ToListAsync();
+            return await _context.Messages.Include(m => m.Media).Where(m => m.ChatId==conversationId).ToListAsync();
         }
         public async Task CreateMessageAsync(Message message)
         {

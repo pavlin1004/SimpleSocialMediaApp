@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SimpleSocialApp.Data;
 using SimpleSocialApp.Data.Models;
+using SimpleSocialApp.Hubs;
 using SimpleSocialApp.Services.Implementations;
 using SimpleSocialApp.Services.Interfaces;
 
@@ -22,7 +23,6 @@ var cloudinary = new Cloudinary(new Account(
     cloudinarySettings["ApiSecret"]
 ));
 
-
 builder.Services.AddSingleton(cloudinary);
 
 builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = false)
@@ -35,7 +35,7 @@ builder.Services.AddScoped<IMediaService, MediaService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
-builder.Services.AddScoped<IConversationService, ConversationService>();
+builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IReactionService, ReactionService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddAuthentication()
@@ -43,10 +43,14 @@ builder.Services.AddAuthentication()
     {
         options.LoginPath = "/Account/Login"; // Change to your login page
     });
+builder.Services.AddSignalR();
+
 
 
 var app = builder.Build();
 
+
+app.MapHub<ChatHub>("/chathub");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

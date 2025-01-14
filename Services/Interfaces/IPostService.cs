@@ -11,5 +11,12 @@ namespace SimpleSocialApp.Services.Interfaces
         public Task UpdatePostAsync(Post post);
         public Task DeletePostAsync(string postId);
 
+        public Task AdjustCount(string postId, string countType, bool function);
+        public Task<bool> UserHasReactedToPostAsync(string postId, string userId);
+        public Task RemoveComment(string postId);
+        public Task AddComment(string postId);
+
+
+
     }
 }

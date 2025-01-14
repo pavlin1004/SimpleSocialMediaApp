@@ -6,36 +6,36 @@ using SimpleSocialApp.Services.Interfaces;
 
 namespace SimpleSocialApp.Services.Implementations
 {
-    public class ConversationService :IConversationService
+    public class ChatService :IChatService
     {
         private readonly SocialDbContext _context;
 
-        public ConversationService(SocialDbContext context)
+        public ChatService(SocialDbContext context)
         {
             _context = context;
         }
-        public async Task<Conversation?> GetConversationAsync(string conversationId)
+        public async Task<Chat?> GetConversationAsync(string conversationId)
         {
-            return await _context.Conversations
+            return await _context.Chats
                 .Include(c => c.Users)
                 .Include(c => c.Messages)
                 .FirstOrDefaultAsync(c => c.Id == conversationId);
         }
-        public async Task<IEnumerable<Conversation>> GetConversationsForUserAsync(string userId)
+        public async Task<IEnumerable<Chat>> GetConversationsForUserAsync(string userId)
         {
-            return await _context.Conversations
+            return await _context.Chats
                 .Where(c => c.Users.Any(u => u.Id == userId)) 
                 .Include(c => c.Messages) 
                 .ToListAsync();
         }
-        public async Task CreateConversationAsync(Conversation conversation)
+        public async Task CreateConversationAsync(Chat conversation)
         {
-           _context.Conversations.Add(conversation);
+           _context.Chats.Add(conversation);
             await _context.SaveChangesAsync();
         }
-        public async Task UpdateConversationAsync(Conversation conversation)
+        public async Task UpdateConversationAsync(Chat conversation)
         {
-            _context.Conversations.Update(conversation);
+            _context.Chats.Update(conversation);
             await _context.SaveChangesAsync();
         }
         public async Task DeleteConversationAsync(string conversationId)
@@ -46,7 +46,7 @@ namespace SimpleSocialApp.Services.Implementations
                 throw new NullReferenceException("Conversation doesn't exist in the database");
             }
 
-            _context.Conversations.Remove(conversation);
+            _context.Chats.Remove(conversation);
             await _context.SaveChangesAsync();
 
         }

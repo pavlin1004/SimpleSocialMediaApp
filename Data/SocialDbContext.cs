@@ -10,7 +10,7 @@ namespace SimpleSocialApp.Data
     {
         public virtual DbSet<Post> Posts { get; set; }
         public virtual DbSet<Friendship> Friendships { get; set; }
-        public virtual DbSet<Conversation> Conversations { get; set; }
+        public virtual DbSet<Chat> Chats { get; set; }
         public virtual DbSet<Message> Messages { get; set; }
         public virtual DbSet<Comment> Comments { get; set; }
         public virtual DbSet<Reaction> Reactions { get; set; }
@@ -38,9 +38,9 @@ namespace SimpleSocialApp.Data
                 .OnDelete(DeleteBehavior.Cascade);
            
             builder.Entity<AppUser>()
-                .HasMany(u => u.Conversations)
+                .HasMany(u => u.Chats)
                 .WithMany(c => c.Users)
-                .UsingEntity(j => j.ToTable("UserConversation"));
+                .UsingEntity(j => j.ToTable("UserChat"));
   
             builder.Entity<AppUser>()
                 .HasOne(u => u.Media)
@@ -95,10 +95,10 @@ namespace SimpleSocialApp.Data
                 .OnDelete(DeleteBehavior.NoAction);  
 
             
-            builder.Entity<Conversation>()
+            builder.Entity<Chat>()
                 .HasMany(c => c.Messages)
-                .WithOne(m => m.Conversation)
-                .HasForeignKey(m => m.ConversationId)
+                .WithOne(m => m.Chat)
+                .HasForeignKey(m => m.ChatId)
                 .OnDelete(DeleteBehavior.Cascade);
 
       

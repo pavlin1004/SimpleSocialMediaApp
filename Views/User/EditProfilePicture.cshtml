@@ -1,0 +1,18 @@
+﻿@using System.Security.Claims
+@{
+    ViewData["Title"] = "Upload Profile Picture";
+}
+
+<h1>Upload Profile Picture</h1>
+
+<form asp-action="EditProfilePicture" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="mediaFile">Select a picture to upload</label>
+        <input type="file" id="mediaFile" name="mediaFile" class="form-control" accept="image/*" />
+    </div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+</form>
+
+<div>
+    <a href="@Url.Action("Profile", "User", new { userId = User.FindFirstValue(ClaimTypes.NameIdentifier) })">Back to Profile</a>
+</div>
