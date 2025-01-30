@@ -36,7 +36,7 @@ namespace SimpleSocialApp.Controllers
                     return BadRequest(new { Success = false, Message = "Invalid Post ID." });
 
                 var existingReaction = await _reactionService.SearchPostReactionAsync(targetId, currentUserId);
-                if (existingReaction != null)
+                if (existingReaction !=  null)
                 {
                     await _reactionService.RemoveLikeAsync(existingReaction);
                     await _postService.ToggleLike(targetId, false);
