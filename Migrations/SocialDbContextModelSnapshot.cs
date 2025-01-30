@@ -282,6 +282,9 @@ namespace SimpleSocialApp.Migrations
                     b.Property<DateTime>("CreatedOnDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("LikesCount")
+                        .HasColumnType("int");
+
                     b.Property<string>("ParentCommentId")
                         .HasColumnType("nvarchar(450)");
 

@@ -25,6 +25,8 @@ namespace SimpleSocialApp.Data.Models
         public string? PostId { get; set; }
         public string? ParentCommentId { get; set; }
 
+        public int LikesCount { get; set; }
+
         public virtual Comment ParentComment { get; set; }
 
         public virtual Post Post { get; set; }

@@ -37,7 +37,7 @@ namespace SimpleSocialApp.Controllers
             };
 
             await _commentService.CreateCommentAsync(comment);
-            await _postService.AddComment(comment.PostId);
+            await _postService.ToggleComment(comment.PostId, true);
 
             return RedirectToAction("Details", "Post", new { postId = comment.PostId });
         }
@@ -68,7 +68,7 @@ namespace SimpleSocialApp.Controllers
         public async Task<IActionResult> Edit(EditCommentViewModel model)
         {
             if (!ModelState.IsValid)
-            {
+            { 
                 return View(model); 
             }
 
@@ -103,7 +103,10 @@ namespace SimpleSocialApp.Controllers
             }
 
             await _commentService.DeleteCommentAsync(comment);
-
+            if (comment.PostId!=null)
+            {
+                await _postService.ToggleComment(comment.PostId, false);
+            }
             return RedirectToAction("Details", "Post", new { postId = comment.PostId });
         }
 

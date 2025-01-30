@@ -35,8 +35,16 @@
                     }
                 </div>
                 <div class="post-footer">
-                    <span>0</span>
-                    <button class="btn btn-outline-primary">Like</button>
+                    <span id="like-count-@post.Id">@post.LikesCount</span>
+                    <button class="btn btn-outline-primary like-button" data-target-type="Post" data-target-id="@post.Id">
+                        Like
+                    </button>
+                    <span>@post.CommentCount</span>
+                    @if (post.UserId == currentUserId)
+                    {
+                        <a href="@Url.Action("Edit", "Post", new { postId = post.Id })" class="btn btn-outline-secondary">Edit</a>
+                        <a href="@Url.Action("Delete", "Post", new { postId = post.Id })" class="btn btn-outline-danger">Delete</a>
+                    }
                     <a href="@Url.Action("Details", "Post", new { postId = post.Id })" class="btn btn-outline-secondary">Comments</a>
                 </div>
             </div>
@@ -51,4 +59,4 @@ else
         <p>Please log in to view and interact with posts.</p>
     </div>
 }
-
+<script type="text/javascript" src="~/js/like-handler.js"></script>

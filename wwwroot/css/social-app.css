@@ -1,0 +1,316 @@
+﻿/* Profile Header Layout */
+.profile-header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 20px;
+    margin: 30px 0;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.profile-picture {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+    .profile-picture img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #4CAF50;
+        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+        .profile-picture img:hover {
+            transform: scale(1.05);
+            border-color: #007bff;
+        }
+
+.profile-info {
+    flex-grow: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+}
+
+    .profile-info h1 {
+        font-size: 30px;
+        color: #333;
+        font-weight: 600;
+        margin-top: 15px;
+    }
+
+    .profile-info .this-is-your-profile {
+        font-size: 16px;
+        color: #666;
+        margin-top: 5px;
+    }
+
+    .profile-info .edit-profile-link {
+        color: #007bff;
+        font-size: 14px;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+        .profile-info .edit-profile-link:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .profile-info .edit-profile-link:focus {
+            outline: none;
+        }
+/* Profile Header Layout */
+.profile-header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 20px;
+    margin: 30px 0;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.profile-picture {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+    .profile-picture img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #4CAF50;
+        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+        .profile-picture img:hover {
+            transform: scale(1.05);
+            border-color: #007bff;
+        }
+
+.profile-info {
+    flex-grow: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+}
+
+    .profile-info h1 {
+        font-size: 30px;
+        color: #333;
+        font-weight: 600;
+        margin-top: 15px;
+    }
+
+    .profile-info .this-is-your-profile {
+        font-size: 16px;
+        color: #666;
+        margin-top: 5px;
+    }
+
+    .profile-info .edit-profile-link {
+        color: #007bff;
+        font-size: 14px;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+        .profile-info .edit-profile-link:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .profile-info .edit-profile-link:focus {
+            outline: none;
+        }
+
+/* Styling for post header */
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.post-user {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.post-date {
+    font-size: 14px;
+    color: #888;
+}
+
+/* Post content styling */
+.post-content {
+    margin-bottom: 15px;
+}
+
+/* Grouped images in a block */
+.post-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+    .post-images img {
+        width: 300px;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+
+/* Post Footer Layout */
+/* Post Footer Layout */
+/* Post Footer Layout */
+.post-footer {
+    display: flex;
+    flex-direction: column; /* Stack the sections vertically */
+    align-items: flex-start;
+    width: 100%; /* Ensure full width */
+    gap: 15px; /* Space between sections */
+}
+
+/* Action count items (like count, comment count) */
+.actions-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%; /* Full width */
+}
+
+/* Styling for like count */
+.like-count, .comment-count {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 5px; /* Space between count and button */
+}
+
+/* Buttons in a row */
+.buttons-row {
+    display: flex;
+    width: 100%;
+    justify-content: flex-start; /* Left-align buttons */
+    gap: 10px; /* Space between the buttons */
+}
+
+/* Styling for each button */
+.like-button, .btn-outline-secondary {
+    width: auto; /* Make buttons take only enough space for the text */
+    padding: 8px 12px; /* Adjust padding for smaller buttons */
+    border-radius: 5px;
+    border: none;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Styling for like button */
+.like-button {
+    background-color: #007bff;
+    color: white;
+}
+
+    .like-button:hover {
+        background-color: #0056b3;
+    }
+
+/* Styling for comment button */
+.btn-outline-secondary {
+    background-color: transparent;
+    color: #007bff;
+    border: 2px solid #007bff;
+}
+
+    .btn-outline-secondary:hover {
+        background-color: #007bff;
+        color: white;
+    }
+
+/* Styling for Edit button */
+.edit-delete-buttons .btn-outline-secondary {
+    background-color: transparent;
+    color: #007bff;
+    border: 2px solid #007bff;
+}
+
+    .edit-delete-buttons .btn-outline-secondary:hover {
+        background-color: #007bff;
+        color: white;
+    }
+
+/* Styling for Delete button */
+.edit-delete-buttons .btn-outline-danger {
+    background-color: transparent;
+    color: #dc3545;
+    border: 2px solid #dc3545;
+}
+
+    .edit-delete-buttons .btn-outline-danger:hover {
+        background-color: #dc3545;
+        color: white;
+    }
+
+.comment {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between; /* Aligns username on the left and date/buttons on the right */
+    align-items: center; /* Vertically aligns the content */
+    margin-bottom: 10px;
+}
+
+    .comment-header p {
+        font-size: 14px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+.comment-actions {
+    display: flex;
+    align-items: center; /* Vertically aligns the date and buttons */
+    gap: 10px; /* Space between the date and buttons */
+    font-size: 12px;
+    color: #888;
+}
+
+    .comment-actions a {
+        font-size: 14px;
+        margin-left: 10px;
+    }
+
+    .comment-actions span {
+        font-size: 12px;
+        color: #666;
+    }
+
+.comment-body {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+}

@@ -2,8 +2,9 @@
 
 <h2>Edit Comment</h2>
 
-<form asp-action="EditComment" method="post">
+<form asp-action="Edit" method="post">
     <div class="form-group">
+        <input type="hidden" asp-for="CommentId" />
         <label for="Content">Comment Content</label>
         <textarea class="form-control" id="Content" name="Content" rows="4">@Model.Content</textarea>
     </div>

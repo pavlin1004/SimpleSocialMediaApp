@@ -8,44 +8,45 @@
 }
 
 <div class="profile-header">
-    <!-- User Picture and Name -->
+    <!-- Profile Picture on Left -->
+    <div class="profile-picture">
+        @if (string.IsNullOrEmpty(userProfilePictureUrl))
+        {
+            <div class="no-profile-picture">
+                <p>No profile picture set.</p>
+                @if (Model.IsCurrentUser)
+                {
+                    <p><a href="@Url.Action("EditProfilePicture", "User")">Add a picture</a></p>
+                }
+            </div>
+        }
+        else
+        {
+            <img src="@userProfilePictureUrl" alt="Profile Picture" class="img-fluid rounded-circle" />
+        }
+    </div>
+
+    <!-- Profile Info in Center -->
     <div class="profile-info">
-        <div class="profile-picture">
-            @if (string.IsNullOrEmpty(userProfilePictureUrl))
-            {
-                <div>
-                    <p>No profile picture set.</p>
-                    @if (Model.IsCurrentUser)
-                    {
-                        <p><a href="@Url.Action("EditProfilePicture", "User")">Add a picture</a></p>
-                    }
-                </div>
-            }
-            else
-            {
-                <img src="@userProfilePictureUrl" alt="Profile Picture" class="img-fluid rounded-circle" />
-                <p><a href="@Url.Action("EditProfilePicture", "User")">Add a picture</a></p>
-            }
-        </div>
         <h1>@Model.User.FirstName @Model.User.LastName</h1>
+        @if (Model.IsCurrentUser)
+        {
+            <p class="this-is-your-profile">This is your profile.</p>
+        }
     </div>
 
     <!-- Friendship Status -->
     <div class="friendship-status">
-        @if (@Model.IsCurrentUser)
+        @if (Model.IsCurrentUser == false)
         {
-            <p>This is your profile.</p>
-        }
-        else
-        {
-            @if (@Model.FriendshipStatus == null)
+            @if (Model.FriendshipStatus == null)
             {
                 <!-- No friendship relationship -->
                 <form method="post" action="@Url.Action("SendFriendRequest", "User", new { userId = Model.User.Id })">
                     <button type="submit" class="btn btn-primary">Send Friend Request</button>
                 </form>
             }
-            else if (@Model.FriendshipStatus.Type == FriendshipType.Pending && @Model.FriendshipStatus.SenderId != currentUserId)
+            else if (Model.FriendshipStatus.Type == FriendshipType.Pending && Model.FriendshipStatus.SenderId != currentUserId)
             {
                 <!-- Friendship request sent by the current user (pending on the other side) -->
                 <form method="post" action="@Url.Action("AcceptFriendshipRequest", "User", new { userId = Model.User.Id })">
@@ -55,14 +56,14 @@
                     <button type="submit" class="btn btn-danger">Reject</button>
                 </form>
             }
-            else if (@Model.FriendshipStatus.Type == FriendshipType.Pending && @Model.FriendshipStatus.SenderId == currentUserId)
+            else if (Model.FriendshipStatus.Type == FriendshipType.Pending && Model.FriendshipStatus.SenderId == currentUserId)
             {
                 <!-- Friend request sent by current user, allow cancel -->
                 <form method="post" action="@Url.Action("RemoveFriendship", "User", new { userId = Model.User.Id })">
                     <button type="submit" class="btn btn-warning">Cancel Request</button>
                 </form>
             }
-            else if (@Model.FriendshipStatus.Type == FriendshipType.Accepted)
+            else if (Model.FriendshipStatus.Type == FriendshipType.Accepted)
             {
                 <!-- They are friends -->
                 <button class="btn btn-info" disabled>Friends</button>
@@ -81,35 +82,71 @@
     {
         <div class="post">
             <div class="post-header">
-                <h4>@post.User.UserName</h4>
-                <span>@post.PostedOn.ToString("MMM dd, yyyy")</span>
+                <!-- User's name on the top left -->
+                <h4 class="post-user">@post.User.UserName</h4>
+                <!-- Date on the top right -->
+                <span class="post-date">@post.PostedOn.ToString("MMM dd, yyyy")</span>
             </div>
+
+            <!-- Post Content -->
             <div class="post-content">
                 <p>@post.Text</p>
-                @foreach (var media in post.Media)
-                {
-                    @if (media.Type == MediaType.Image)
+
+                <!-- Grouped Images in a div (display as a block) -->
+                <div class="post-images">
+                    @foreach (var media in post.Media)
                     {
-                        <img src="@media.Url" alt="Post Image" class="post-image" />
+                        @if (media.Type == MediaType.Image)
+                        {
+                            <img src="@media.Url" alt="Post Image" class="post-image" />
+                        }
+                        else if (media.Type == MediaType.Video)
+                        {
+                            <video controls>
+                                <source src="@media.Url" type="video/mp4" />
+                            </video>
+                        }
                     }
-                    else if (media.Type == MediaType.Video)
-                    {
-                        <video controls>
-                            <source src="@media.Url" type="video/mp4" />
-                        </video>
-                    }
-                }
+                </div>
             </div>
+
+            <!-- Post Footer -->
             <div class="post-footer">
-                <span>0</span>
-                <button class="btn btn-outline-primary">Like</button>
-                @if (post.UserId== currentUserId)
-                {
-                    <a href="@Url.Action("Edit", "Post", new { postId = post.Id })" class="btn btn-outline-secondary">Edit</a>
-                    <a href="@Url.Action("Delete", "Post", new { postId = post.Id })" class="btn btn-outline-danger">Delete</a>
-                }
-                <a href="@Url.Action("Details", "Post", new { postId = post.Id })" class="btn btn-outline-secondary">Comments</a>
+                <div class="actions-container">
+                    <!-- Likes Count -->
+                    <div class="action-item">
+                        <span id="like-count-@post.Id" class="like-count">Likes: @post.LikesCount</span>
+                    </div>
+
+                    <!-- Comment Count -->
+                    <div class="action-item">
+                        <span class="comment-count">Comments: @post.CommentCount</span>
+                    </div>
+                </div>
+
+                <!-- Buttons for Like, Comments, Edit, and Delete -->
+                <div class="buttons-row">
+                    <!-- Like Button -->
+                    <button class="btn btn-outline-primary like-button" data-target-type="Post" data-target-id="@post.Id">
+                        Like
+                    </button>
+                    <!-- Comments Button -->
+                    <a href="@Url.Action("Details", "Post", new { postId = post.Id })" class="btn btn-outline-secondary">Comments</a>
+
+                    <!-- Edit and Delete buttons for the current user's post -->
+                    @if (post.UserId == currentUserId)
+                    {
+                        <a href="@Url.Action("Edit", "Post", new { postId = post.Id })" class="btn btn-outline-secondary">Edit</a>
+                        <a href="@Url.Action("Delete", "Post", new { postId = post.Id })" class="btn btn-outline-danger">Delete</a>
+                    }
+                </div>
             </div>
+
         </div>
     }
 </div>
+
+<script type="text/javascript" src="~/js/like-handler.js"></script>
+
+
+<script type="text/javascript" src="~/js/like-handler.js"></script>

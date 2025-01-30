@@ -72,5 +72,17 @@ namespace SimpleSocialApp.Services.Implementations
             }
             return comment;
         }
+
+        public async Task ToggleLike(string commentId, bool toLike)
+        {
+            var comment = await _context.Posts.FirstOrDefaultAsync(c => c.Id == commentId);
+            if (comment != null)
+            {
+                if (toLike == true) comment.LikesCount++;
+                else comment.LikesCount--;
+                _context.Posts.Update(comment);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

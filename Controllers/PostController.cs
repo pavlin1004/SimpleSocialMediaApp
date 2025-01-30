@@ -172,5 +172,38 @@ namespace SimpleSocialApp.Controllers
             return RedirectToAction("Details", "Post", new { postId = post.Id });
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Delete(string postId)
+        {
+            if (string.IsNullOrEmpty(postId))
+            {
+                return BadRequest("Invalid post ID.");
+            }
+
+            var post = await _postService.GetPostByIdAsync(postId);
+            if (post == null)
+            {
+                return NotFound();
+            }
+
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized();
+            }
+
+            if (post.UserId != currentUserId)
+            {
+                return Forbid(); // More appropriate than Unauthorized for permission issues
+            }
+
+            // Perform deletion
+            await _postService.DeletePostAsync(postId);
+
+            // Redirect back to the home page or user profile (if applicable)
+            return RedirectToAction("Index", "Home", new { userId = currentUserId });
+        }
+
+
     }
 }

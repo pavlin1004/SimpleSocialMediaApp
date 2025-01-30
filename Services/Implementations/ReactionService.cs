@@ -57,7 +57,7 @@ namespace SimpleSocialApp.Services.Implementations
         public async Task RemoveLikeAsync(Reaction reaction)
         {
             
-           _context.Reactions.Remove(reaction);
+            _context.Reactions.Remove(reaction);
             await _context.SaveChangesAsync();
         }
 

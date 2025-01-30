@@ -27,18 +27,18 @@
                 }
             }
         </div>
-            <div class="post-footer">
-                <span>@Model.Post.LikesCount</span>
-                <form asp-action="ToggleReaction" asp-controller="Reaction" method="post">
-                    <input type="hidden" name="postId" value="@Model.Post.Id" />
-                    <button type="submit" class="btn btn-outline-primary">
-                        @(Model.HasReacted ? "Unlike" : "Like")
-                    </button>
-                </form>
-                <span>@Model.Post.CommentCount</span>
-            </div> 
+        <div class="post-footer">
+            <span id="like-count-@Model.Post.Id">Likes: @Model.Post.LikesCount</span>
+
+            <!-- Like/Unlike Button -->
+            <button class="btn btn-outline-primary like-button" data-target-type="Post" data-target-id="@Model.Post.Id">
+                @(Model.HasReacted ? "Unlike" : "Like")
+            </button>
+
+        </div>
     </div>
 
+    <!-- Comments Section -->
     <!-- Comments Section -->
     <div class="comments-section">
         <h5>Comments (@Model.Post.CommentCount)</h5>
@@ -49,13 +49,23 @@
             @foreach (var comment in Model.Comments)
             {
                 <div class="comment">
-                    <p><strong>@comment.User.FirstName @comment.User.LastName:</strong> @comment.Content</p>
-                    <span>@comment.CreatedOnDate.ToString("MMM dd, yyyy HH:mm")</span>
-                    @if (comment.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier))
-                    {
-                        <a href="@Url.Action("Edit", "Comment", new { commentId = comment.Id })" class="btn btn-outline-secondary">Edit</a>
-                        <a href="@Url.Action("Delete", "Comment", new { commentId = comment.Id })" class="btn btn-outline-danger">Delete</a>
-                    }
+                    <!-- Comment Header: Username, Date, Edit/Delete buttons -->
+                    <div class="comment-header">
+                        <p><strong>@comment.User.FirstName @comment.User.LastName</strong></p>
+                        <div class="comment-actions">
+                            <span>@comment.CreatedOnDate.ToString("MMM dd, yyyy HH:mm")</span>
+                            @if (comment.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                            {
+                                <a href="@Url.Action("Edit", "Comment", new { commentId = comment.Id })" class="btn btn-outline-secondary">Edit</a>
+                                <a href="@Url.Action("Delete", "Comment", new { commentId = comment.Id })" class="btn btn-outline-danger">Delete</a>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Comment Body: Content -->
+                    <div class="comment-body">
+                        <p>@comment.Content</p>
+                    </div>
                 </div>
             }
         }
@@ -71,4 +81,6 @@
             <button type="submit" class="btn btn-primary mt-2">Add Comment</button>
         </form>
     </div>
+
 </div>
+<script type="text/javascript" src="~/js/like-handler.js"></script>

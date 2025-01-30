@@ -2,7 +2,8 @@
 
 <h2>Edit Post</h2>
 
-<form asp-action="EditPost" method="post">
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="PostId" />
     <div class="form-group">
         <label for="Text">Post Text</label>
         <textarea class="form-control" id="Text" name="Text" rows="4">@Model.Text</textarea>
