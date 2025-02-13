@@ -2,6 +2,8 @@
 {
     public interface ICloudinaryService
     {
-        public Task<string> UploadMediaFileAsync(IFormFile file);    
+        public Task<(string,string)> UploadMediaFileAsync(IFormFile file);
+        public Task<bool> DeleteMediaAsync(string publicId);
+
     }
 }

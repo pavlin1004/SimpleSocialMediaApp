@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol.Plugins;
 using SimpleSocialApp.Data;
 using SimpleSocialApp.Data.Enums;
 using SimpleSocialApp.Data.Models;
@@ -80,8 +81,10 @@ namespace SimpleSocialApp.Services.Implementations
             return friendship;
         }
 
-     
-
-
+        public async Task<List<AppUser>> GetAllFriends(string userId)
+        {
+            var friendships = await GetUserAcceptedFriendshipsAsync(userId);
+            return friendships.Select(u => u.SenderId == userId ? u.Sender : u.Receiver).ToList();
+        }
     }
 }

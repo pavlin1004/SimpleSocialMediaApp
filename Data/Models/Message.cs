@@ -18,7 +18,6 @@ namespace SimpleSocialApp.Data.Models
         public string Content { get; set; }
         public DateTime TimeSent { get; set; }  
         public string ChatId { get; set; }
-
         public virtual Chat Chat { get; set; }
         public virtual ICollection<Media> Media { get; set; }
 

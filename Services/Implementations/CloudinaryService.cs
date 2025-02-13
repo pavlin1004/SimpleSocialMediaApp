@@ -1,6 +1,7 @@
 ﻿using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http.Metadata;
+using NuGet.Protocol;
 using SimpleSocialApp.Services.Interfaces;
 
 
@@ -16,7 +17,7 @@ namespace SimpleSocialApp.Services.Implementations
             _cloudinary = cloudinary;
         }
 
-        public async Task<string> UploadMediaFileAsync(IFormFile file)
+        public async Task<(string,string)> UploadMediaFileAsync(IFormFile file)
         {
             if (file.ContentType.StartsWith("image/"))
             {
@@ -27,14 +28,14 @@ namespace SimpleSocialApp.Services.Implementations
                 return await UploadVideoAsync(file);
             }
          
-            return String.Empty;
+            return (String.Empty,String.Empty);
         }
 
 
 
 
 
-        private async Task<string> UploadImageAsync(IFormFile image)
+        private async Task<(string,string)> UploadImageAsync(IFormFile image)
         {
             if (image.Length > 0)
             {
@@ -51,13 +52,13 @@ namespace SimpleSocialApp.Services.Implementations
                     };
 
                     var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-                    return uploadResult.SecureUrl.ToString();
+                    return (uploadResult.SecureUrl.ToString(),uploadResult.PublicId);
                 }
             }
-            
-            return string.Empty;
+
+            return (String.Empty, String.Empty);
         }
-        private async Task<string> UploadVideoAsync(IFormFile video)
+        private async Task<(string,string)> UploadVideoAsync(IFormFile video)
         {
             if (video.Length > 0)
             {
@@ -69,11 +70,22 @@ namespace SimpleSocialApp.Services.Implementations
                     };
 
                     var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-                    return uploadResult.SecureUrl.ToString();
+                    return (uploadResult.SecureUrl.ToString(),uploadResult.PublicId);
                 }
             }
-            
-            return string.Empty;
+            return (String.Empty,String.Empty);
+        }
+
+        public async Task<bool> DeleteMediaAsync(string publicId)
+        {
+            if(!string.IsNullOrEmpty(publicId))
+            {
+                var deletionParams = new DeletionParams(publicId);
+                var result = await _cloudinary.DestroyAsync(deletionParams);
+                return result.Result == "ok";
+            }
+
+            return false;
         }
     }
 }

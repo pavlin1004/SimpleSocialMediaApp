@@ -12,5 +12,7 @@ namespace SimpleSocialApp.Services.Interfaces
         public Task AddUserAsync(string conversationId, AppUser user);
         public Task RemoveUserAsync(string conversationId, AppUser user);
 
+    
+
     }
 }

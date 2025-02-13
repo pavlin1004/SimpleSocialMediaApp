@@ -12,6 +12,7 @@ using SimpleSocialApp.Data;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Models.InputModels;
 using SimpleSocialApp.Models.ViewModels;
+using SimpleSocialApp.Models.ViewModels.Post;
 using SimpleSocialApp.Services.Implementations;
 using SimpleSocialApp.Services.Interfaces;
 

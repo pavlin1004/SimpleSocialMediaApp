@@ -1,0 +1,20 @@
+﻿@model CreateConversationViewModel
+
+<h1>Create New Conversation</h1>
+
+<form method="post" action="/Chat/Create">
+    <label for="ChatTitle">Chat Title:</label>
+    <input type="text" name="ChatTitle" id="ChatTitle" placeholder="Enter chat title" required />
+
+    <h3>Select Friends to Add</h3>
+    <div>
+        @foreach (var friend in Model.AvailableFriends)
+        {
+            <label>
+                <input type="checkbox" name="selectedFriends" value="@friend" /> @friend.FirstName @friend.LastName
+            </label>
+        }
+    </div>
+
+    <button type="submit">Create Chat</button>
+</form>

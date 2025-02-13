@@ -19,8 +19,11 @@ namespace SimpleSocialApp.Data.Models
         public string Title { get; set; }
         public DateTime CreatedOn { get; set; }
 
-        public virtual ICollection<Message> Messages { get; set;}
+        public bool IsGroup { get; set; } // group or private (2 friends) chat
 
-        public virtual ICollection<AppUser> Users  { get; set;}
+        public string OwnerId { get; set; }
+        public virtual ICollection<Message>? Messages { get; set;}
+
+        public virtual ICollection<AppUser>? Users  { get; set;}
     }
 }

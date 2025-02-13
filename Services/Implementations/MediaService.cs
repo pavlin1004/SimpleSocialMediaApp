@@ -12,7 +12,6 @@ namespace SimpleSocialApp.Services.Implementations
     public class MediaService : IMediaService
     {
         private readonly SocialDbContext _context;
-
         public MediaService(SocialDbContext context)
         {
             _context = context;
@@ -22,6 +21,7 @@ namespace SimpleSocialApp.Services.Implementations
             var media = await _context.Media.FirstOrDefaultAsync(x => x.User.Id == userId);
             if (media != null)
             {
+
                 _context.Media.Remove(media);
                 await _context.SaveChangesAsync();
             }
