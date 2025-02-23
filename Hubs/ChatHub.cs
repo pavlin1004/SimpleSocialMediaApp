@@ -1,30 +1,21 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using SimpleSocialApp.Services.Interfaces;
+﻿
+using Microsoft.AspNetCore.SignalR;
+using System.Threading.Tasks;
 
-namespace SimpleSocialApp.Hubs
-{
-    public class ChatHub : Hub
+public class ChatHub : Hub
     {
-        private readonly IChatService _chatService;
-
-        public ChatHub(IChatService chatService)
+        public async Task JoinChat(string chatId)
         {
-            _chatService = chatService;
+            await Groups.AddToGroupAsync(Context.ConnectionId, chatId);
+        }
+        public async Task LeaveChat(string chatId)
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, chatId);
         }
 
-        //public async Task SendMessage(int chatId, string senderId, string messageContent)
-        //{
-        //    // Logic for sending messages
-        //}
-
-        //public async Task JoinChat(int chatId)
-        //{
-        //    // Logic for joining a SignalR group
-        //}
-
-        //public async Task LeaveChat(int chatId)
-        //{
-        //    // Logic for leaving a SignalR group
-        //}
+        public async Task SendMessage(string chatId, string user, string message)
+        {
+            await Clients.Group(chatId).SendAsync("ReceiveMessage", user, message);
+        }
     }
-}
+

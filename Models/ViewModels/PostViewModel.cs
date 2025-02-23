@@ -7,7 +7,7 @@ namespace SimpleSocialApp.Models.ViewModels
     { 
 
         public required Post Post { get; set; }
-        public IEnumerable<Comment?> Comments { get; set; }
+        public IEnumerable<Comment>? Comments { get; set; }
         public required bool HasReacted { get; set; }
 
 

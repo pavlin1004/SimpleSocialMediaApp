@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SimpleSocialApp.Data;
 using SimpleSocialApp.Data.Models;
-using SimpleSocialApp.Hubs;
 using SimpleSocialApp.Services.Implementations;
 using SimpleSocialApp.Services.Interfaces;
 

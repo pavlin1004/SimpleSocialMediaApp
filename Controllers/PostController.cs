@@ -12,7 +12,6 @@ using SimpleSocialApp.Data;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Models.InputModels;
 using SimpleSocialApp.Models.ViewModels;
-using SimpleSocialApp.Models.ViewModels.Post;
 using SimpleSocialApp.Services.Implementations;
 using SimpleSocialApp.Services.Interfaces;
 
@@ -82,9 +81,9 @@ namespace SimpleSocialApp.Controllers
                 foreach (var media in model.MediaFiles)
                 {
                     var mediaUrl = await _cloudinaryService.UploadMediaFileAsync(media);
-                    if (!String.IsNullOrEmpty(mediaUrl))
+                    if (!String.IsNullOrEmpty(mediaUrl.Item1))
                     {
-                        p.Media.Add(new Media { Url = mediaUrl });
+                        p.Media.Add(new Media { Url = mediaUrl.Item1 });
                     }
                     else
                     {

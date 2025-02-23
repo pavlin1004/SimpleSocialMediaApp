@@ -9,10 +9,11 @@ namespace SimpleSocialApp.Services.Implementations
     public class ChatService :IChatService
     {
         private readonly SocialDbContext _context;
-
+        //private readonly IUserService _userService;
         public ChatService(SocialDbContext context)
         {
             _context = context;
+            //_userService = userService;
         }
         public async Task<Chat?> GetConversationAsync(string conversationId)
         {
@@ -27,6 +28,11 @@ namespace SimpleSocialApp.Services.Implementations
                 .Where(c => c.Users.Any(u => u.Id == userId)) 
                 .Include(c => c.Messages) 
                 .ToListAsync();
+        }
+
+        public async Task<List<AppUser>> GetAllUsers(Chat chat)
+        {
+            return await _context.Users.Where(u => chat.Users.Any(x => x.Id == u.Id)).ToListAsync();
         }
         public async Task CreateConversationAsync(Chat conversation)
         {
@@ -50,26 +56,20 @@ namespace SimpleSocialApp.Services.Implementations
             await _context.SaveChangesAsync();
 
         }
-        public async Task AddUserAsync(string conversationId, AppUser user)
+        public async Task AddUserAsync(Chat chat, AppUser user)
         {
-            var conversation = await GetConversationAsync(conversationId);
-            if (conversation == null)
-            {
-                throw new NullReferenceException("Conversation doesn't exist in the database");
-            }
-            conversation.Users.Add(user);
+            chat.Users.Add(user);
             await _context.SaveChangesAsync();
         }
-        public async Task RemoveUserAsync(string conversationId, AppUser user)
+        public async Task<bool> RemoveUserAsync(Chat chat, AppUser user)
         {
-
-            var conversation = await GetConversationAsync(conversationId);
-            if (conversation == null)
+            if (!chat.Users.Any(u => u.Id == user.Id))
             {
-                throw new NullReferenceException("Conversation doesn't exist in the database");
+                return false;
             }
-            conversation.Users.Remove(user);
+            chat.Users.Remove(user);
             await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

@@ -9,10 +9,11 @@ namespace SimpleSocialApp.Services.Interfaces
         public Task CreateConversationAsync(Chat conversation);
         public Task UpdateConversationAsync(Chat conversation);
         public Task DeleteConversationAsync(string conversationId);
-        public Task AddUserAsync(string conversationId, AppUser user);
-        public Task RemoveUserAsync(string conversationId, AppUser user);
+        public Task AddUserAsync(Chat chat, AppUser user);
+        public Task<bool> RemoveUserAsync(Chat chat, AppUser user);
 
-    
+        public Task<List<AppUser>> GetAllUsers(Chat chat);
+
 
     }
 }

@@ -1,0 +1,23 @@
+﻿@using SimpleSocialApp.Data.Models
+@using SimpleSocialApp.Models.ViewModels
+@model List<Chat>
+
+@if(Model.Count!=0)
+{ 
+    @foreach (var chat in Model)
+    {
+        <p>@chat.Id</p>
+        <div class="chat-list-item">
+            <h3>@chat.Title</h3>
+            <a asp-action="Index" asp-controller="Chat" asp-route-chatId="@chat.Id" class="btn btn-primary">Go To Chat</a>
+        </div>
+    }
+    
+}
+else
+{
+   <h3>You participate in no chats yet!</h3> 
+}
+<a asp-action="Create" asp-controller="Chat"> Create a new chat</a>
+
+

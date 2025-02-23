@@ -1,5 +1,27 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@using SimpleSocialApp.Models.ViewModels
+@model ChatIndexViewModel
+
+<h2>@Model.Title</h2>
+
+<!-- Message List -->
+<div id="chatBox">
+    @foreach (var message in Model.Messages)
+    {
+        <div class="message">
+            <strong>@message.User.FirstName:</strong>
+            <span class="timestamp">@message.TimeSent.ToString("HH:mm:ss")</span>
+            <p>@message.Content</p>
+        </div>
+    }
+</div>
+
+<!-- Message Input Form -->
+<form id="messageForm">
+    <textarea id="messageInput" rows="3" placeholder="Type a new message..."></textarea>
+    <button type="submit">Send Message</button>
+    <input type="hidden" id="chatId" value="@Model.ChatId" />
+</form>
+
+<!-- Include External JavaScript File -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+<script src="~/js/chat.js"></script> <!-- Link to external JavaScript -->

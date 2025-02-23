@@ -31,9 +31,15 @@
                                 </form>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Profile" asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)">Profile</a>
-                        </li>
+                        @if (User.Identity.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Profile" asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)">Profile</a>
+                            </li>                          
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Chat" asp-action="ListChat" asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)">Chats</a>
+                            </li>
+                        }
                         @* <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>

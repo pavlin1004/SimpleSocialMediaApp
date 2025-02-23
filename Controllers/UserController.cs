@@ -84,6 +84,7 @@ namespace SimpleSocialApp.Controllers
             if (currentUserId == userId) return BadRequest("You cannot send a friend request to yourself.");
 
             await _friendshipService.AcceptUserFriendshipAsync(currentUserId, userId);
+            
             return RedirectToAction("Profile", new { userId });
         }
 
@@ -129,7 +130,7 @@ namespace SimpleSocialApp.Controllers
 
             // Upload the file (using Cloudinary or your media service)
             var mediaUrl = await _cloudinaryService.UploadMediaFileAsync(mediaFile);
-            if (string.IsNullOrEmpty(mediaUrl))
+            if (string.IsNullOrEmpty(mediaUrl.Item1))
             {
                 return BadRequest("Media upload failed");
             }
@@ -141,7 +142,7 @@ namespace SimpleSocialApp.Controllers
                 return NotFound();
             }
 
-            user.Media = new Media { Url = mediaUrl };
+            user.Media = new Media { Url = mediaUrl.Item1 };
             await _userService.UpdateAsync(user);
 
             // Redirect back to the profile

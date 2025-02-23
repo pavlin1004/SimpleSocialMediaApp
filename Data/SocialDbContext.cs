@@ -36,7 +36,9 @@ namespace SimpleSocialApp.Data
                 .WithOne(p => p.User)
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-           
+
+        
+
             builder.Entity<AppUser>()
                 .HasMany(u => u.Chats)
                 .WithMany(c => c.Users)
@@ -138,7 +140,13 @@ namespace SimpleSocialApp.Data
                 .HasMany(m => m.Media)
                 .WithOne(m => m.Message)
                 .HasForeignKey(m => m.MessageId)
-                .OnDelete(DeleteBehavior.NoAction);  
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<Message>()
+                .HasOne(m => m.User)
+                .WithMany()
+                .HasForeignKey(m => m.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
 
 

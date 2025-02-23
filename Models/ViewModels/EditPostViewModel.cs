@@ -1,4 +1,4 @@
-﻿namespace SimpleSocialApp.Models.ViewModels.Post
+﻿namespace SimpleSocialApp.Models.ViewModels
 {
     public class EditPostViewModel
     {
