@@ -1,0 +1,29 @@
+﻿@using SimpleSocialApp.Models.ViewModels.Chats
+@model ModifyChatParticipantViewModel
+
+
+<form asp-controller="Chat" asp-action="ModifyUsers" method="post">
+    <div class="form-group">
+        <label>Select Participants</label>
+        <div class="checkbox-list">
+            @foreach (var user in Model.Users)
+            {
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="user_@user.Id" name="userIds" value="@user.Id" />
+                    <label class="form-check-label" for="user_@user.Id">@user.FirstName</label>
+                </div>
+            }
+        </div>
+    </div>
+
+    <input type="hidden" name="chatId" value="@Model.ChatId" />
+    <input type="hidden" name="actionType" value="@Model.Action" />
+    @if (@Model.Action == "Add")
+    {
+        <button type="submit" class="btn btn-primary">Add</button>
+    }
+    else
+    {
+        <button type="submit" class="btn btn-primary">Remove</button>
+    }
+</form>

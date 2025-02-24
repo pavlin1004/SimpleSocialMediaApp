@@ -32,8 +32,11 @@ namespace SimpleSocialApp.Services.Implementations
 
         public async Task<List<AppUser>> GetAllUsers(Chat chat)
         {
-            return await _context.Users.Where(u => chat.Users.Any(x => x.Id == u.Id)).ToListAsync();
+            return await _context.Users
+                .Where(u => chat.Users.Select(x => x.Id).Contains(u.Id)) 
+                .ToListAsync();
         }
+
         public async Task CreateConversationAsync(Chat conversation)
         {
            _context.Chats.Add(conversation);

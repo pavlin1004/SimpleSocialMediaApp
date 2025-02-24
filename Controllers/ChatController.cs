@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SimpleSocialApp.Data.Enums;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Models.InputModels.Chat;
 using SimpleSocialApp.Models.ViewModels;
+using SimpleSocialApp.Models.ViewModels.Chats;
 using SimpleSocialApp.Services.Implementations;
 using SimpleSocialApp.Services.Interfaces;
 using System;
@@ -113,24 +115,106 @@ namespace SimpleSocialApp.Controllers
             return RedirectToAction("ListChat", new { userId = currentUserId});
         }
         [HttpGet]
-        public async Task<IActionResult> RemoveUsersFromChat(string chatId, string userId)
+        public async Task<IActionResult> ModifyUsers(string chatId, string userId, string actionType)
         {
             var chat = await _chatService.GetConversationAsync(chatId);
             if(chat == null)
             {
                 return BadRequest();
             }
-            var participant = await _chatService.GetAllUsers(chat);
-            return View(participant);
+            ModifyChatParticipantViewModel model;
+            //if (string.IsNullOrEmpty(actionType))
+            //{
+            //    throw new Exception($"null string {actionType}");
+            //}
+            //if (!string.IsNullOrEmpty(chatId))
+            //{
+            //    throw new Exception($"null string {chatId}");
+            //}
+            //if (chat == null)
+            //{
+            //    throw new Exception($"null string {actionType}");
+            //}
+            if (actionType == "Remove")
+            {
+                var participants = await _chatService.GetAllUsers(chat);
+                var filteredParticipants = participants.Where(p => p.Id != userId).ToList();
+                model = new ModifyChatParticipantViewModel
+                {
+                    ChatId = chatId,
+                    Users = filteredParticipants,
+                    Action = "Remove"
+                };
+                //if (model.Users == null) throw new Exception("null to add");
+            }
+            else
+            {
+                var friends = await _friendshipService.GetAllFriends(userId);
+                var friendsNotInChat = friends.Where(f => !chat.Users.Any(u => u.Id == f.Id)).ToList();
+                model = new ModifyChatParticipantViewModel
+                {
+                    ChatId = chatId,
+                    Users = friendsNotInChat,
+                    Action = "Add"
+                };
+                if (model.Users == null) throw new Exception("null to add");
+            }
+            return View(model);
         }
-        public async Task<IActionResult> RemoveUsersFromChat(string chatId, List<string> userIds)
-        {
+        //public async Task<IActionResult> RemoveUsersFromChat(string chatId, List<string> userIds)
+        //{
+        //    var chat = await _chatService.GetConversationAsync(chatId);
+        //    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        //    if (chat == null || userIds == null || userIds.Count == 0)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    if (currentUserId != chat.OwnerId)
+        //    {
+        //        return Unauthorized();
+        //    }
+
+        //    foreach (var userId in userIds)
+        //    {
+        //        var user = await _userService.GetUserByIdAsync(userId);
+        //        if (user != null)
+        //        {
+        //            await _chatService.RemoveUserAsync(chat, user);
+        //        }
+        //    }
+
+        //    return RedirectToAction("Index", new { chatId });
+        //}
+        //[HttpGet]
+        //public async Task<IActionResult> AddUsersToChat(string chatId, string userId)
+        //{
+        //    if(string.IsNullOrEmpty(chatId) || string.IsNullOrEmpty(userId))
+        //    {
+        //        return BadRequest();
+        //    }
+        //    var chat = await _chatService.GetConversationAsync(chatId);
+        //    var friends = await _friendshipService.GetAllFriends(userId);
+        //    var toAdd = friends.Where(f => !chat.Users.Any(u => u.Id == f.Id));
+        //   //if(toAdd = null || )
+        //    var model = new ModifyChatParticipantViewModel
+        //    {
+        //        ChatId = chatId,
+        //        Users = toAdd
+        //    };
+
+        //    return View(model); 
+        //}
+        [HttpPost]
+        public async Task<IActionResult> ModifyUsers(string chatId, List<string> userIds, string actionType)
+        {              
             var chat = await _chatService.GetConversationAsync(chatId);
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (chat == null || userIds == null || userIds.Count == 0)
             {
-                return BadRequest();
+                return BadRequest("Something is null");
             }
 
             if (currentUserId != chat.OwnerId)
@@ -138,55 +222,35 @@ namespace SimpleSocialApp.Controllers
                 return Unauthorized();
             }
 
-            foreach (var userId in userIds)
+            if (actionType == "Add")
             {
-                var user = await _userService.GetUserByIdAsync(userId);
-                if (user != null)
+                foreach (var userId in userIds)
                 {
-                    await _chatService.RemoveUserAsync(chat, user);
+                    var user = await _userService.GetUserByIdAsync(userId);
+                    if (user != null)
+                    {
+                        await _chatService.AddUserAsync(chat, user);
+                    }
                 }
             }
-
-            return RedirectToAction("Index", new { chatId });
-        }
-        [HttpGet]
-        public async Task<IActionResult> AddUsersToChat(string chatId, string userId)
-        {
-            if(string.IsNullOrEmpty(chatId) || string.IsNullOrEmpty(userId))
+            else if(actionType == "Remove")
             {
-                return BadRequest();
-            }
-            var chat = await _chatService.GetConversationAsync(chatId);
-            var friends = await _friendshipService.GetAllFriends(userId);
-            var toAdd = friends.Where(f => !chat.Users.Any(u => u.Id == f.Id));
-
-            return View(toAdd); 
-        }
-        public async Task<IActionResult> AddUsersToChat(string chatId, List<string> userIds)
-        {
-            var chat = await _chatService.GetConversationAsync(chatId);
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (chat == null || userIds == null || userIds.Count == 0)
-            {
-                return BadRequest();
-            }
-
-            if (currentUserId != chat.OwnerId)
-            {
-                return Unauthorized();
-            }
-
-            foreach (var userId in userIds)
-            {
-                var user = await _userService.GetUserByIdAsync(userId);
-                if (user!= null)
+                foreach (var userId in userIds)
                 {
-                    await _chatService.AddUserAsync(chat, user);
+                    var user = await _userService.GetUserByIdAsync(userId);
+                    if (user != null)
+                    {
+                        await _chatService.RemoveUserAsync(chat, user);
+                    }
                 }
             }
+            else
+            {
+                TempData["ErrorMessage"] = "Invalid operation!";
+            }
+ 
 
-            return RedirectToAction("Index", new { chatId });
+            return RedirectToAction("Index", "Chat", new { ChatId = chatId });
         }
 
         public async Task<IActionResult> DeleteChat(string chatId)
@@ -199,14 +263,14 @@ namespace SimpleSocialApp.Controllers
                 return NotFound();
             }
 
-            if (string.IsNullOrEmpty(currentUserId)||currentUserId != chat.OwnerId)
+            if (string.IsNullOrEmpty(currentUserId) || currentUserId != chat.OwnerId)
             {
                 return Unauthorized();
             }
 
             await _chatService.DeleteConversationAsync(chatId);
-            
-            return RedirectToAction("ChatList");
+
+            return RedirectToAction("ListChat", new { userId = currentUserId});
         }
 
         public async Task<IActionResult> LeaveChat(string chatId)
