@@ -2,16 +2,43 @@
 @using System.Security.Claims
 @model ChatIndexViewModel
 
-<h2>@Model.Title</h2>
-
-@if(Model.OwnerId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+@if (Model.IsGroup)
 {
-    <form asp-controller="Chat" asp-action="DeleteChat" method="post">
+    <h2>@Model.Title</h2>
+    if (Model.OwnerId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+    {
+        <form asp-controller="Chat" asp-action="DeleteChat" method="post">
         <input type="hidden" name="chatId" value="@Model.ChatId" />
         <button type="submit" class="leave-button">Delete Chat</button>
     </form>
+
+    <!-- Add Participant -->
+    <form asp-controller="Chat" asp-action="ModifyUsers" method="get">
+        <input type="hidden" name="chatId" value="@Model.ChatId" />
+        <input type="hidden" name="userId" value="@User.FindFirstValue(ClaimTypes.NameIdentifier)" />
+        <input type="hidden" name="actionType" value="Add" />
+        <button type="submit" class="leave-button">Add Friend</button>
+    </form>
+
+    <!-- Remove Participant -->
+    <form asp-controller="Chat" asp-action="ModifyUsers" method="get">
+        <input type="hidden" name="chatId" value="@Model.ChatId" />
+        <input type="hidden" name="userId" value="@User.FindFirstValue(ClaimTypes.NameIdentifier)" />
+        <input type="hidden" name="actionType" value="Remove" />
+        <button type="submit" class="leave-button">Remove Friend</button>
+    </form>
+    }
 }
-<!-- Message List -->
+else
+{
+    <h2>@Model.OtherUser</h2> <!-- Show the other user's name for private chats -->
+}
+    <!-- Leave Chat -->
+<form asp-controller="Chat" asp-action="LeaveChat" method="post">
+    <input type="hidden" name="chatId" value="@Model.ChatId" />
+    <button type="submit" class="leave-button">Leave Chat</button>
+</form>
+<!-- Display Messages -->
 <div id="chatBox">
     @foreach (var message in Model.Messages)
     {
@@ -30,24 +57,5 @@
     <input type="hidden" id="chatId" value="@Model.ChatId" />
 </form>
 
-<form asp-controller="Chat" asp-action="LeaveChat" method="post">
-    <input type="hidden" name="chatId" value="@Model.ChatId" />
-    <button type="submit" class="leave-button">Leave Chat</button>
-</form>
-
-<form asp-controller="Chat" asp-action="ModifyUsers" method="get">
-    <input type="hidden" name="chatId" value="@Model.ChatId" />
-    <input type="hidden" name="userId" value="@User.FindFirstValue(ClaimTypes.NameIdentifier)"/>
-    <input type="hidden" name="actionType" value="Add" />
-    <button type="submit" class="leave-button">Add friends</button>
-</form>
-
-<form asp-controller="Chat" asp-action="ModifyUsers" method="get">
-    <input type="hidden" name="chatId" value="@Model.ChatId" />
-    <input type="hidden" name="userId" value="@User.FindFirstValue(ClaimTypes.NameIdentifier)"/>
-    <input type="hidden" name="actionType" value="Remove" />
-    <button type="submit" class="leave-button">RemoveUsersFromChat</button>
-</form>
-<!-- Include External JavaScript File -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 <script src="~/js/chat.js"></script> <!-- Link to external JavaScript -->

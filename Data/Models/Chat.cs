@@ -14,12 +14,10 @@ namespace SimpleSocialApp.Data.Models
         }
         [Key]
         public string Id { get; set; }
-
-        [Required(ErrorMessage = "Title is required.")]
-        [StringLength(100, ErrorMessage = "Title can't be longer than 100 characters.")]
-        public string Title { get; set; }
+        public string? Title { get; set; }
         public DateTime CreatedOn { get; set; }
 
+        bool IsDeleted { get; set; } // for keeping two users chat in the database except deleting the whole correspondation
         public ChatType Type { get; set; } // group or private (2 friends) chat
 
         public string? OwnerId { get; set; }

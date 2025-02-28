@@ -5,7 +5,7 @@ namespace SimpleSocialApp.Data.Models
 {
     public class Media
     {
-        #pragma warning disable CS8618
+#pragma warning disable CS8618
         public Media()
         {
             this.Id = Guid.NewGuid().ToString();
@@ -20,6 +20,7 @@ namespace SimpleSocialApp.Data.Models
         [Url(ErrorMessage = "Invalid URL.")]
         public string Url { get; set; }
 
+        public string PublicId { get; set; }
         public MediaType Type { get; set; }
         public string? PostId { get; set; }
         public string? CommentId { get; set; }

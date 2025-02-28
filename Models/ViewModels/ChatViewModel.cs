@@ -3,7 +3,9 @@
     public class ChatViewModel
     {
         public required string ChatId {get;set;}
-        public required string Title { get; set; }
+        public string? Title { get; set; }
+
+        public string? FriendName { get; set; }
 
     }
 }

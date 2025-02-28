@@ -78,13 +78,12 @@ namespace SimpleSocialApp.Services.Implementations
 
         public async Task<bool> DeleteMediaAsync(string publicId)
         {
-            if(!string.IsNullOrEmpty(publicId))
+            if (!string.IsNullOrEmpty(publicId))
             {
                 var deletionParams = new DeletionParams(publicId);
                 var result = await _cloudinary.DestroyAsync(deletionParams);
                 return result.Result == "ok";
             }
-
             return false;
         }
     }

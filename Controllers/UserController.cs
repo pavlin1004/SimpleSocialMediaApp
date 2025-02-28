@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.IdentityModel.Tokens;
+using SimpleSocialApp.Data.Enums;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Models.ViewModels;
 using SimpleSocialApp.Services.Implementations;
 using SimpleSocialApp.Services.Interfaces;
 using System.Security.Claims;
+using System.Transactions;
 
 namespace SimpleSocialApp.Controllers
 {
@@ -17,14 +20,16 @@ namespace SimpleSocialApp.Controllers
         private readonly IPostService _postService;
         private readonly IMediaService _mediaService;
         private readonly ICloudinaryService _cloudinaryService;
+        private readonly IChatService _chatService; 
 
-        public UserController(IUserService userService, IFriendshipService friendshipService, IPostService postService, IMediaService mediaService, ICloudinaryService cloudinaryService)
+        public UserController(IUserService userService, IFriendshipService friendshipService, IPostService postService, IMediaService mediaService, ICloudinaryService cloudinaryService, IChatService chatService)
         {
             _userService = userService;
             _friendshipService = friendshipService;
             _postService = postService;
             _mediaService = mediaService;
             _cloudinaryService = cloudinaryService;
+            _chatService = chatService;
         }
 
         [HttpGet]
@@ -83,8 +88,20 @@ namespace SimpleSocialApp.Controllers
 
             if (currentUserId == userId) return BadRequest("You cannot send a friend request to yourself.");
 
+            var currentUser = await _userService.GetUserByIdAsync(currentUserId);
+            var friend = await _userService.GetUserByIdAsync(userId);
+            if(currentUser != null && friend != null)
+            {
+                var chat = new Chat {
+                    CreatedOn = DateTime.Now,
+                    Type = ChatType.Private
+                };
+                chat.Users.Add(currentUser);
+                chat.Users.Add(friend);
+
+            await _chatService.CreateConversationAsync(chat);
             await _friendshipService.AcceptUserFriendshipAsync(currentUserId, userId);
-            
+            }  
             return RedirectToAction("Profile", new { userId });
         }
 
@@ -129,8 +146,8 @@ namespace SimpleSocialApp.Controllers
             }
 
             // Upload the file (using Cloudinary or your media service)
-            var mediaUrl = await _cloudinaryService.UploadMediaFileAsync(mediaFile);
-            if (string.IsNullOrEmpty(mediaUrl.Item1))
+            var mediaData = await _cloudinaryService.UploadMediaFileAsync(mediaFile);
+            if (String.IsNullOrEmpty(mediaData.Item1)||String.IsNullOrEmpty(mediaData.Item2))
             {
                 return BadRequest("Media upload failed");
             }
@@ -142,7 +159,10 @@ namespace SimpleSocialApp.Controllers
                 return NotFound();
             }
 
-            user.Media = new Media { Url = mediaUrl.Item1 };
+            user.Media = new Media { 
+                Url = mediaData.Item1,
+                PublicId = mediaData.Item2
+            };
             await _userService.UpdateAsync(user);
 
             // Redirect back to the profile

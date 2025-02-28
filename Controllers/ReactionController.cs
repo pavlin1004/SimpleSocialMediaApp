@@ -5,7 +5,7 @@ using SimpleSocialApp.Data.Models;
 using Microsoft.Extensions.Hosting;
 
 namespace SimpleSocialApp.Controllers
-{
+{ 
     public class ReactionController : Controller
     {
         private readonly IPostService _postService;
@@ -18,10 +18,11 @@ namespace SimpleSocialApp.Controllers
             _commentService = commentService;
             _reactionService = reactionService;
         }
-
+       
         [HttpPost]
         public async Task<IActionResult> ToggleLike(string targetType, string targetId)
         {
+           
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(currentUserId))
                 return Unauthorized();
@@ -42,8 +43,7 @@ namespace SimpleSocialApp.Controllers
                     await _postService.ToggleLike(targetId, false);
                 }
                 else
-                {
-                   
+                {                  
                     var reaction = new Reaction
                     {
                         UserId = currentUserId,

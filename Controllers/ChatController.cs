@@ -29,21 +29,38 @@ namespace SimpleSocialApp.Controllers
 
         public async Task<IActionResult> Index(string chatId)
         {
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+           
             var chat = await _chatService.GetConversationAsync(chatId);
             if (chat == null)
             {
                 return NotFound();
             }
-
-            var model = new ChatIndexViewModel
+            if (chat.Type == ChatType.Group)
             {
-                Title = chat.Title,
-                OwnerId = chat.OwnerId,
-                ChatId = chat.Id,
-                Messages = chat.Messages?.OrderBy(m => m.TimeSent).ToList() ?? new List<Message>()
-            };
+                return View(new ChatIndexViewModel
+                {
+                    Title = chat.Title,
+                    OwnerId = chat.OwnerId,
+                    ChatId = chat.Id,
+                    IsGroup = true,
+                    Messages = chat.Messages?.OrderBy(m => m.TimeSent).ToList() ?? new List<Message>(),
+                     
+                });
+            }
+            else
+            {
+                var friendInChat = chat.Users.Where(u => u.Id != currentUserId).FirstOrDefault();
+                return View(new ChatIndexViewModel
+                {
+                    OtherUser = String.Concat(friendInChat.FirstName, " ", friendInChat.LastName),
+                    ChatId = chat.Id,
+                    Messages = chat.Messages?.OrderBy(m => m.TimeSent).ToList() ?? new List<Message>(),
+                    IsGroup = false
+                });
+            }
 
-            return View(model);
+            
         }
 
         public async Task<IActionResult> ListChat(string userId)

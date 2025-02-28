@@ -1,9 +1,9 @@
-﻿// like-handler.js
-$(document).ready(function () {
+﻿$(document).ready(function () {
     // Handle like/unlike button click
     $('.like-button').click(function () {
         var targetType = $(this).data('target-type');
         var targetId = $(this).data('target-id');
+        var icon = $(this).find('svg'); // Find the SVG icon inside the button
 
         // Send AJAX request to toggle like/unlike
         $.ajax({
@@ -18,12 +18,11 @@ $(document).ready(function () {
                     // Update the like count
                     $('#like-count-' + targetId).text(response.newLikeCount);
 
-                    // Toggle the button text (Like/Unlike)
-                    var button = $('[data-target-id="' + targetId + '"]');
+                    // Toggle the SVG color based on like status
                     if (response.isLiked) {
-                        button.text('Unlike');
+                        icon.css('fill', 'blue'); // Change to blue when liked
                     } else {
-                        button.text('Like');
+                        icon.css('fill', 'currentColor'); // Revert back to the default color when unliked
                     }
                 } else {
                     alert('An error occurred: ' + response.message);

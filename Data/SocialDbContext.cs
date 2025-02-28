@@ -135,7 +135,10 @@ namespace SimpleSocialApp.Data
                 .HasForeignKey(r => r.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-     
+            builder.Entity<Reaction>()
+                .HasIndex(r => new { r.UserId, r.PostId })
+                .IsUnique();
+
             builder.Entity<Message>()
                 .HasMany(m => m.Media)
                 .WithOne(m => m.Message)

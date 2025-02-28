@@ -80,10 +80,14 @@ namespace SimpleSocialApp.Controllers
                 }
                 foreach (var media in model.MediaFiles)
                 {
-                    var mediaUrl = await _cloudinaryService.UploadMediaFileAsync(media);
-                    if (!String.IsNullOrEmpty(mediaUrl.Item1))
+                    var mediaData = await _cloudinaryService.UploadMediaFileAsync(media);
+                    if (!String.IsNullOrEmpty(mediaData.Item1) && !String.IsNullOrEmpty(mediaData.Item2))
+                        
                     {
-                        p.Media.Add(new Media { Url = mediaUrl.Item1 });
+                        p.Media.Add( new Media {
+                                Url = mediaData.Item1,
+                                PublicId = mediaData.Item2
+                            });
                     }
                     else
                     {
@@ -194,9 +198,8 @@ namespace SimpleSocialApp.Controllers
 
             if (post.UserId != currentUserId)
             {
-                return Forbid(); // More appropriate than Unauthorized for permission issues
+                return Unauthorized(); // More appropriate than Unauthorized for permission issues
             }
-
             // Perform deletion
             await _postService.DeletePostAsync(postId);
 
