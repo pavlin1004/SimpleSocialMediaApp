@@ -105,28 +105,24 @@ namespace SimpleSocialApp.Controllers
         {
 
             var post = await _postService.GetPostByIdAsync(postId);
-            var comments = await _commentService.GetAllPostComments(postId);
             if (post == null)
             {
                 throw new ArgumentNullException("");
             }
-
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (currentUserId == null)
             {
                 return BadRequest();
             }
-            var hasReacted = false;
-            if (await _reactionService.SearchPostReactionAsync(postId, currentUserId) != null)
-            {
-                hasReacted = true;
-            }
+
+            var comments = await _commentService.GetAllPostComments(postId);
 
             var viewModel = new PostViewModel
             {
                 Post = post,
                 Comments = comments,
-                HasReacted = hasReacted
+                CommentsCount = await _postService.GetCommentsCountAsync(postId),
+                LikesCount = await _postService.GetLikesCountAsync(postId)
             };
 
             return View(viewModel);

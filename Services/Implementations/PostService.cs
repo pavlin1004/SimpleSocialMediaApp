@@ -31,7 +31,7 @@ namespace SimpleSocialApp.Services.Implementations
                 .Include(x => x.Media)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
-        public async Task<IEnumerable<Post>> GetAllUserPostsAsync(string userId)
+        public async Task<ICollection<Post>> GetAllUserPostsAsync(string userId)
         {
             return await _context.Posts
                 .Include(p => p.Comments)
@@ -41,7 +41,7 @@ namespace SimpleSocialApp.Services.Implementations
                 .Where(p => p.UserId == userId)
                 .ToListAsync();
         }
-        public async Task<IEnumerable<Post>> GetAllUserFriendsPostsAsync(string userId)
+        public async Task<ICollection<Post>> GetAllUserFriendsPostsAsync(string userId)
         {
             var friends = await _userService.GetAllUserFriendsAsync(userId);
             var ids = friends.Select(x => x.Id).ToList();
@@ -68,28 +68,14 @@ namespace SimpleSocialApp.Services.Implementations
                 await _context.SaveChangesAsync();
             }
         }
-        public async Task ToggleComment(string postId, bool toLike)
+        public async Task<int> GetCommentsCountAsync(string postId)
         {
-            var post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == postId);
-            if (post != null)
-            {
-                if (toLike == true) post.CommentCount++;
-                else post.CommentCount--;
-                _context.Posts.Update(post);
-                await _context.SaveChangesAsync();
-            }
+            return await _context.Comments.Where(c => c.PostId == postId).CountAsync();          
         }
 
-        public async Task ToggleLike(string postId, bool toLike)
+        public async Task<int> GetLikesCountAsync(string postId)
         {
-            var post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == postId);
-            if (post != null)
-            {
-                if (toLike == true) post.LikesCount++;
-                else post.LikesCount--;
-                _context.Posts.Update(post);
-                await _context.SaveChangesAsync();
-            }
+            return await _context.Reactions.Where(r => r.PostId == postId).CountAsync();
         }
     }
 }        

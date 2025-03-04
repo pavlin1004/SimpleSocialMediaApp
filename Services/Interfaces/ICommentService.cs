@@ -12,8 +12,7 @@ namespace SimpleSocialApp.Services.Interfaces
         public Task CreateCommentAsync(Comment comment);
         public Task UpdateCommentAsync(Comment comment);
         public Task DeleteCommentByIdAsync(string commentId);
-
-        public Task ToggleLike(string commentId, bool toLike);
+        public Task<int> GetLikesCountAsync(string commentId);
         public Task DeleteCommentAsync(Comment comment);
     }
 }

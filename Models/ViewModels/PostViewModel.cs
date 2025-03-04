@@ -5,11 +5,10 @@ namespace SimpleSocialApp.Models.ViewModels
 {
     public class PostViewModel
     { 
-
         public required Post Post { get; set; }
-        public IEnumerable<Comment>? Comments { get; set; }
-        public required bool HasReacted { get; set; }
+        public ICollection<Comment>? Comments { get; set; }
+        public required int CommentsCount { get; set; }
 
-
+        public required int LikesCount { get; set; }
     }
 }

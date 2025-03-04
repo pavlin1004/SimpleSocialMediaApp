@@ -8,7 +8,7 @@ namespace SimpleSocialApp.Models.ViewModels
 
         public Friendship? FriendshipStatus { get; set; }
 
-        public required IEnumerable<Post?> Posts { get; set; }
+        public required IEnumerable<PostViewModel> Posts { get; set; }
 
         public bool IsCurrentUser { get; set; }
     }

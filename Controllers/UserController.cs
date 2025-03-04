@@ -20,9 +20,10 @@ namespace SimpleSocialApp.Controllers
         private readonly IPostService _postService;
         private readonly IMediaService _mediaService;
         private readonly ICloudinaryService _cloudinaryService;
-        private readonly IChatService _chatService; 
+        private readonly IChatService _chatService;
+        private readonly ICommentService _commentService;
 
-        public UserController(IUserService userService, IFriendshipService friendshipService, IPostService postService, IMediaService mediaService, ICloudinaryService cloudinaryService, IChatService chatService)
+        public UserController(IUserService userService, IFriendshipService friendshipService, IPostService postService, IMediaService mediaService, ICloudinaryService cloudinaryService, IChatService chatService, ICommentService commentService)
         {
             _userService = userService;
             _friendshipService = friendshipService;
@@ -30,6 +31,7 @@ namespace SimpleSocialApp.Controllers
             _mediaService = mediaService;
             _cloudinaryService = cloudinaryService;
             _chatService = chatService;
+            _commentService = commentService;
         }
 
         [HttpGet]
@@ -47,6 +49,18 @@ namespace SimpleSocialApp.Controllers
             // Fetch posts
             var posts = await _postService.GetAllUserPostsAsync(userId);
 
+            var postViewModels = new List<PostViewModel>();
+
+            foreach(var post in posts)
+            {
+                postViewModels.Add(new PostViewModel
+                {
+                    Post = post,
+                    Comments = await _commentService.GetAllPostComments(post.Id),
+                    LikesCount = await _postService.GetLikesCountAsync(post.Id),
+                    CommentsCount = await _postService.GetCommentsCountAsync(post.Id)
+                });
+            }
             // Fetch friendship status or default to "None"
             Friendship? friendshipStatus = null;
             friendshipStatus = await _friendshipService.CheckFriendship(currentUserId, userId);
@@ -55,7 +69,7 @@ namespace SimpleSocialApp.Controllers
             var viewModel = new AppUserViewModel
             {
                 User = user,
-                Posts = posts,
+                Posts = postViewModels,
                 FriendshipStatus = friendshipStatus, // Null if no relationship exists
                 IsCurrentUser = (currentUserId == userId)
             };

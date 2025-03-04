@@ -7,7 +7,7 @@
 
         // Send AJAX request to toggle like/unlike
         $.ajax({
-            url: '/Reaction/ToggleLike', // Change the URL to match the correct path in your app
+            url: '/Reaction/ToggleLike', // Ensure this is the correct URL in your app
             type: 'POST',
             data: {
                 targetType: targetType,
@@ -15,10 +15,18 @@
             },
             success: function (response) {
                 if (response.success) {
-                    // Update the like count
-                    $('#like-count-' + targetId).text(response.newLikeCount);
+                    // Debugging: Check what the like count element contains before and after
+                    var likeText = $('#like-count-' + targetId).text();
+                    console.log("Before update: " + likeText);  // Log the current text
 
-                    // Toggle the SVG color based on like status
+                    // Check the response and set the updated like count
+                    var updatedText = "Likes: " + response.newLikeCount; // Updated text with like count
+                    console.log("After update: " + updatedText);  // Log the updated text
+
+                    // Update the like count text (keeping "Likes:" and just changing the number)
+                    $('#like-count-' + targetId).text(updatedText);
+
+                    // Optionally: Toggle the icon's color
                     if (response.isLiked) {
                         icon.css('fill', 'blue'); // Change to blue when liked
                     } else {

@@ -28,45 +28,41 @@ namespace SimpleSocialApp.Controllers
                 return Unauthorized();
 
             int newLikeCount = 0;
-            bool isLiked = false;
 
             if (targetType == "Post")
             {
                 var post = await _postService.GetPostByIdAsync(targetId);
-                if (post == null)
-                    return BadRequest(new { Success = false, Message = "Invalid Post ID." });
+                if(post == null)
+                {
+                    return BadRequest();
+                }
 
                 var existingReaction = await _reactionService.SearchPostReactionAsync(targetId, currentUserId);
-                if (existingReaction !=  null)
+                if (existingReaction != null)
                 {
                     await _reactionService.RemoveLikeAsync(existingReaction);
-                    await _postService.ToggleLike(targetId, false);
                 }
                 else
-                {                  
+                {
                     var reaction = new Reaction
                     {
                         UserId = currentUserId,
                         PostId = targetId
                     };
                     await _reactionService.AddLikeAsync(reaction);
-                    await _postService.ToggleLike(targetId, true);
-                    isLiked = true;
-                    
                 }
-                newLikeCount = post.LikesCount;
+
+                newLikeCount = await _postService.GetLikesCountAsync(targetId);
             }
             else if (targetType == "Comment")
             {
-                var comment = await _commentService.GetCommentAsync(targetId);
-                if (comment == null)
-                    return BadRequest(new { Success = false, Message = "Invalid Comment ID." });
 
-                var existingReaction = await _reactionService.SearchCommentReactionAsync(targetId,currentUserId);
+                var comment = await _commentService.GetCommentAsync(targetId);
+
+                var existingReaction = await _reactionService.SearchCommentReactionAsync(targetId, currentUserId);
                 if (existingReaction != null)
                 {
                     await _reactionService.RemoveLikeAsync(existingReaction);
-                    await _commentService.ToggleLike(targetId, false);
                 }
                 else
                 {
@@ -76,17 +72,16 @@ namespace SimpleSocialApp.Controllers
                         CommentId = targetId
                     };
                     await _reactionService.AddLikeAsync(reaction);
-                    await _commentService.ToggleLike(targetId, true);
-                    isLiked = true;
                 }
-                newLikeCount = comment.LikesCount;
+
+                newLikeCount = await _commentService.GetLikesCountAsync(targetId);
             }
             else
             {
                 return Json(new { success = false, message = "Invalid target type" });
             }
 
-            return Json(new { success = true, newLikeCount, isLiked });
+            return Json(new { success = true, newLikeCount});
         }
     }
 }

@@ -37,7 +37,6 @@ namespace SimpleSocialApp.Controllers
             };
 
             await _commentService.CreateCommentAsync(comment);
-            await _postService.ToggleComment(comment.PostId, true);
 
             return RedirectToAction("Details", "Post", new { postId = comment.PostId });
         }
@@ -103,10 +102,7 @@ namespace SimpleSocialApp.Controllers
             }
 
             await _commentService.DeleteCommentAsync(comment);
-            if (comment.PostId!=null)
-            {
-                await _postService.ToggleComment(comment.PostId, false);
-            }
+
             return RedirectToAction("Details", "Post", new { postId = comment.PostId });
         }
 
