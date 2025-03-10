@@ -1,8 +1,9 @@
-﻿@using SimpleSocialApp.Models.ViewModels
+﻿@using SimpleSocialApp.Data.Enums
+@using SimpleSocialApp.Models.ViewModels.Chats
 @using System.Security.Claims
-@model ChatIndexViewModel
+@model ChatViewModel
 
-@if (Model.IsGroup)
+@if (Model.Type == ChatType.Group )
 {
     <h2>@Model.Title</h2>
     if (Model.OwnerId == User.FindFirstValue(ClaimTypes.NameIdentifier))
@@ -27,17 +28,18 @@
         <input type="hidden" name="actionType" value="Remove" />
         <button type="submit" class="leave-button">Remove Friend</button>
     </form>
+    <form asp-controller="Chat" asp-action="LeaveChat" method="post">
+    <input type="hidden" name="chatId" value="@Model.ChatId" />
+    <button type="submit" class="leave-button">Leave Chat</button>
+</form>
     }
 }
 else
 {
-    <h2>@Model.OtherUser</h2> <!-- Show the other user's name for private chats -->
+    <h2>@Model.FriendName</h2> <!-- Show the other user's name for private chats -->
 }
     <!-- Leave Chat -->
-<form asp-controller="Chat" asp-action="LeaveChat" method="post">
-    <input type="hidden" name="chatId" value="@Model.ChatId" />
-    <button type="submit" class="leave-button">Leave Chat</button>
-</form>
+
 <!-- Display Messages -->
 <div id="chatBox">
     @foreach (var message in Model.Messages)

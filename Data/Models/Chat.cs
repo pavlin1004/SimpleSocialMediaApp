@@ -16,7 +16,6 @@ namespace SimpleSocialApp.Data.Models
         public string Id { get; set; }
         public string? Title { get; set; }
         public DateTime CreatedOn { get; set; }
-
         bool IsDeleted { get; set; } // for keeping two users chat in the database except deleting the whole correspondation
         public ChatType Type { get; set; } // group or private (2 friends) chat
 

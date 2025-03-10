@@ -13,41 +13,7 @@
         <h3>Posts</h3>
         @foreach (var post in Model.Posts)
         {
-            <div class="post">
-                <div class="post-header">
-                    <h4>@post.User.UserName</h4>
-                    <span>@post.PostedOn.ToString("MMM dd, yyyy")</span>
-                </div>
-                <div class="post-content">
-                    <p>@post.Text</p>
-                    @foreach (var media in post.Media)
-                    {
-                        @if (media.Type == MediaType.Image)
-                        {
-                            <img src="@media.Url" alt="Post Image" class="post-image" />
-                        }
-                        else if (media.Type == MediaType.Video)
-                        {
-                            <video controls>
-                                <source src="@media.Url" type="video/mp4" />
-                            </video>
-                        }
-                    }
-                </div>
-                <div class="post-footer">
-                    <span id="like-count-@post.Id">@post.LikesCount</span>
-                    <button class="btn btn-outline-primary like-button" data-target-type="Post" data-target-id="@post.Id">
-                        Like
-                    </button>
-                    <span>@post.CommentCount</span>
-                    @if (post.UserId == currentUserId)
-                    {
-                        <a href="@Url.Action("Edit", "Post", new { postId = post.Id })" class="btn btn-outline-secondary">Edit</a>
-                        <a href="@Url.Action("Delete", "Post", new { postId = post.Id })" class="btn btn-outline-danger">Delete</a>
-                    }
-                    <a href="@Url.Action("Details", "Post", new { postId = post.Id })" class="btn btn-outline-secondary">Comments</a>
-                </div>
-            </div>
+            @await Html.PartialAsync("Post/_PostPartial", post);
         }
     </div>
 

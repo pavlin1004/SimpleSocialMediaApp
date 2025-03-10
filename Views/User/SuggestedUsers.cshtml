@@ -1,12 +1,6 @@
 ﻿@using SimpleSocialApp.Models.ViewModels.AppUsers
 @model List<UserViewModel>
 
-@{
-    ViewData["Title"] = "Search Results";
-}
-
-<h3>Search Results</h3>
-
 @if (Model != null && Model.Any())
 {
     <div class="user-results">
@@ -18,5 +12,5 @@
 }
 else
 {
-    <p>No users found matching your search.</p>
+    <p>No users found.</p>
 }

@@ -5,6 +5,8 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleSocialApp.Data.Enums;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Models.ViewModels;
+using SimpleSocialApp.Models.ViewModels.AppUsers;
+using SimpleSocialApp.Models.ViewModels.Posts;
 using SimpleSocialApp.Services.Implementations;
 using SimpleSocialApp.Services.Interfaces;
 using System.Security.Claims;
@@ -66,7 +68,7 @@ namespace SimpleSocialApp.Controllers
             friendshipStatus = await _friendshipService.CheckFriendship(currentUserId, userId);
 
 
-            var viewModel = new AppUserViewModel
+            var viewModel = new ProfileViewModel
             {
                 User = user,
                 Posts = postViewModels,
@@ -142,50 +144,56 @@ namespace SimpleSocialApp.Controllers
         }
 
         // POST method to handle media file upload and save the media URL to the user profile
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditProfilePicture(IFormFile mediaFile)
-        {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (currentUserId == null || mediaFile == null)
-            {
-                return BadRequest("User or file is missing");
-            }
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> EditProfilePicture(IFormFile mediaFile)
+        //{
+        //    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    if (currentUserId == null || mediaFile == null)
+        //    {
+        //        return BadRequest("User or file is missing");
+        //    }
 
-            // Validate the file type (image)
-            var validImageTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/bmp" };
-            if (!validImageTypes.Contains(mediaFile.ContentType.ToLower()))
-            {
-                return BadRequest("Invalid file type. Only image files are allowed.");
-            }
+        //    // Validate the file type (image)
+        //    var validImageTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/bmp" };
+        //    if (!validImageTypes.Contains(mediaFile.ContentType.ToLower()))
+        //    {
+        //        return BadRequest("Invalid file type. Only image files are allowed.");
+        //    }
 
-            // Upload the file (using Cloudinary or your media service)
-            var mediaData = await _cloudinaryService.UploadMediaFileAsync(mediaFile);
-            if (String.IsNullOrEmpty(mediaData.Item1)||String.IsNullOrEmpty(mediaData.Item2))
-            {
-                return BadRequest("Media upload failed");
-            }
+        //    // Upload the file (using Cloudinary or your media service)
+        //    var mediaData = await _cloudinaryService.UploadMediaFileAsync(mediaFile);
+        //    if (String.IsNullOrEmpty(mediaData.Item1)||String.IsNullOrEmpty(mediaData.Item2))
+        //    {
+        //        return BadRequest("Media upload failed");
+        //    }
 
-            // Update the user's profile with the new image
-            var user = await _userService.GetUserByIdAsync(currentUserId);
-            if (user == null)
-            {
-                return NotFound();
-            }
+        //    // Update the user's profile with the new image
+        //    var user = await _userService.GetUserByIdAsync(currentUserId);
+        //    if (user == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            user.Media = new Media { 
-                Url = mediaData.Item1,
-                PublicId = mediaData.Item2
-            };
-            await _userService.UpdateAsync(user);
+        //    user.Media = new Media { 
+        //        Url = mediaData.Item1,
+        //        PublicId = mediaData.Item2
+        //    };
+        //    await _userService.UpdateAsync(user);
 
-            // Redirect back to the profile
-            return RedirectToAction("Profile", new { userId = currentUserId });
-        }
+        //    // Redirect back to the profile
+        //    return RedirectToAction("Profile", new { userId = currentUserId });
+        //}
 
         [HttpGet]
         public async Task<IActionResult> SearchUsers(string searchQuery)
         {
+            var currentUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if(String.IsNullOrEmpty(currentUser))
+            {
+                return Unauthorized();
+            }
             // If no query is entered, you can either show an empty result or handle it
             if (string.IsNullOrEmpty(searchQuery))
             {
@@ -195,9 +203,42 @@ namespace SimpleSocialApp.Controllers
             // Fetch users based on search query
             var users = await _userService.SearchUsersByNameAsync(searchQuery);
 
-            return View(users); // Return the view with results
+            var model = new List<UserViewModel>();
+            
+            foreach (var user in users)
+            {
+                model.Add(new UserViewModel
+                {
+                    User = user,
+                    IsFriend = await _friendshipService.CheckFriendship(user.Id, currentUser) != null ? true : false
+                }); 
+            }
+
+            return View(model); // Return the view with results
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Friends(string userId)
+        {
+            if(String.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+            var friends = await _friendshipService.GetAllFriends(userId);
+
+            return View(friends);
+        }
+        [HttpGet]
+        public async Task<IActionResult> SuggestedUsers(string userId)
+        {
+            if (String.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+            var nonFriends = await _friendshipService.GetNonFriendUsers(userId);
+
+            return View(nonFriends);
+        }
 
     }
 }

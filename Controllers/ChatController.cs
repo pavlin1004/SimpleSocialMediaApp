@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SimpleSocialApp.Data.Enums;
 using SimpleSocialApp.Data.Models;
+using SimpleSocialApp.Mapping;
 using SimpleSocialApp.Models.InputModels.Chat;
 using SimpleSocialApp.Models.ViewModels;
 using SimpleSocialApp.Models.ViewModels.Chats;
@@ -18,19 +20,25 @@ namespace SimpleSocialApp.Controllers
         private readonly IChatService _chatService;
         private readonly IFriendshipService _friendshipService;
         private readonly IUserService _userService; // Needed for fetching user objects
+        private readonly IMapper _mapper;
        
 
-        public ChatController(IChatService chatService, IFriendshipService friendshipService, IUserService userService)
+        public ChatController(IChatService chatService, IFriendshipService friendshipService, IUserService userService, IMapper mapper)
         {
             _chatService = chatService;
             _friendshipService = friendshipService;
             _userService = userService;
+            _mapper = mapper;
+
         }
 
         public async Task<IActionResult> Index(string chatId)
         {
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-           
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized();
+            }
             var chat = await _chatService.GetConversationAsync(chatId);
             if (chat == null)
             {
@@ -38,29 +46,13 @@ namespace SimpleSocialApp.Controllers
             }
             if (chat.Type == ChatType.Group)
             {
-                return View(new ChatIndexViewModel
-                {
-                    Title = chat.Title,
-                    OwnerId = chat.OwnerId,
-                    ChatId = chat.Id,
-                    IsGroup = true,
-                    Messages = chat.Messages?.OrderBy(m => m.TimeSent).ToList() ?? new List<Message>(),
-                     
-                });
+                return View(_mapper.MapToChatViewModel(chat));
             }
             else
             {
-                var friendInChat = chat.Users.Where(u => u.Id != currentUserId).FirstOrDefault();
-                return View(new ChatIndexViewModel
-                {
-                    OtherUser = String.Concat(friendInChat.FirstName, " ", friendInChat.LastName),
-                    ChatId = chat.Id,
-                    Messages = chat.Messages?.OrderBy(m => m.TimeSent).ToList() ?? new List<Message>(),
-                    IsGroup = false
-                });
+                var friendName = _chatService.GetFriendName(chat, currentUserId);
+                return View(_mapper.MapToChatViewModel(chat, friendName));
             }
-
-            
         }
 
         public async Task<IActionResult> ListChat(string userId)
@@ -70,7 +62,21 @@ namespace SimpleSocialApp.Controllers
                 RedirectToAction("Index", "Home"); 
             }
             var chats = await _chatService.GetConversationsForUserAsync(userId);
-            return View(chats);           
+            var chatViewModelList = new List<ChatViewModel>();
+            foreach(var chat in chats)
+            {
+                if (chat.Type == ChatType.Group)
+                {
+                    chatViewModelList.Add(_mapper.MapToChatViewModel(chat));
+                }
+                else
+                {
+                    var friendName = _chatService.GetFriendName(chat,userId);
+                    chatViewModelList.Add(_mapper.MapToChatViewModel(chat, friendName));
+                }
+            }
+
+            return View(chatViewModelList);           
         }
 
         [HttpGet]
@@ -83,6 +89,11 @@ namespace SimpleSocialApp.Controllers
             }
           
             var friends =  await _friendshipService.GetAllFriends(userId);
+            if(friends == null || friends.Count == 0)
+            {
+                TempData["ErrorMessage"] = "No users available to create a chat.";
+                return RedirectToAction("Index", "Home");
+            }
             var chat = new CreateChatViewModel
             {
                 Users = friends

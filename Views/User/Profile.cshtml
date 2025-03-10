@@ -1,6 +1,6 @@
 ﻿@using System.Security.Claims
 @using SimpleSocialApp.Data.Enums
-@model SimpleSocialApp.Models.ViewModels.AppUserViewModel
+@model SimpleSocialApp.Models.ViewModels.ProfileViewModel
 
 @{
     var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -10,81 +10,98 @@
     ViewData["IsCommentView"] = true;
 }
 
-<div class="profile-header">
-    <!-- Profile Picture on Left -->
-    <div class="profile-picture">
-        @if (string.IsNullOrEmpty(userProfilePictureUrl))
-        {
-            <div class="no-profile-picture">
-                <p>No profile picture set.</p>
+<!-- Wrapper div to center content -->
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <!-- Empty 1/4 section on the left -->
+        <div class="col-lg-3 col-md-3"></div>
+
+        <!-- Middle 2/4 (your content) -->
+        <div class="col-lg-6 col-md-6">
+            <!-- Profile Header -->
+            <div class="profile-header text-center mb-5">
+                <!-- Profile Picture -->
+                <div class="profile-picture mb-4">
+                    @if (string.IsNullOrEmpty(userProfilePictureUrl))
+                    {
+                        <div class="no-profile-picture">
+                            <p class="text-muted">No profile picture set.</p>
+                            @if (Model.IsCurrentUser)
+                            {
+                                <p><a href="@Url.Action("EditProfilePicture", "User")" class="btn btn-outline-primary btn-sm">Add a picture</a></p>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <img src="@userProfilePictureUrl" alt="Profile Picture" class="img-fluid rounded-circle" style="width: 150px; height: 150px; object-fit: cover;" />
+                    }
+                </div>
+
+                <!-- Profile Info -->
+                <h1 class="display-4">@Model.User.FirstName @Model.User.LastName</h1>
                 @if (Model.IsCurrentUser)
                 {
-                    <p><a href="@Url.Action("EditProfilePicture", "User")">Add a picture</a></p>
+                    <p class="text-muted">This is your profile.</p>
                 }
             </div>
-        }
-        else
-        {
-            <img src="@userProfilePictureUrl" alt="Profile Picture" class="img-fluid rounded-circle" />
-        }
-    </div>
 
-    <!-- Profile Info in Center -->
-    <div class="profile-info">
-        <h1>@Model.User.FirstName @Model.User.LastName</h1>
-        @if (Model.IsCurrentUser)
-        {
-            <p class="this-is-your-profile">This is your profile.</p>
-        }
-    </div>
+            <!-- Friendship Status Section -->
+            <div class="friendship-status mt-4 text-center">
+                @if (Model.IsCurrentUser == false)
+                {
+                    @if (Model.FriendshipStatus == null)
+                    {
+                        <!-- No friendship relationship -->
+                        <form method="post" action="@Url.Action("SendFriendRequest", "User", new { userId = Model.User.Id })">
+                            <button type="submit" class="btn btn-primary btn-lg">Send Friend Request</button>
+                        </form>
+                    }
+                    else if (Model.FriendshipStatus.Type == FriendshipType.Pending && Model.FriendshipStatus.SenderId != currentUserId)
+                    {
+                        <!-- Friendship request sent by the current user (pending on the other side) -->
+                        <form method="post" action="@Url.Action("AcceptFriendshipRequest", "User", new { userId = Model.User.Id })">
+                            <button type="submit" class="btn btn-success btn-lg">Accept</button>
+                        </form>
+                        <form method="post" action="@Url.Action("RemoveFriendship", "User", new { userId = Model.User.Id })">
+                            <button type="submit" class="btn btn-danger btn-lg">Reject</button>
+                        </form>
+                    }
+                    else if (Model.FriendshipStatus.Type == FriendshipType.Pending && Model.FriendshipStatus.SenderId == currentUserId)
+                    {
+                        <!-- Friend request sent by current user, allow cancel -->
+                        <form method="post" action="@Url.Action("RemoveFriendship", "User", new { userId = Model.User.Id })">
+                            <button type="submit" class="btn btn-warning btn-lg">Cancel Request</button>
+                        </form>
+                    }
+                    else if (Model.FriendshipStatus.Type == FriendshipType.Accepted)
+                    {
+                        <!-- They are friends -->
+                        <button class="btn btn-info btn-lg" disabled>Friends</button>
+                        <form method="post" action="@Url.Action("RemoveFriendship", "User", new { userId = Model.User.Id })">
+                            <button type="submit" class="btn btn-danger btn-lg">Remove Friend</button>
+                        </form>
+                    }
+                }
+            </div>
 
-    <!-- Friendship Status -->
-    <div class="friendship-status">
-        @if (Model.IsCurrentUser == false)
-        {
-            @if (Model.FriendshipStatus == null)
-            {
-                <!-- No friendship relationship -->
-                <form method="post" action="@Url.Action("SendFriendRequest", "User", new { userId = Model.User.Id })">
-                    <button type="submit" class="btn btn-primary">Send Friend Request</button>
-                </form>
-            }
-            else if (Model.FriendshipStatus.Type == FriendshipType.Pending && Model.FriendshipStatus.SenderId != currentUserId)
-            {
-                <!-- Friendship request sent by the current user (pending on the other side) -->
-                <form method="post" action="@Url.Action("AcceptFriendshipRequest", "User", new { userId = Model.User.Id })">
-                    <button type="submit" class="btn btn-success">Accept</button>
-                </form>
-                <form method="post" action="@Url.Action("RemoveFriendship", "User", new { userId = Model.User.Id })">
-                    <button type="submit" class="btn btn-danger">Reject</button>
-                </form>
-            }
-            else if (Model.FriendshipStatus.Type == FriendshipType.Pending && Model.FriendshipStatus.SenderId == currentUserId)
-            {
-                <!-- Friend request sent by current user, allow cancel -->
-                <form method="post" action="@Url.Action("RemoveFriendship", "User", new { userId = Model.User.Id })">
-                    <button type="submit" class="btn btn-warning">Cancel Request</button>
-                </form>
-            }
-            else if (Model.FriendshipStatus.Type == FriendshipType.Accepted)
-            {
-                <!-- They are friends -->
-                <button class="btn btn-info" disabled>Friends</button>
-                <form method="post" action="@Url.Action("RemoveFriendship", "User", new { userId = Model.User.Id })">
-                    <button type="submit" class="btn btn-danger">Remove Friend</button>
-                </form>
-            }
-        }
-    </div>
-</div>
+            <!-- User's Posts -->
+            <div class="posts-section mt-5">
+                <h3 class="mb-4">Posts</h3>
+                @foreach (var post in Model.Posts)
+                {
+                    @await Html.PartialAsync("Post/_PostPartial", post)
+                }
 
-<!-- User's Posts -->
-<div class="posts-section">
-    <h3>Posts</h3>
-    @foreach (var post in Model.Posts)
-    {
-        @await Html.PartialAsync("_PostPartial", post)
-    }
+                <div class="text-center mt-4">
+                    <a asp-action="Create" asp-controller="Post" class="btn btn-outline-primary btn-lg">Create a new post</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty 1/4 section on the right -->
+        <div class="col-lg-3 col-md-3"></div>
+    </div>
 </div>
 
 <script type="text/javascript" src="~/js/like-handler.js"></script>

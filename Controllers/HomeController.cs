@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Models;
 using SimpleSocialApp.Models.ViewModels;
+using SimpleSocialApp.Models.ViewModels.Posts;
 using SimpleSocialApp.Services.Interfaces;
 using System.Diagnostics;
 using System.Security.Claims;
@@ -12,31 +14,34 @@ namespace SimpleSocialApp.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IPostService _postService;
-
-        public HomeController(ILogger<HomeController> logger, IPostService postService)
-        {
+        private readonly ICommentService _commentService; 
+        public HomeController(ILogger<HomeController> logger, IPostService postService, ICommentService commentService)
+        { 
             _logger = logger;
             _postService = postService;
+            _commentService = commentService; 
         }
-
-        public async Task<IActionResult> Index()
-        {
-            IEnumerable<Post> friendsPosts = Enumerable.Empty<Post>();
-
-
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (!string.IsNullOrEmpty(currentUserId))
+        [Authorize]
+        public async Task<IActionResult> Index() 
+        { var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(currentUserId)) 
+            { 
+                return Unauthorized();
+            } 
+            var friendsPosts = await _postService.GetAllUserFriendsPostsAsync(currentUserId);
+            var postViewModels = new List<PostViewModel>();
+            if (!(friendsPosts == null || friendsPosts.Count == 0)) 
             {
-                friendsPosts = await _postService.GetAllUserFriendsPostsAsync(currentUserId);
-            }
-
-            var model = new HomeIndexViewModel
-            {
-                Posts = friendsPosts
-            };
-
-            return View(model);
+                foreach (var post in friendsPosts) 
+                {
+                    postViewModels.Add(new PostViewModel 
+                    {
+                        Post = post,
+                        Comments = await _commentService.GetAllPostComments(post.Id), 
+                        LikesCount = await _postService.GetLikesCountAsync(post.Id),
+                        CommentsCount = await _postService.GetCommentsCountAsync(post.Id) });
+                } } 
+            return View(new HomeIndexViewModel { Posts = postViewModels }); 
         }
 
         public IActionResult Privacy()

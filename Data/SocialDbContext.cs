@@ -37,8 +37,6 @@ namespace SimpleSocialApp.Data
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-        
-
             builder.Entity<AppUser>()
                 .HasMany(u => u.Chats)
                 .WithMany(c => c.Users)
@@ -48,7 +46,7 @@ namespace SimpleSocialApp.Data
                 .HasOne(u => u.Media)
                 .WithOne(m => m.User)
                 .HasForeignKey<Media>(m => m.UserId)
-                .OnDelete(DeleteBehavior.NoAction);  
+                .OnDelete(DeleteBehavior.Cascade);  
 
             builder.Entity<Friendship>()
                 .HasOne(f => f.Sender)
@@ -80,7 +78,7 @@ namespace SimpleSocialApp.Data
                 .HasMany(p => p.Reacts)
                 .WithOne(r => r.Post)
                 .HasForeignKey(r => r.PostId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             
             builder.Entity<Post>()
@@ -94,7 +92,7 @@ namespace SimpleSocialApp.Data
                 .HasMany(p => p.Media)
                 .WithOne(m => m.Post)
                 .HasForeignKey(m => m.PostId)
-                .OnDelete(DeleteBehavior.NoAction);  
+                .OnDelete(DeleteBehavior.Restrict);  
 
             
             builder.Entity<Chat>()
@@ -108,7 +106,7 @@ namespace SimpleSocialApp.Data
                 .HasMany(c => c.Reacts)
                 .WithOne(r => r.Comment)
                 .HasForeignKey(r => r.CommentId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Comment>()
                 .HasMany(c => c.Media)
@@ -133,7 +131,7 @@ namespace SimpleSocialApp.Data
                 .HasOne(r => r.User)
                 .WithMany()
                 .HasForeignKey(r => r.UserId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Reaction>()
                 .HasIndex(r => new { r.UserId, r.PostId })

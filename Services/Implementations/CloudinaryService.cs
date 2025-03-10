@@ -17,7 +17,7 @@ namespace SimpleSocialApp.Services.Implementations
             _cloudinary = cloudinary;
         }
 
-        public async Task<(string,string)> UploadMediaFileAsync(IFormFile file)
+        public async Task<List<string>?> UploadMediaFileAsync(IFormFile file)
         {
             if (file.ContentType.StartsWith("image/"))
             {
@@ -27,15 +27,15 @@ namespace SimpleSocialApp.Services.Implementations
             {
                 return await UploadVideoAsync(file);
             }
-         
-            return (String.Empty,String.Empty);
+
+            return null;
         }
 
 
 
 
 
-        private async Task<(string,string)> UploadImageAsync(IFormFile image)
+        private async Task<List<string>?> UploadImageAsync(IFormFile image)
         {
             if (image.Length > 0)
             {
@@ -52,13 +52,13 @@ namespace SimpleSocialApp.Services.Implementations
                     };
 
                     var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-                    return (uploadResult.SecureUrl.ToString(),uploadResult.PublicId);
+                    return new List<string> { uploadResult.SecureUrl.ToString(), uploadResult.PublicId, "Image" };
                 }
             }
 
-            return (String.Empty, String.Empty);
+            return null;
         }
-        private async Task<(string,string)> UploadVideoAsync(IFormFile video)
+        private async Task<List<string>?> UploadVideoAsync(IFormFile video)
         {
             if (video.Length > 0)
             {
@@ -70,10 +70,10 @@ namespace SimpleSocialApp.Services.Implementations
                     };
 
                     var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-                    return (uploadResult.SecureUrl.ToString(),uploadResult.PublicId);
+                    return new List<string> { uploadResult.SecureUrl.ToString(), uploadResult.PublicId, "Video" };
                 }
             }
-            return (String.Empty,String.Empty);
+            return null;
         }
 
         public async Task<bool> DeleteMediaAsync(string publicId)

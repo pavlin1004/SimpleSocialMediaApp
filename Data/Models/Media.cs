@@ -21,7 +21,7 @@ namespace SimpleSocialApp.Data.Models
         public string Url { get; set; }
 
         public string PublicId { get; set; }
-        public MediaType Type { get; set; }
+        public MediaOptions Type { get; set; }
         public string? PostId { get; set; }
         public string? CommentId { get; set; }
         public string? MessageId { get; set; }

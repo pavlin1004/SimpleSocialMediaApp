@@ -1,0 +1,30 @@
+﻿@using SimpleSocialApp.Models.ViewModels.AppUsers
+@model UserViewModel
+
+<div class="user-card" style="border: 1px solid #ddd; padding: 10px; margin: 10px 0;">
+    <div class="user-info">
+        <!-- You can use the user's profile picture, or a placeholder if it's missing -->
+       @*  @if (string.IsNullOrEmpty(@Model.Media.Url))
+        {
+            <img src="https://via.placeholder.com/50" alt="@Model.FirstName @Model.LastName" class="rounded-circle" />
+        }
+        else
+        {
+            <img src="@Model.Media.Url" alt="@Model.FirstName @Model.LastName" class="rounded-circle" style="width: 50px; height: 50px;" />
+        } *@
+        <div style="display: inline-block; margin-left: 10px;">
+            <h5>@Model.User.FirstName @Model.User.LastName</h5>
+            <p>@Model.User.UserName</p>
+        </div>
+    </div>
+
+    <!-- Button to go to the user's profile -->
+    <a href="@Url.Action("Profile", "User", new { userId = Model.User.Id })" class="btn btn-primary">Go to Profile</a>
+    @if (!Model.IsFriend)
+    {
+        <form method="post" asp-controller="User" asp-action="SendFriendRequest">
+            <input type="hidden" name="userId" value="@Model.User.Id" />
+            <button type="submit" class="btn btn-primary">Add Friend</button>
+        </form>
+    }
+</div>

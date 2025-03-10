@@ -21,7 +21,7 @@ namespace SimpleSocialApp.Data.Models
 
         public AppUser UserTo { get; set; }
 
-        public AppUser ?UserFrom { get; set; }
+        public AppUser? UserFrom { get; set; }
 
         public string UserToId {  get; set; }
 

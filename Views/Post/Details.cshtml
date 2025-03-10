@@ -1,13 +1,14 @@
 ﻿@using System.Security.Claims
-@model SimpleSocialApp.Models.ViewModels.PostViewModel
+@using SimpleSocialApp.Models.ViewModels.Posts
+@model PostViewModel
 
 @{
     ViewData["ShowActions"] = true;
-    ViewData["IsCommentView"] = false ;
+    ViewData["IsCommentView"] = false;
 }
 
 <div class="post-details">
-    @await Html.PartialAsync("_PostPartial", Model)
+    @await Html.PartialAsync("Post/_PostPartial", Model)
 
     <!-- Comments Section -->
     <!-- Comments Section -->

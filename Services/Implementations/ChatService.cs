@@ -26,7 +26,8 @@ namespace SimpleSocialApp.Services.Implementations
         {
             return await _context.Chats
                 .Where(c => c.Users.Any(u => u.Id == userId)) 
-                .Include(c => c.Messages) 
+                .Include(c => c.Messages)
+                .Include(c => c.Users)
                 .ToListAsync();
         }
 
@@ -73,6 +74,12 @@ namespace SimpleSocialApp.Services.Implementations
             chat.Users.Remove(user);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public string GetFriendName(Chat chat, string currentUserId)
+        {
+            var friend = chat.Users.Where(u => u.Id != currentUserId).FirstOrDefault();
+            return string.Concat(friend.FirstName + " " + friend.LastName).ToString();
         }
     }
 }

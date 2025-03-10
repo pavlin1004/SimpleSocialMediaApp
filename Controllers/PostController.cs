@@ -6,12 +6,15 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SimpleSocialApp.Data;
+using SimpleSocialApp.Data.Enums;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Models.InputModels;
 using SimpleSocialApp.Models.ViewModels;
+using SimpleSocialApp.Models.ViewModels.Posts;
 using SimpleSocialApp.Services.Implementations;
 using SimpleSocialApp.Services.Interfaces;
 
@@ -81,12 +84,13 @@ namespace SimpleSocialApp.Controllers
                 foreach (var media in model.MediaFiles)
                 {
                     var mediaData = await _cloudinaryService.UploadMediaFileAsync(media);
-                    if (!String.IsNullOrEmpty(mediaData.Item1) && !String.IsNullOrEmpty(mediaData.Item2))
+                    if (mediaData != null)
                         
                     {
                         p.Media.Add( new Media {
-                                Url = mediaData.Item1,
-                                PublicId = mediaData.Item2
+                                Url = mediaData[0],
+                                PublicId = mediaData[1],
+                                Type = mediaData[2] == "Image" ? MediaOptions.Image : MediaOptions.Video
                             });
                     }
                     else
@@ -172,7 +176,7 @@ namespace SimpleSocialApp.Controllers
             return RedirectToAction("Details", "Post", new { postId = post.Id });
         }
 
-        [HttpPost]
+       
         public async Task<IActionResult> Delete(string postId)
         {
             if (string.IsNullOrEmpty(postId))
@@ -196,13 +200,17 @@ namespace SimpleSocialApp.Controllers
             {
                 return Unauthorized(); // More appropriate than Unauthorized for permission issues
             }
+
+            foreach(var media in post.Media)
+            {
+                await _cloudinaryService.DeleteMediaAsync(media.PublicId);
+                await _mediaService.RemoveUserMediaAsync(media.Id);
+            }
             // Perform deletion
             await _postService.DeletePostAsync(postId);
 
             // Redirect back to the home page or user profile (if applicable)
             return RedirectToAction("Index", "Home", new { userId = currentUserId });
         }
-
-
     }
 }

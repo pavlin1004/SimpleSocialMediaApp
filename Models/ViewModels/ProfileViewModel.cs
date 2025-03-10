@@ -1,8 +1,9 @@
 ﻿using SimpleSocialApp.Data.Models;
+using SimpleSocialApp.Models.ViewModels.Posts;
 
 namespace SimpleSocialApp.Models.ViewModels
 {
-    public class AppUserViewModel
+    public class ProfileViewModel
     {
         public required AppUser User { get; set; }
 

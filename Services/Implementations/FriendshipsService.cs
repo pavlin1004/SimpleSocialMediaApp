@@ -3,6 +3,7 @@ using SimpleSocialApp.Data;
 using SimpleSocialApp.Data.Enums;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Services.Interfaces;
+using System.Net.WebSockets;
 
 namespace SimpleSocialApp.Services.Implementations
 {
@@ -105,5 +106,19 @@ namespace SimpleSocialApp.Services.Implementations
             var friendships = await GetUserAcceptedFriendshipsAsync(userId);
             return friendships.Select(u => u.SenderId == userId ? u.Receiver : u.Sender).ToList();
         }
+        public async Task<List<AppUser>> GetNonFriendUsers(string userId)
+        {
+            var friends = await _context.Friendships
+                .Where(f => f.SenderId == userId || f.ReceiverId == userId)  // Get friendships where the user is involved
+                .Select(f => f.SenderId == userId ? f.ReceiverId : f.SenderId) // Select the friend's ID
+                .ToListAsync();
+
+            var nonFriends = await _context.Users
+                .Where(u => u.Id != userId && !friends.Contains(u.Id))  // Exclude current user & their friends
+                .ToListAsync();
+
+            return nonFriends;
+        }
+
     }
 }

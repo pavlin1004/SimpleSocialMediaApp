@@ -1,0 +1,19 @@
+﻿@using System.Security.Claims
+@using SimpleSocialApp.Models.ViewModels.AppUsers
+@model List<UserViewModel>
+
+@if (Model != null && Model.Any())
+{
+    <h3>(@Model.Count()) Friends:</h3>
+    <div class="user-results">
+        @foreach (var user in Model)
+        {
+            @await Html.PartialAsync("User/_UserProfilePartial", user)
+        }
+    </div>
+}
+else
+{
+    <p>You have no friends yet.</p>
+    <a asp-controller="User" asp-action="SuggestedUsers" asp-all-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)">Find new friends</a>
+}

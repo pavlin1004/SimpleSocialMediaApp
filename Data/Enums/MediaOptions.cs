@@ -1,6 +1,6 @@
 ﻿namespace SimpleSocialApp.Data.Enums
 {
-    public enum MediaType
+    public enum MediaOptions
     {
         Image,
         Video

@@ -41,7 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Views\Shared\_PostPartial.cshtml" />
+    <None Include="Views\Shared\Post\_PostPartial.cshtml" />
   </ItemGroup>
 
 </Project>

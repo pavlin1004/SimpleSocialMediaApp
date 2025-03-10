@@ -1,9 +1,10 @@
 ﻿using SimpleSocialApp.Data.Models;
+using SimpleSocialApp.Models.ViewModels.Posts;
 
 namespace SimpleSocialApp.Models.ViewModels
 {
     public class HomeIndexViewModel
     {
-        public required IEnumerable<Post> Posts { get; set; }
+        public required ICollection<PostViewModel> Posts { get; set; }
     }
 }
