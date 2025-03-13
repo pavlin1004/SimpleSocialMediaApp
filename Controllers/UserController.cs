@@ -106,18 +106,11 @@ namespace SimpleSocialApp.Controllers
 
             var currentUser = await _userService.GetUserByIdAsync(currentUserId);
             var friend = await _userService.GetUserByIdAsync(userId);
-            if(currentUser != null && friend != null)
+            if (currentUser != null && friend != null)
             {
-                var chat = new Chat {
-                    CreatedOn = DateTime.Now,
-                    Type = ChatType.Private
-                };
-                chat.Users.Add(currentUser);
-                chat.Users.Add(friend);
-
-            await _chatService.CreateConversationAsync(chat);
+                await _chatService.CreatePrivateChatAsync(currentUser, friend);
+            } 
             await _friendshipService.AcceptUserFriendshipAsync(currentUserId, userId);
-            }  
             return RedirectToAction("Profile", new { userId });
         }
 

@@ -77,5 +77,9 @@ namespace SimpleSocialApp.Services.Implementations
         {
             return await _context.Reactions.Where(r => r.CommentId == commentId).CountAsync();
         }
+        public async Task<bool> AnyAsync()
+        {
+            return await _context.Comments.AnyAsync();
+        }
     }
 }

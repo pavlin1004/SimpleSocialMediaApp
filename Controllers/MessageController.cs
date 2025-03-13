@@ -45,7 +45,7 @@ namespace SimpleSocialApp.Controllers
             {
                 UserId = currentUserId,
                 ChatId = model.ChatId,
-                TimeSent = DateTime.UtcNow,
+                CreatedDateTime = DateTime.UtcNow,
                 Content = model.Content
             };
 
@@ -54,7 +54,7 @@ namespace SimpleSocialApp.Controllers
 
             await _messageService.CreateMessageAsync(message);
 
-            await _hubContext.Clients.Group(model.ChatId).SendAsync("ReceiveMessage",user.FirstName, message.Content, message.TimeSent.ToString("HH:mm:ss"));
+            await _hubContext.Clients.Group(model.ChatId).SendAsync("ReceiveMessage",user.FirstName, message.Content, message.CreatedDateTime.ToString("HH:mm:ss"));
 
             return BadRequest();
         }

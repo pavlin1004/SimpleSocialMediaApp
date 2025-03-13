@@ -106,6 +106,13 @@ namespace SimpleSocialApp.Services.Implementations
             var friendships = await GetUserAcceptedFriendshipsAsync(userId);
             return friendships.Select(u => u.SenderId == userId ? u.Receiver : u.Sender).ToList();
         }
+
+        public async Task<List<string>> GetAllFriendsIds(string userId)
+        {
+            var friends = await GetAllFriends(userId);
+            return friends.Select(f => f.Id).ToList();
+        }
+
         public async Task<List<AppUser>> GetNonFriendUsers(string userId)
         {
             var friends = await _context.Friendships
@@ -119,6 +126,20 @@ namespace SimpleSocialApp.Services.Implementations
 
             return nonFriends;
         }
+
+        public async Task<bool> AnyAsync()
+        {
+            return await _context.Friendships.AnyAsync();
+        }
+        public async Task CreateAsync(Friendship f)
+        {
+            if(f!=null)
+            {
+                await _context.Friendships.AddAsync(f);
+                await _context.SaveChangesAsync();
+            }
+        }
+
 
     }
 }

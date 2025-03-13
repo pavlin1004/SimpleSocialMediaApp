@@ -17,7 +17,6 @@ namespace SimpleSocialApp.Data.Models
         public string Id { get; set; }
 
         [Required]
-        [Url(ErrorMessage = "Invalid URL.")]
         public string Url { get; set; }
 
         public string PublicId { get; set; }

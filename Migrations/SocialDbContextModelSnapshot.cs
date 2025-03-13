@@ -257,7 +257,7 @@ namespace SimpleSocialApp.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("CreatedOn")
+                    b.Property<DateTime>("CreatedDateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("OwnerId")
@@ -283,7 +283,7 @@ namespace SimpleSocialApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedOnDate")
+                    b.Property<DateTime>("CreatedDateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("LikesCount")
@@ -394,7 +394,7 @@ namespace SimpleSocialApp.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("TimeSent")
+                    b.Property<DateTime>("CreatedDateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
@@ -415,7 +415,7 @@ namespace SimpleSocialApp.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("DateTime")
+                    b.Property<DateTime>("CreatedDateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Text")
@@ -446,19 +446,13 @@ namespace SimpleSocialApp.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("CommentCount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LikesCount")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("PostedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Text")
+                    b.Property<string>("Content")
                         .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("nvarchar(40)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("CreatedDateTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -617,7 +611,7 @@ namespace SimpleSocialApp.Migrations
                     b.HasOne("SimpleSocialApp.Data.Models.Comment", "Comment")
                         .WithMany("Media")
                         .HasForeignKey("CommentId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("SimpleSocialApp.Data.Models.Message", "Message")
                         .WithMany("Media")
@@ -627,12 +621,12 @@ namespace SimpleSocialApp.Migrations
                     b.HasOne("SimpleSocialApp.Data.Models.Post", "Post")
                         .WithMany("Media")
                         .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("SimpleSocialApp.Data.Models.AppUser", "User")
                         .WithOne("Media")
                         .HasForeignKey("SimpleSocialApp.Data.Models.Media", "UserId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Comment");
 
@@ -696,17 +690,17 @@ namespace SimpleSocialApp.Migrations
                     b.HasOne("SimpleSocialApp.Data.Models.Comment", "Comment")
                         .WithMany("Reacts")
                         .HasForeignKey("CommentId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("SimpleSocialApp.Data.Models.Post", "Post")
                         .WithMany("Reacts")
                         .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("SimpleSocialApp.Data.Models.AppUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Comment");

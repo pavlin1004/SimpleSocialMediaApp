@@ -23,12 +23,13 @@ namespace SimpleSocialApp.Controllers
         }
         [Authorize]
         public async Task<IActionResult> Index() 
-        { var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        { 
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(currentUserId)) 
             { 
                 return Unauthorized();
             } 
-            var friendsPosts = await _postService.GetAllUserFriendsPostsAsync(currentUserId);
+            var friendsPosts = await _postService.GetAllAsync();
             var postViewModels = new List<PostViewModel>();
             if (!(friendsPosts == null || friendsPosts.Count == 0)) 
             {

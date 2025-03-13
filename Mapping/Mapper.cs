@@ -10,7 +10,7 @@ namespace SimpleSocialApp.Mapping
             return new ChatViewModel
             {
                 ChatId = chat.Id,
-                Messages = chat.Messages?.OrderBy(c => c.TimeSent).ToList() ?? new List<Message>(),
+                Messages = chat.Messages?.OrderBy(c => c.CreatedDateTime).ToList() ?? new List<Message>(),
                 Type = chat.Type,
                 FriendName = friendName,
                 Title = null,
@@ -22,7 +22,7 @@ namespace SimpleSocialApp.Mapping
             return new ChatViewModel
             {
                 ChatId = chat.Id,
-                Messages = chat.Messages?.OrderBy(c => c.TimeSent).ToList() ?? new List<Message>(),
+                Messages = chat.Messages?.OrderBy(c => c.CreatedDateTime).ToList() ?? new List<Message>(),
                 Type = chat.Type,
                 FriendName = null,
                 Title = chat.Title,

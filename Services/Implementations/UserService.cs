@@ -103,6 +103,16 @@ namespace SimpleSocialApp.Services.Implementations
                 .ToListAsync();
         }
 
+        public async Task<bool> AnyAsync()
+        {
+            return await _context.Users.AnyAsync();
+        }
+
+        public Task<List<AppUser>> GetAllAsync()
+        {
+            return _context.Users.ToListAsync();
+        }
+
 
     }
 }

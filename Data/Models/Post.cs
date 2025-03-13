@@ -16,16 +16,11 @@ namespace SimpleSocialApp.Data.Models
         [Key]
         public string Id { get; set; }
 
-
-        [StringLength(40, ErrorMessage = "Last Name can't be longer than 40 characters")]
-        public string Text { get; set; }
+        [MaxLength(1000)]
+        public string Content { get; set; }
 
         [Required]
-        public DateTime PostedOn { get; set; }
-
-        public int CommentCount { get; set; }
-
-        public int LikesCount { get; set; }
+        public DateTime CreatedDateTime { get; set; }
 
         public string UserId { get; set; }
 

@@ -19,7 +19,7 @@ namespace SimpleSocialApp.Data.Models
 
         public string Content { get; set; }
 
-        public DateTime CreatedOnDate { get; set; }
+        public DateTime CreatedDateTime { get; set; }
 
         public string UserId { get; set; }
         public string? PostId { get; set; }

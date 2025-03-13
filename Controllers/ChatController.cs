@@ -125,7 +125,7 @@ namespace SimpleSocialApp.Controllers
                 OwnerId = currentUserId,
                 Title = model.Title,
                 Type = ChatType.Group,
-                CreatedOn = DateTime.Now,
+                CreatedDateTime = DateTime.Now,
             };
 ;
             foreach (var participantId in model.ParticipantsIds)

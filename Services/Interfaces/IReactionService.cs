@@ -20,6 +20,8 @@ namespace SimpleSocialApp.Services.Interfaces
         public Task<int> GetCommentReactionCountAsync(string commentId);
 
         public Task<int> GetPostReactionCountAsync(string postId);
-       
+
+        public Task<bool> AnyAsync();
+
     }
 }

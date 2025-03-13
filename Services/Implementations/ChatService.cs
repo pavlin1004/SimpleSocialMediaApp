@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow;
 using Microsoft.EntityFrameworkCore;
 using SimpleSocialApp.Data;
+using SimpleSocialApp.Data.Enums;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Services.Interfaces;
 
@@ -43,6 +44,23 @@ namespace SimpleSocialApp.Services.Implementations
            _context.Chats.Add(conversation);
             await _context.SaveChangesAsync();
         }
+
+        public async Task CreatePrivateChatAsync(AppUser? first, AppUser? second)
+        {
+            if (first != null && second != null)
+            {
+
+                var chat = new Chat
+                {
+                    CreatedDateTime = DateTime.UtcNow,
+                    Type = ChatType.Private,
+                    Users = new HashSet<AppUser> { first, second }
+                };
+                _context.Chats.Add(chat);
+                await _context.SaveChangesAsync();
+            }
+        }
+
         public async Task UpdateConversationAsync(Chat conversation)
         {
             _context.Chats.Update(conversation);
@@ -80,6 +98,11 @@ namespace SimpleSocialApp.Services.Implementations
         {
             var friend = chat.Users.Where(u => u.Id != currentUserId).FirstOrDefault();
             return string.Concat(friend.FirstName + " " + friend.LastName).ToString();
+        }
+
+        public async Task<bool> AnyAsync()
+        {
+            return await _context.Chats.AnyAsync();
         }
     }
 }

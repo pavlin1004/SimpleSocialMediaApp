@@ -35,7 +35,7 @@ namespace SimpleSocialApp.Data
                 .HasMany(u => u.Posts)
                 .WithOne(p => p.User)
                 .HasForeignKey(p => p.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade);//////////
 
             builder.Entity<AppUser>()
                 .HasMany(u => u.Chats)
@@ -46,7 +46,7 @@ namespace SimpleSocialApp.Data
                 .HasOne(u => u.Media)
                 .WithOne(m => m.User)
                 .HasForeignKey<Media>(m => m.UserId)
-                .OnDelete(DeleteBehavior.Cascade);  
+                .OnDelete(DeleteBehavior.Cascade);  //////////////////
 
             builder.Entity<Friendship>()
                 .HasOne(f => f.Sender)
@@ -67,7 +67,7 @@ namespace SimpleSocialApp.Data
             builder.Entity<Notification>()
                 .HasOne(n => n.UserTo)
                 .WithMany(u => u.Notifications)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade);//////////////////
 
             builder.Entity<Notification>()
                 .HasOne(n => n.UserFrom)
@@ -78,14 +78,14 @@ namespace SimpleSocialApp.Data
                 .HasMany(p => p.Reacts)
                 .WithOne(r => r.Post)
                 .HasForeignKey(r => r.PostId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade);/////////
 
             
             builder.Entity<Post>()
                 .HasMany(p => p.Comments)
                 .WithOne(c => c.Post)
                 .HasForeignKey(c => c.PostId)
-                .OnDelete(DeleteBehavior.Cascade);  
+                .OnDelete(DeleteBehavior.Cascade);  ///////////////
 
        
             builder.Entity<Post>()
@@ -99,20 +99,20 @@ namespace SimpleSocialApp.Data
                 .HasMany(c => c.Messages)
                 .WithOne(m => m.Chat)
                 .HasForeignKey(m => m.ChatId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade);/////////////////
 
       
             builder.Entity<Comment>()
                 .HasMany(c => c.Reacts)
                 .WithOne(r => r.Comment)
                 .HasForeignKey(r => r.CommentId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Comment>()
                 .HasMany(c => c.Media)
                 .WithOne(m => m.Comment)
                 .HasForeignKey(m => m.CommentId)
-                .OnDelete(DeleteBehavior.Cascade);  
+                .OnDelete(DeleteBehavior.Restrict);  
 
             builder.Entity<Comment>()
                 .HasOne(c => c.User)

@@ -6,6 +6,8 @@ using System.Net.WebSockets;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SQLitePCL;
 using Microsoft.Identity.Client;
+using SimpleSocialApp.Data.Enums;
+using CloudinaryDotNet.Actions;
 
 namespace SimpleSocialApp.Services.Implementations
 {
@@ -45,7 +47,7 @@ namespace SimpleSocialApp.Services.Implementations
         {
             var friends = await _userService.GetAllUserFriendsAsync(userId);
             var ids = friends.Select(x => x.Id).ToList();
-            return await _context.Posts.Include(p => p.Media).Where(p => ids.Contains(p.UserId)).OrderByDescending(x => x.PostedOn).ToListAsync();
+            return await _context.Posts.Include(p => p.Media).Where(p => ids.Contains(p.UserId)).OrderByDescending(x => x.CreatedDateTime).ToListAsync();
         }
         public async Task AddPostAsync(Post post)
         {
@@ -76,6 +78,32 @@ namespace SimpleSocialApp.Services.Implementations
         public async Task<int> GetLikesCountAsync(string postId)
         {
             return await _context.Reactions.Where(r => r.PostId == postId).CountAsync();
+        }
+        public async Task<List<Post>> GetAllFriendsPosts(List<string> friends)
+        {
+            return await _context.Posts.Where(p => friends.Contains(p.UserId)).ToListAsync();
+        }
+
+        public async Task AddPostsAsync(List<Post> posts)
+        {
+            _context.Posts.AddRange(posts);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> AnyAsync()
+        {
+            return await _context.Posts.AnyAsync();
+        }
+
+        public async Task<List<Post>> GetAllAsync()
+        {
+            return await _context.Posts
+               .Include(p => p.Comments)
+               .Include(p => p.Reacts)
+               .Include(p => p.User)
+               .Include(p => p.Media)
+               .OrderByDescending(p => p.CreatedDateTime)
+               .ToListAsync();
         }
     }
 }        

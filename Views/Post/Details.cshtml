@@ -25,7 +25,7 @@
                     <div class="comment-header">
                         <p><strong>@comment.User.FirstName @comment.User.LastName</strong></p>
                         <div class="comment-actions">
-                            <span>@comment.CreatedOnDate.ToString("MMM dd, yyyy HH:mm")</span>
+                            <span>@comment.CreatedDateTime.ToString("MMM dd, yyyy HH:mm")</span>
                             @if (comment.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier))
                             {
                                 <a href="@Url.Action("Edit", "Comment", new { commentId = comment.Id })" class="btn btn-outline-secondary">Edit</a>

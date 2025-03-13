@@ -1,14 +1,15 @@
 using CloudinaryDotNet;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SimpleSocialApp.Data;
 using SimpleSocialApp.Data.Models;
+using SimpleSocialApp.Data.Seeders;
+using SimpleSocialApp.External.AI;
 using SimpleSocialApp.Mapping;
 using SimpleSocialApp.Services.Implementations;
 using SimpleSocialApp.Services.Interfaces;
-
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<SocialDbContext>(options =>
@@ -39,6 +40,8 @@ builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IReactionService, ReactionService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IMapper, Mapper>();
+builder.Services.AddScoped<ISeeder, Seeder>();
+builder.Services.AddScoped<IOpenAIService, OpenAIService>();
 builder.Services.AddAuthentication()
     .AddCookie(options =>
     {
@@ -76,5 +79,16 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<SocialDbContext>();
+    var seeder = services.GetRequiredService<ISeeder>();
+
+    await seeder.SeedAsync().ConfigureAwait(false);
+}
+
 
 app.Run();

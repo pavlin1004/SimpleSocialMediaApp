@@ -71,15 +71,13 @@ namespace SimpleSocialApp.Controllers
                 Post p = new Post
                 {
                     UserId = userId,
-                    PostedOn = DateTime.UtcNow,
+                    CreatedDateTime = DateTime.UtcNow,
                     Media = new Collection<Media>(),
-                    LikesCount = 0,
-                    CommentCount = 0
                 };
 
-                if (!String.IsNullOrEmpty(model.Text))
+                if (!String.IsNullOrEmpty(model.Content))
                 {
-                    p.Text = model.Text;
+                    p.Content = model.Content;
                 }
                 foreach (var media in model.MediaFiles)
                 {
@@ -146,7 +144,7 @@ namespace SimpleSocialApp.Controllers
             var viewModel = new EditPostViewModel
             {
                 PostId = post.Id,
-                Text = post.Text
+                Content = post.Content
             };
             return View(viewModel);
         }
@@ -169,7 +167,7 @@ namespace SimpleSocialApp.Controllers
                 return Unauthorized(); 
             }
          
-            post.Text = model.Text;
+            post.Content = model.Content;
 
             await _postService.UpdatePostAsync(post);
 

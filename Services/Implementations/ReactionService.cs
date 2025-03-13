@@ -82,7 +82,10 @@ namespace SimpleSocialApp.Services.Implementations
         {
             return await _context.Reactions.Where(r => r.PostId == postId).CountAsync();
         }
-
+        public async Task<bool> AnyAsync()
+        {
+            return await _context.Reactions.AnyAsync();
+        }
 
 
 

@@ -14,5 +14,7 @@ namespace SimpleSocialApp.Services.Interfaces
         public Task DeleteCommentByIdAsync(string commentId);
         public Task<int> GetLikesCountAsync(string commentId);
         public Task DeleteCommentAsync(Comment comment);
+
+        public Task<bool> AnyAsync();
     }
 }

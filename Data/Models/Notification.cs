@@ -15,7 +15,7 @@ namespace SimpleSocialApp.Data.Models
 
         public string Text {  get; set; }
 
-        public DateTime DateTime { get; set; }
+        public DateTime CreatedDateTime { get; set; }
 
         public NotificationType Type { get; set; }
 

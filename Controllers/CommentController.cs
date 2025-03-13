@@ -33,7 +33,7 @@ namespace SimpleSocialApp.Controllers
                 UserId = userId,
                 PostId = inputModel.PostId,
                 Content = inputModel.Content,
-                CreatedOnDate = DateTime.Now
+                CreatedDateTime = DateTime.Now
             };
 
             await _commentService.CreateCommentAsync(comment);

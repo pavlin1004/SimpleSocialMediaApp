@@ -16,7 +16,7 @@ namespace SimpleSocialApp.Data.Models
         [Key]
         public string Id { get; set; }
         public string? Content { get; set; }
-        public DateTime TimeSent { get; set;}
+        public DateTime CreatedDateTime { get; set;}
 
         public string UserId { get; set; }
 

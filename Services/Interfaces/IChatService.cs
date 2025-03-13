@@ -7,6 +7,8 @@ namespace SimpleSocialApp.Services.Interfaces
         public Task<Chat?> GetConversationAsync(string id);
         public Task<IEnumerable<Chat>> GetConversationsForUserAsync(string userId);
         public Task CreateConversationAsync(Chat conversation);
+
+        public Task CreatePrivateChatAsync(AppUser? first, AppUser? second);
         public Task UpdateConversationAsync(Chat conversation);
         public Task DeleteConversationAsync(string conversationId);
         public Task AddUserAsync(Chat chat, AppUser user);
@@ -15,6 +17,7 @@ namespace SimpleSocialApp.Services.Interfaces
 
         public string GetFriendName(Chat chat, string currentUserId);
 
+        public Task<bool> AnyAsync();
 
     }
 }

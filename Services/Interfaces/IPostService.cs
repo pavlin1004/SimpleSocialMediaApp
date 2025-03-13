@@ -1,4 +1,5 @@
 ﻿using SimpleSocialApp.Data.Models;
+using SQLitePCL;
 
 namespace SimpleSocialApp.Services.Interfaces
 {
@@ -12,5 +13,11 @@ namespace SimpleSocialApp.Services.Interfaces
         public Task DeletePostAsync(string postId);
         public Task<int> GetCommentsCountAsync(string postId);
         public Task<int> GetLikesCountAsync(string postId);
+
+        public Task<List<Post>> GetAllFriendsPosts(List<string> friends);
+
+        public Task AddPostsAsync(List<Post> posts);
+        public Task<bool> AnyAsync();
+        public Task<List<Post>> GetAllAsync();
     }
 }

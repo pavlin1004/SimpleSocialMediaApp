@@ -46,7 +46,7 @@ else
     {
         <div class="message">
             <strong>@message.User.FirstName:</strong>
-            <span class="timestamp">@message.TimeSent.ToString("HH:mm:ss")</span>
+            <span class="timestamp">@message.CreatedDateTime.ToString("HH:mm:ss")</span>
             <p>@message.Content</p>
         </div>
     }
