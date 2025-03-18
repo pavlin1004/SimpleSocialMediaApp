@@ -14,7 +14,8 @@ namespace SimpleSocialApp.Services.Interfaces
         public Task<IEnumerable<AppUser>> SearchUsersByNameAsync(string searchQuery);
         public Task<IEnumerable<AppUser>> GetAllConversationUsersAsync(string userId);
         public Task<bool> AnyAsync();
-
+        public Task AddProfilePictureAsync(AppUser user ,Media media);
+        
         public Task<List<AppUser>> GetAllAsync();
 
     }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using SimpleSocialApp.Data.Models;
 using System.Reflection.Emit;
 
@@ -25,7 +26,7 @@ namespace SimpleSocialApp.Data
         {
             //this.Database.EnsureCreated();
         }
-
+      
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

@@ -1,16 +1,10 @@
-﻿
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.AspNetCore.Mvc;
 using SimpleSocialApp.Data.Enums;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Mapping;
 using SimpleSocialApp.Models.InputModels.Chat;
-using SimpleSocialApp.Models.ViewModels;
 using SimpleSocialApp.Models.ViewModels.Chats;
-using SimpleSocialApp.Services.Implementations;
 using SimpleSocialApp.Services.Interfaces;
-using System;
 using System.Security.Claims;
 
 namespace SimpleSocialApp.Controllers
@@ -87,7 +81,7 @@ namespace SimpleSocialApp.Controllers
             {
                 return Unauthorized();
             }
-          
+
             var friends =  await _friendshipService.GetAllFriends(userId);
             if(friends == null || friends.Count == 0)
             {

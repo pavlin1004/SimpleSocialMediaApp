@@ -112,6 +112,17 @@ namespace SimpleSocialApp.Services.Implementations
         {
             return _context.Users.ToListAsync();
         }
+        public async Task AddProfilePictureAsync(AppUser user, Media media)
+        {
+            if (user != null && media!=null)
+            {
+                user.Media = media;
+                user.MediaId = media.Id;
+                _context.Update(user);
+            }
+            await _context.SaveChangesAsync();
+
+        }
 
 
     }

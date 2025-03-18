@@ -1,0 +1,58 @@
+﻿@using SimpleSocialApp.Data.Enums
+@using SimpleSocialApp.Data.Models
+@using SimpleSocialApp.Models.ViewModels.Chats
+@model List<ChatViewModel>
+
+<div class="chat-list-container">
+    @if (Model.Count != 0)
+    {
+        <h2>Chats</h2>
+        @foreach (var item in Model)
+        {
+           
+            <div class="chat-list-item mb-2">
+                <!-- Chat displayed as a div-like link with hover effect -->
+                <a asp-action="Index" asp-controller="Chat" asp-route-chatId="@item.ChatId" class="chat-link d-block p-3 rounded border text-decoration-none hover-bg-light">
+                    @if (item.Type == ChatType.Group)
+                    {
+                        <h2 class="m-0">@item.Title</h2>
+                    }
+                    else if (item.Type == ChatType.Private)
+                    {
+                        <h2 class="m-0">@item.FriendName</h2>
+                    }
+                </a>
+            </div>
+        }
+    }
+    else
+    {
+        <h3>You participate in no chats yet!</h3>
+    }
+    <div class="create-chat-btn mt-3">
+        <a asp-action="Create" asp-controller="Chat" class="btn btn-success">Create a new chat</a>
+    </div>
+</div>
+
+<style>
+    
+    .chat-list-item {
+        background-color: #343a40; 
+        border-radius: 5px; 
+        transition: background-color 0.3s ease; 
+    }
+
+    .chat-list-item:hover {
+            background-color: #495057; 
+     }
+
+   
+    .chat-link .chat-link:hover {
+        text-decoration: none; 
+        color: white; 
+    }
+
+    .chat-list-item:hover .chat-link {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    }
+</style>

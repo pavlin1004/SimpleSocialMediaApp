@@ -23,6 +23,7 @@ var cloudinary = new Cloudinary(new Account(
     cloudinarySettings["ApiKey"],
     cloudinarySettings["ApiSecret"]
 ));
+builder.Services.AddHttpClient(); 
 
 builder.Services.AddSingleton(cloudinary);
 
@@ -36,12 +37,12 @@ builder.Services.AddScoped<IMediaService, MediaService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
-builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddTransient<IChatService, ChatService>();
 builder.Services.AddScoped<IReactionService, ReactionService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IMapper, Mapper>();
 builder.Services.AddScoped<ISeeder, Seeder>();
-builder.Services.AddScoped<IOpenAIService, OpenAIService>();
+builder.Services.AddScoped<IFakePersonService, FakePersonService>();
 builder.Services.AddAuthentication()
     .AddCookie(options =>
     {

@@ -6,6 +6,7 @@ namespace SimpleSocialApp.Services.Interfaces
     {
         public Task RemoveUserMediaAsync(string mediaId);
 
+        public Task<Media> CreateAsync(Media media);
        
     }
 }

@@ -4,7 +4,7 @@
 
 @{
     var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    var userProfilePictureUrl = Model.User.Media?.Url;
+    var userProfilePictureUrl = @Model.User.Media?.Url;
 
     ViewData["ShowActions"] = true;
     ViewData["IsCommentView"] = true;
@@ -35,6 +35,7 @@
                     else
                     {
                         <img src="@userProfilePictureUrl" alt="Profile Picture" class="img-fluid rounded-circle" style="width: 150px; height: 150px; object-fit: cover;" />
+                        <h3>@Model.User.Gender</h3>
                     }
                 </div>
 

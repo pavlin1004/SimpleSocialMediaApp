@@ -10,7 +10,10 @@ using SimpleSocialApp.Services.Implementations;
 using Microsoft.Identity.Client;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Bogus.DataSets;
+using Microsoft.AspNetCore.Razor.Language;
 using SimpleSocialApp.Data.Enums;
+using System.Security.Policy;
+using CloudinaryDotNet.Actions;
 
 
 public class Seeder : ISeeder
@@ -22,15 +25,19 @@ public class Seeder : ISeeder
     private readonly IPostService _postService;
     private readonly ICommentService _commentService;
     private readonly IReactionService _reactionService;
+    private readonly IMediaService _mediaService;
+    private readonly IFakePersonService _fakePersonService;
 
-  
+
     public Seeder(UserManager<AppUser> userManager,
                 IFriendshipService friendshipService,
                 IUserService userService,
                 IChatService chatService,
                 IPostService postService,
                 ICommentService commentService,
-                IReactionService reactionService)
+                IReactionService reactionService,
+                IFakePersonService fakePersonService,
+                IMediaService mediaService)
     {
         _userManager = userManager;
         _friendshipService = friendshipService;
@@ -39,13 +46,15 @@ public class Seeder : ISeeder
         _postService = postService;
         _commentService = commentService;
         _reactionService = reactionService;
+        _fakePersonService = fakePersonService;
+        _mediaService = mediaService;
     }
 
     public async Task SeedAsync()
     {
         if (!await _userService.AnyAsync())
         {
-            await SeedCustomUsers();
+            //await SeedCustomUsers();
             await SeedRandomUsers();
             await SeedRandomFriendships();
         }
@@ -61,48 +70,107 @@ public class Seeder : ISeeder
     {
         await _userManager.CreateAsync(new AppUser { UserName = "123", Email ="123@abv.bg"}, "123123Aa.");
 
-        var users = new List<AppUser>
-        {
-            new AppUser { FirstName = "Pavlin", LastName = "Marinov"},
-            new AppUser { FirstName = "Olivia", LastName = "Smith"},
-            new AppUser { FirstName = "Emma", LastName = "Williams"},
-            new AppUser { FirstName = "Michael", LastName = "Brown"},
-            new AppUser { FirstName = "Sophia", LastName = "Davis"}
-        };
+        //var users = new List<AppUser>
+        //{
+        //    new AppUser { FirstName = "Pavlin", LastName = "Marinov", Gender = GenderType.Male},
+        //    new AppUser { FirstName = "Olivia", LastName = "Smith", Gender = GenderType.Female},
+        //    new AppUser { FirstName = "Emma", LastName = "Williams", Gender = GenderType.Female},
+        //    new AppUser { FirstName = "Michael", LastName = "Brown", Gender = GenderType.Male},
+        //    new AppUser { FirstName = "Sophia", LastName = "Davis", Gender = GenderType.Female}
+        //};
 
-        for (int i = 0; i < users.Count; i++)
-        {
-            users[i].UserName = string.Concat($"Username{i}");
-            users[i].Email = string.Concat("abv" + $"{i}" + "@abv.bg");
-            var result = await _userManager.CreateAsync(users[i], "TestPassword123.");
-            if (!result.Succeeded)
-            {
-                Console.WriteLine($"Error seeding user {users[i].FirstName} {users[i].LastName}");
-            }
-        }
+        //for (int i = 0; i < users.Count; i++)
+        //{
+        //    users[i].UserName = string.Concat($"Username{i}");
+        //    users[i].Email = string.Concat("abv" + $"{i}" + "@abv.bg");
+        //    var result = await _userManager.CreateAsync(users[i], "TestPassword123.");
+        //    if (!result.Succeeded)
+        //    {
+        //        Console.WriteLine($"Error seeding user {users[i].FirstName} {users[i].LastName}");
+        //    }
+        //}
     }
     public async Task SeedRandomUsers()
     {
-        var userFaker = new Faker<AppUser>()
-         .RuleFor(u => u.Id, () => Guid.NewGuid().ToString()) // Unique ID
-         .RuleFor(u => u.FirstName, f => f.Name.FirstName())
-         .RuleFor(u => u.LastName, f => f.Name.LastName())
-         .RuleFor(u => u.UserName, (f, u) => $"{u.FirstName}.{u.LastName}".ToLower()) // Generate unique username
-         .RuleFor(u => u.Email, (f, u) => f.Internet.Email(u.FirstName, u.LastName))
-         .RuleFor(u => u.Media, () => new Media { Url = "wwwroot/images/custom_profile_picture/default_avatar.jpg", PublicId = ""});
+        var profilePicsUrl = new List<string>();
+        var genders = new List<string>();
 
+        // Fetch random URLs and genders
+        for (int i = 0; i < 50; i++)
+        {
+            var url = await _fakePersonService.FetchRandomImageAsync();
+            if (string.IsNullOrEmpty(url))
+            {
+                Console.WriteLine($"Failed to fetch image URL for user {i}. Skipping...");
+                continue; // Skip if URL is invalid
+            }
+
+            profilePicsUrl.Add(url);
+
+            // Ensure we await DetectGenderAsync properly
+            var gender = _fakePersonService.DetectGenderAsync(url);
+            if (string.IsNullOrEmpty(gender))
+            {
+                Console.WriteLine($"Failed to detect gender for image {url}. Skipping...");
+                continue; // Skip if gender detection fails
+            }
+
+            genders.Add(gender);
+        }
+
+        // Ensure that there are valid data in both lists
+        if (genders.Count == 0) throw new Exception("No valid genders detected.");
+        if (profilePicsUrl.Count == 0) throw new Exception("No valid URLs found.");
+
+        Console.WriteLine($"Total URLs: {profilePicsUrl.Count}, Total Genders: {genders.Count}");
+
+        // Now, let's create the users using Faker
+        var userFaker = new Faker<AppUser>()
+            .RuleFor(u => u.Id, () => Guid.NewGuid().ToString())
+            .RuleFor(u => u.Gender, (f, u) =>
+            {
+                // Set gender based on the detected gender
+                var gender = genders.First() == "Male" ? GenderType.Male : GenderType.Female;
+                genders.RemoveAt(0);
+                return gender;
+            })
+            .RuleFor(u => u.FirstName, (f, u) =>
+            {
+                // Assign first name based on gender
+                return u.Gender == GenderType.Male ? f.Name.FirstName(Name.Gender.Male) : f.Name.FirstName(Name.Gender.Female);
+            })
+            .RuleFor(u => u.LastName, (f, u) =>
+            {
+                // Assign last name based on gender
+                return SanitizeLastName(u.Gender == GenderType.Male ? f.Name.LastName(Name.Gender.Male) : f.Name.LastName(Name.Gender.Female));
+            })
+            .RuleFor(u => u.UserName, (f, u) => $"{u.FirstName}.{u.LastName}".ToLower())
+            .RuleFor(u => u.Email, (f, u) => f.Internet.Email(u.FirstName, u.LastName));
+
+        // Generate the users
         var users = userFaker.Generate(50);
 
-        foreach (var user in users)
+        // Create users in the database
+        for (int i = 0; i < 50; i++)
         {
-            var result = await _userManager.CreateAsync(user, "DontLogIn123@");
+            var result = await _userManager.CreateAsync(users[i], "DontLogIn123@");
             if (!result.Succeeded)
             {
-                Console.WriteLine($"Error seeding user {user.FirstName} {user.LastName}");
+                Console.WriteLine($"Error seeding user {users[i].FirstName} {users[i].LastName}. Errors: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             }
         }
+        for (int i = 0; i < 50; i++)
+        {
+            var media = await _mediaService.CreateAsync(new Media
+            {
+                Url = profilePicsUrl[i],
+                PublicId = " ",
+                Type = MediaOptions.Image,
+                UserId = users[i].Id
+            });
+            await _userService.AddProfilePictureAsync(users[i], media);
+        }
     }
-
     public async Task SeedRandomFriendships()
     {
         var friendships = new HashSet<(string, string)>();
@@ -111,14 +179,14 @@ public class Seeder : ISeeder
         var faker = new Faker();
         var friendshipsCount = 0;
 
-        while(friendshipsCount<100)
+        while (friendshipsCount < 100)
         {
             var firstId = faker.PickRandom(userIds);
             var secondId = faker.PickRandom(userIds);
 
-            if(firstId!=secondId && !friendships.Contains((firstId,secondId)) && !friendships.Contains((secondId,firstId)))
+            if (firstId != secondId && !friendships.Contains((firstId, secondId)) && !friendships.Contains((secondId, firstId)))
             {
-                friendships.Add((firstId,secondId));
+                friendships.Add((firstId, secondId));
                 var friendship = new Friendship
                 {
                     SenderId = firstId,
@@ -147,7 +215,7 @@ public class Seeder : ISeeder
         var posts = postFaker.Generate(60);
         await _postService.AddPostsAsync(posts);
         await SeedPostContentAndImageAsync();
-        
+
     }
 
     //Hardcore seeding for logically connected Content and Images (Option B: AI integration)
@@ -155,10 +223,10 @@ public class Seeder : ISeeder
     {
         var postsData = new List<(string Content, string ImageFile)>
     {
-    ("Exploring the hidden gems of Paris!", "/images/posts/paris_sunset.jpeg"),
-    ("Had the best sushi for dinner last night!", "/images/posts/sushi_lover.jpeg"),
-    ("Weekend getaway to the mountains. Breathtaking views!", "/images/posts/mountain_views.jpeg"),
-    ("Morning coffee and a good book. Perfect start to the day.", "/images/posts/coffee_morning.jpeg"),
+    ("Exploring the hidden gems of Paris!", "/images/posts/paris_sunset.jpeg"), //---------
+    ("Had the best sushi for dinner last night!", "/images/posts/sushi_lover.jpeg"), //---------
+    ("Weekend getaway to the mountains. Breathtaking views!", "/images/posts/mountain_views.jpeg"),//---------
+    ("Morning coffee and a good book. Perfect start to the day.", "/images/posts/coffee_morning.jpg"),//---------
     ("Tried a new recipe today - pasta with homemade pesto!", "/images/posts/pasta_recipe.jpeg"),
     ("A perfect day at the beach! So relaxing.", "/images/posts/beach_vibes.jpeg"),
     ("Sunset at the Grand Canyon. Words can't describe.", "/images/posts/grand_canyon_sunset.jpeg"),
@@ -180,7 +248,7 @@ public class Seeder : ISeeder
     ("Trying out some new fashion trends. Thoughts?", "/images/posts/fashion_trends.jpeg"),
     ("My new favorite smoothie recipe - super refreshing!", "/images/posts/smoothie_time.jpeg"),
     ("Celebrating my best friend's birthday today. So much fun!", "/images/posts/birthday_bash.jpeg"),
-    ("Winter wonderland vibes. Snow is falling and I love it.", "/images/posts/winter_snowfall.jpeg"),
+    ("Winter wonderland vibes. Snow is falling and I love it.", "/images/posts/winter_snowfall.jpeg"), //---------
     ("I could live at the beach forever. This view is everything.", "/images/posts/beach_sunrise.jpeg"),
     ("Saturday morning pancakes! Who else loves pancakes?", "/images/posts/pancake_morning.jpeg"),
     ("Went on a road trip this weekend. Here’s one of my favorite stops!", "/images/posts/road_trip.jpeg"),
@@ -193,7 +261,7 @@ public class Seeder : ISeeder
     ("A lazy Sunday brunch with friends is just what I needed.", "/images/posts/brunch_buddies.jpeg"),
     ("Just finished an amazing book. Can’t wait to start another.", "/images/posts/book_night.jpeg"),
     ("Exploring the city and loving every minute of it!", "/images/posts/city_exploration.jpeg"),
-    ("I love my new plant. It’s like having a piece of nature indoors.", "/images/posts/plant_love.jpeg"),
+    ("I love my new plant. It’s like having a piece of nature indoors.", "/images/posts/plant_lover.jpeg"),
     ("Nothing beats a cozy night in with a great movie.", "/images/posts/movie_night.jpeg"),
     ("Spent the day with my favorite people. Love them to bits.", "/images/posts/friendship_love.jpeg"),
     ("Enjoying a quiet moment with my morning tea.", "/images/posts/morning_tea.jpeg"),
@@ -257,4 +325,14 @@ public class Seeder : ISeeder
             }
         }
     }
+    private string SanitizeLastName(string lastName)
+    {
+        // Replace apostrophes or any other special characters
+        var sanitized = lastName.Replace("'", "_");  // Replace apostrophe with an underscore
+
+        // You can also add more sanitization rules here if needed
+
+        return sanitized;
+    }
 }
+

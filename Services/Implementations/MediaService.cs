@@ -25,5 +25,13 @@ namespace SimpleSocialApp.Services.Implementations
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<Media> CreateAsync(Media media)
+        {
+            await _context.Media.AddAsync(media);
+            await _context.SaveChangesAsync();
+
+            return media;
+        }
     }
 }

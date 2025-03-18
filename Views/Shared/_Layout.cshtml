@@ -4,74 +4,57 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SimpleSocialApp</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-@*     <link rel="stylesheet" href="~/css/social-app.css" asp-append-version="true" />
- *@    <link rel="stylesheet" href="~/SimpleSocialApp.styles.css" asp-append-version="true" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-   
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <title>@ViewData["Title"] - SimpleSocialApp</title>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav id="main-navbar" class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SimpleSocialApp</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-
-                        <li class="nav-item">                       
-                                <form class="d-flex" method="get" asp-action="SearchUsers" asp-controller="User">
-                                    <input class="form-control me-2" type="search" name="searchQuery" placeholder="Search users" aria-label="Search" />
-                                </form>
-                        </li>
-
-                        @if (User.Identity.IsAuthenticated == true)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Profile" asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)">Profile</a>
-                            </li>                          
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Chat" asp-action="ListChat" asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)">Chats</a>
-                            </li>
-                        }
-                        @* <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        @if (User.Identity?.IsAuthenticated==true) // Check if the user is authenticated
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Post" asp-action="Index">Posts</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Friendship" asp-action="Index">Friendships</a>
-                            </li>
-                        } *@
-                    </ul>
+                <a asp-area="" asp-controller="Home" asp-action="Index">SimpleSocialApp</a>
+                <div>
                     <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+
+    <div>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div class="container-fluid pt-5 mt-4">
+                <div class="row">
+                    <div class="col-md-2 position-fixed start-0">
+                        @await Html.PartialAsync("_Navbar")
+                    </div>
+                    <div class="col-md-3"></div>
+                    <main class="col-md-6">
+                        @RenderBody()
+                    </main>
+                    <div class="col-md-3"></div>
+                    <div class="col-md-2 position-fixed end-0">
+                        @await Component.InvokeAsync("ListChat")
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div>
+                <main>
+                    @RenderBody()
+                </main>
+            </div>
+        }
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
+    @* <footer class="fixed-bottom">
+        <div>
             &copy; 2024 - SimpleSocialApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-@*     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
- *@    <script src="~/js/site.js" asp-append-version="true"></script>
+    </footer> *@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
