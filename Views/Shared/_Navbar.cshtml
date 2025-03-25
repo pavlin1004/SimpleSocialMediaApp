@@ -1,26 +1,125 @@
 ﻿@using System.Security.Claims
 <!-- Sidebar Navbar -->
-<div id="sidenav-1" class="sidenav" data-mdb-sidenav-init data-mdb-color="dark" role="navigation" data-mdb-hidden="false"
-     data-mdb-accordion="true">
-    <form class="d-none d-md-flex justify-content-center mx-auto input-group w-auto my-auto" method="get" asp-action="SearchUsers" asp-controller="User">
-        <input class="form-control" type="search" name="searchQuery" placeholder="Search users" aria-label="Search">
+<div class="sidenav">
+    <form method="get" asp-action="SearchUsers" asp-controller="User" class="search-form">
+        <input class="form-control search-bar" type="search" name="searchQuery" placeholder="Search users" aria-label="Search">
     </form>
-    <ul class ="sidenav-menu">
+    <ul class="sidenav-menu">
         <li class="sidenav-item">
-            <a class="nav-link fas fa-history fa-fw me-3" asp-action="Index" asp-controller="Home">
-                <i class="fas fa-home fa-fw me-3"><span>Home</span></i>
-            </a>
+            <div class="nav-button">
+                <a class="nav-link" asp-action="Index" asp-controller="Home">
+                    <span>Home</span>
+                </a>
+            </div>
         </li>
         <li class="sidenav-item">
-            <a class="nav-link fas fa-history fa-fw me-3" asp-area="" asp-controller="User" asp-action="Profile" asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)">
-                <i class="fas fa-home fa-fw me-3"><span>Profile</span></i>
-            </a>
+            <div class="nav-button">
+                <a class="nav-link" asp-area="" asp-controller="User" asp-action="Profile" asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)">
+                    <span>Profile</span>
+                </a>
+            </div>
         </li>
-        <li class="sidenav-item active">
-            <a class="nav-link fas fa-history fa-fw me-3" asp-area="" asp-controller="Chat" asp-action="ListChat">
-                <i class="fas fa-home fa-fw me-3"><span>Chats</span></i>
-            </a>
+        <li class="sidenav-item">
+            <div class="nav-button active">
+                <a class="nav-link" asp-area="" asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)" asp-controller="Chat" asp-action="ListChat">
+                    <span>Chats</span>
+                </a>
+            </div>
         </li>
     </ul>
 </div>
 
+<style>
+    /* Navbar Styles */
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    .sidenav {
+        position: fixed;
+        left: 0;
+        top:56px;
+        height: 92vh; /* Take remaining screen height */
+        width: 250px; /* Sidebar width */
+        background-color: #ecf0f1; /* Light Blue background */
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding-top: 10px;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Sidebar Menu Items */
+    .sidenav-menu {
+        list-style: none;
+        padding: 0;
+        width: 100%; /* Full width */
+    }
+
+    /* Individual Menu Item */
+    .sidenav-item {
+        width: 100%;
+    }
+
+    /* Transparent background for nav button, and apply hover effect */
+    .nav-button {
+        width: 100%; /* Ensure it takes full width */
+        transition: background-color 0.3s ease; /* Smooth transition for background */
+    }
+
+        /* Sidebar Links */
+        .nav-button a {
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+            color: #1E3A8A; /* Dark Blue text */
+            font-size: 16px;
+            text-decoration: none; /* Remove underline */
+            background-color: transparent; /* Transparent background by default */
+            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for background and text color */
+        }
+
+            /* Hover Effect */
+            .nav-button a:hover {
+                background-color: #1E3A8A; /* Dark Blue background on hover */
+                color: white; /* White text on hover */
+            }
+
+    /* Active Link */
+    .sidenav-item.active .nav-button a {
+        background-color: white; /* White background for active link */
+        color: #1E3A8A; /* Dark Blue text */
+        font-weight: bold;
+    }
+
+    /* Search bar styles */
+    .search-form {
+        width: 100%;
+        display: flex;
+        justify-content: center; /* Center the form horizontally */
+        margin-bottom: 20px;
+    }
+
+    .search-bar {
+        width: 80%; /* Adjust width as necessary */
+        padding: 10px;
+        border-radius: 20px; /* Oval edges */
+        border: none;
+        background-color: white; /* White background for the search input */
+        color: black; /* Black text */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+        .search-bar::placeholder {
+            color: #bbb; /* Light grey placeholder text */
+        }
+
+        .search-bar:focus {
+            outline: none; /* Remove the focus outline */
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+        }
+
+</style>

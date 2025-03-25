@@ -33,21 +33,28 @@ namespace SimpleSocialApp.Services.Implementations
                 .Include(x => x.Media)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
-        public async Task<ICollection<Post>> GetAllUserPostsAsync(string userId)
+        public async Task<ICollection<Post>> GetAllUserPostsAsync(string userId, int size, int count=0)
         {
-            return await _context.Posts
+            var friendsPosts = await _context.Posts
                 .Include(p => p.Comments)
                 .Include(p => p.Reacts)
                 .Include(p => p.User)
                 .Include(p => p.Media)
                 .Where(p => p.UserId == userId)
+                .OrderByDescending(p => p.CreatedDateTime)
                 .ToListAsync();
+
+            return friendsPosts.Skip(size * count).Take(size).ToList();
         }
         public async Task<ICollection<Post>> GetAllUserFriendsPostsAsync(string userId)
         {
             var friends = await _userService.GetAllUserFriendsAsync(userId);
             var ids = friends.Select(x => x.Id).ToList();
-            return await _context.Posts.Include(p => p.Media).Where(p => ids.Contains(p.UserId)).OrderByDescending(x => x.CreatedDateTime).ToListAsync();
+
+            return await _context.Posts.Include(p => p.Media)
+                .Where(p => ids.Contains(p.UserId))
+                .OrderByDescending(x => x.CreatedDateTime)
+                .ToListAsync();
         }
         public async Task AddPostAsync(Post post)
         {
@@ -64,8 +71,6 @@ namespace SimpleSocialApp.Services.Implementations
             var post = await GetPostByIdAsync(postId);
             if (post != null)
             {
-                //await _reactService.DeletePostReactsAsync(postId);
-                //await _mediaService.DeleteMediaByPostIdAsync(postId);
                 _context.Posts.Remove(post);
                 await _context.SaveChangesAsync();
             }
@@ -105,6 +110,12 @@ namespace SimpleSocialApp.Services.Implementations
                .OrderByDescending(p => p.CreatedDateTime)
                .ToListAsync();
         }
+        public async Task<List<Post>> GetAllAsync(int size, int count)
+        {
+            var posts = await GetAllAsync();
+            return posts.Skip(count*size).Take(size).ToList();
+        }
+
     }
 }        
 

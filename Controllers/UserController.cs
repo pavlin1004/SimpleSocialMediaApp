@@ -37,7 +37,7 @@ namespace SimpleSocialApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Profile(string userId)
+        public async Task<IActionResult> Profile(string userId, int size = 5, int count = 0)
         {
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (String.IsNullOrEmpty(currentUserId))
@@ -49,11 +49,11 @@ namespace SimpleSocialApp.Controllers
             if (user == null) return NotFound();
 
             // Fetch posts
-            var posts = await _postService.GetAllUserPostsAsync(userId);
+            var posts = await _postService.GetAllUserPostsAsync(userId, size, count);
 
             var postViewModels = new List<PostViewModel>();
 
-            foreach(var post in posts)
+            foreach (var post in posts)
             {
                 postViewModels.Add(new PostViewModel
                 {
@@ -75,8 +75,11 @@ namespace SimpleSocialApp.Controllers
                 FriendshipStatus = friendshipStatus, // Null if no relationship exists
                 IsCurrentUser = (currentUserId == userId)
             };
-
-            return View(viewModel);
+            if (count == 0)
+            {
+                return View(viewModel);
+            }
+            else return PartialView("Post/_PostPartial", postViewModels);
         }
 
         [HttpPost]

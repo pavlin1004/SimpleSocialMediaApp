@@ -9,14 +9,18 @@
 
 @if (isUserLoggedIn)
 {
-    <div class="posts-section">
-        <h3>Posts</h3>
-        @foreach (var post in Model.Posts)
-        {
-            @await Html.PartialAsync("Post/_PostPartial", post);
-        }
-    </div>
+    <div class="main-content">
+        <!-- Posts Section -->
+        <div class="posts-section">
+            <h3>Posts</h3>
+            @await Html.PartialAsync("Post/_PostPartial", Model.Posts)  <!-- Renders each individual post using the PostPartial -->           
+        </div>
 
+        <!-- Invisible Load More Trigger -->
+        <div id="load-more-trigger" style="height: 1px; visibility: hidden;"
+             data-url="@Url.Action("Index", "Home")">
+        </div>
+    </div>
 }
 else
 {
@@ -25,4 +29,6 @@ else
         <p>Please log in to view and interact with posts.</p>
     </div>
 }
+
 <script type="text/javascript" src="~/js/like-handler.js"></script>
+<script type="text/javascript" src="~/js/post-loader.js"></script>

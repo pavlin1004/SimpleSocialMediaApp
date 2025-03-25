@@ -44,6 +44,7 @@
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Views\Post\_PostPartial.cshtml" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\chat.css" />
   </ItemGroup>
 
   <ItemGroup>

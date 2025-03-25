@@ -5,10 +5,11 @@
 @{
     ViewData["ShowActions"] = true;
     ViewData["IsCommentView"] = false;
+    var list = new List<PostViewModel> { Model };
 }
 
 <div class="post-details">
-    @await Html.PartialAsync("Post/_PostPartial", Model)
+    @await Html.PartialAsync("Post/_PostPartial", list)
 
     <!-- Comments Section -->
     <!-- Comments Section -->

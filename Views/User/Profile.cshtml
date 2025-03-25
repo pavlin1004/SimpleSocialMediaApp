@@ -14,10 +14,10 @@
 <div class="container-fluid">
     <div class="row justify-content-center">
         <!-- Empty 1/4 section on the left -->
-        <div class="col-lg-3 col-md-3"></div>
+        <div ></div>
 
         <!-- Middle 2/4 (your content) -->
-        <div class="col-lg-6 col-md-6">
+        <div class=>
             <!-- Profile Header -->
             <div class="profile-header text-center mb-5">
                 <!-- Profile Picture -->
@@ -87,22 +87,26 @@
             </div>
 
             <!-- User's Posts -->
-            <div class="posts-section mt-5">
-                <h3 class="mb-4">Posts</h3>
-                @foreach (var post in Model.Posts)
-                {
-                    @await Html.PartialAsync("Post/_PostPartial", post)
-                }
+            <div class="main-content">
+                <!-- Posts Section -->
+                <div class="posts-section">
+                    <h3>Posts</h3>
+                    @await Html.PartialAsync("Post/_PostPartial", Model.Posts)  <!-- Renders each individual post using the PostPartial -->
+                </div>
 
+                <!-- Invisible Load More Trigger -->
+                <div id="load-more-trigger" style="height: 1px; visibility: hidden;"
+                     data-url="@Url.Action("Profile", "User")">
+                </div>
                 <div class="text-center mt-4">
                     <a asp-action="Create" asp-controller="Post" class="btn btn-outline-primary btn-lg">Create a new post</a>
                 </div>
-            </div>
+            </div>        
         </div>
 
         <!-- Empty 1/4 section on the right -->
         <div class="col-lg-3 col-md-3"></div>
     </div>
 </div>
-
-<script type="text/javascript" src="~/js/like-handler.js"></script>
+<script type="text/javascript" src="/js/like-handler.js" ></script>
+<script type="text/javascript" src="/js/post-loader.js"></script>

@@ -12,8 +12,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<SocialDbContext>(options =>
-    options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<SocialDbContext>(
+    options => options.UseSqlServer(connectionString,
+    sqlOptions => sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 

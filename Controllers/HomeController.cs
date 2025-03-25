@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Models;
 using SimpleSocialApp.Models.ViewModels;
@@ -22,27 +23,36 @@ namespace SimpleSocialApp.Controllers
             _commentService = commentService; 
         }
         [Authorize]
-        public async Task<IActionResult> Index() 
-        { 
+        public async Task<IActionResult> Index(int size = 5, int count = 0)
+        {
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(currentUserId)) 
-            { 
-                return Unauthorized();
-            } 
-            var friendsPosts = await _postService.GetAllAsync();
-            var postViewModels = new List<PostViewModel>();
-            if (!(friendsPosts == null || friendsPosts.Count == 0)) 
+            if (string.IsNullOrEmpty(currentUserId))
             {
-                foreach (var post in friendsPosts) 
+                return Unauthorized();
+            }
+            var friendsPosts = await _postService.GetAllAsync(size, count);
+            var postViewModels = new List<PostViewModel>();
+            if (!(friendsPosts == null || friendsPosts.Count == 0))
+            {
+                foreach (var post in friendsPosts)
                 {
-                    postViewModels.Add(new PostViewModel 
+                    postViewModels.Add(new PostViewModel
                     {
                         Post = post,
-                        Comments = await _commentService.GetAllPostComments(post.Id), 
+                        Comments = await _commentService.GetAllPostComments(post.Id),
                         LikesCount = await _postService.GetLikesCountAsync(post.Id),
-                        CommentsCount = await _postService.GetCommentsCountAsync(post.Id) });
-                } } 
-            return View(new HomeIndexViewModel { Posts = postViewModels }); 
+                        CommentsCount = await _postService.GetCommentsCountAsync(post.Id)
+                    });
+                }
+            }
+            if (count == 0)
+            {
+                return View(new HomeIndexViewModel { Posts = postViewModels });
+            }
+            else
+            {
+                return PartialView("Post/_PostPartial", postViewModels);
+            }
         }
 
         public IActionResult Privacy()

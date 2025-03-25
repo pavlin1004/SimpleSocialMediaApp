@@ -26,7 +26,15 @@ namespace SimpleSocialApp.Data
         {
             //this.Database.EnsureCreated();
         }
-      
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("YourConnectionStringHere", options =>
+                    options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
+            }
+        }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

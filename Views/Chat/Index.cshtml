@@ -3,61 +3,103 @@
 @using System.Security.Claims
 @model ChatViewModel
 
-@if (Model.Type == ChatType.Group )
-{
-    <h2>@Model.Title</h2>
-    if (Model.OwnerId == User.FindFirstValue(ClaimTypes.NameIdentifier))
-    {
-        <form asp-controller="Chat" asp-action="DeleteChat" method="post">
-        <input type="hidden" name="chatId" value="@Model.ChatId" />
-        <button type="submit" class="leave-button">Delete Chat</button>
-    </form>
+<div class="chat-wrapper">
+    <div class="chat-container">
+        <!-- Fixed Buttons at the Top -->
+        <div class="chat-header">
+            <div class="chat-header-left">
+                @if (Model.Type == ChatType.Group)
+                {
+                    <h2>@Model.Title</h2>
+                }
+                else
+                {
+                    <h2>@Model.FriendName</h2> <!-- Display the other user's name for private chats -->
+                }
+            </div>
 
-    <!-- Add Participant -->
-    <form asp-controller="Chat" asp-action="ModifyUsers" method="get">
-        <input type="hidden" name="chatId" value="@Model.ChatId" />
-        <input type="hidden" name="userId" value="@User.FindFirstValue(ClaimTypes.NameIdentifier)" />
-        <input type="hidden" name="actionType" value="Add" />
-        <button type="submit" class="leave-button">Add Friend</button>
-    </form>
+            @if (Model.OwnerId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+            {
+                <!-- Chat Management Buttons (Each in its own div) -->
+                <div class="button-container">
+                    <div class="button-wrapper">
+                        <form asp-controller="Chat" asp-action="DeleteChat" method="post">
+                            <input type="hidden" name="chatId" value="@Model.ChatId" />
+                            <button type="submit" class="chat-action-button">Delete Chat</button>
+                        </form>
+                    </div>
 
-    <!-- Remove Participant -->
-    <form asp-controller="Chat" asp-action="ModifyUsers" method="get">
-        <input type="hidden" name="chatId" value="@Model.ChatId" />
-        <input type="hidden" name="userId" value="@User.FindFirstValue(ClaimTypes.NameIdentifier)" />
-        <input type="hidden" name="actionType" value="Remove" />
-        <button type="submit" class="leave-button">Remove Friend</button>
-    </form>
-    <form asp-controller="Chat" asp-action="LeaveChat" method="post">
-    <input type="hidden" name="chatId" value="@Model.ChatId" />
-    <button type="submit" class="leave-button">Leave Chat</button>
-</form>
-    }
-}
-else
-{
-    <h2>@Model.FriendName</h2> <!-- Show the other user's name for private chats -->
-}
-    <!-- Leave Chat -->
+                    <div class="button-wrapper">
+                        <form asp-controller="Chat" asp-action="ModifyUsers" method="get">
+                            <input type="hidden" name="chatId" value="@Model.ChatId" />
+                            <button type="submit" class="chat-action-button">Add Friend</button>
+                        </form>
+                    </div>
 
-<!-- Display Messages -->
-<div id="chatBox">
-    @foreach (var message in Model.Messages)
-    {
-        <div class="message">
-            <strong>@message.User.FirstName:</strong>
-            <span class="timestamp">@message.CreatedDateTime.ToString("HH:mm:ss")</span>
-            <p>@message.Content</p>
+                    <div class="button-wrapper">
+                        <form asp-controller="Chat" asp-action="ModifyUsers" method="get">
+                            <input type="hidden" name="chatId" value="@Model.ChatId" />
+                            <button type="submit" class="chat-action-button">Remove Friend</button>
+                        </form>
+                    </div>
+
+                    <div class="button-wrapper">
+                        <form asp-controller="Chat" asp-action="LeaveChat" method="post">
+                            <input type="hidden" name="chatId" value="@Model.ChatId" />
+                            <button type="submit" class="chat-action-button">Leave Chat</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="more-options">
+                    <button id="moreOptionsBtn" class="chat-action-button">...</button>
+                </div>
+            }
         </div>
-    }
-</div>
 
-<!-- Message Input Form -->
-<form id="messageForm">
-    <textarea id="messageInput" rows="3" placeholder="Type a new message..."></textarea>
-    <button type="submit">Send Message</button>
-    <input type="hidden" id="chatId" value="@Model.ChatId" />
-</form>
+
+        <!-- Chat Messages Container with Scrollbar -->
+        <div id="chatBox" class="chat-box">
+            @foreach (var message in Model.Messages)
+            {
+                <div class="message">
+                    <div class = "user">
+                       <strong>@message.User.FirstName:</strong>
+                    </div>            
+                    <p>@message.Content</p>
+                </div>
+            }
+        </div>
+
+        <!-- Fixed Message Input at the Bottom -->
+        <div id="messageInputArea" class="message-container">
+            <form id="messageForm">
+                <textarea id="messageInput" rows="3" placeholder="Type a new message..."></textarea>
+                <div class="button-container">
+                    <button type="submit">Send Message</button>
+                </div>
+                <input type="hidden" id="chatId" value="@Model.ChatId" style="position:a" />
+            </form>
+        </div>
+    </div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 <script src="~/js/chat.js"></script> <!-- Link to external JavaScript -->
+<link rel="stylesheet" href="/css/chat.css" />
+<script>
+    // Get the elements
+    const moreOptionsBtn = document.getElementById('moreOptionsBtn');
+    const buttonContainer = document.querySelector('.button-container');
+
+    // Add event listener to toggle visibility
+    moreOptionsBtn.addEventListener('click', function () {
+        // Toggle the display of the button container
+        if (buttonContainer.style.display === 'none' || buttonContainer.style.display === '') {
+            buttonContainer.style.display = 'flex'; // Show the buttons
+        } else {
+            buttonContainer.style.display = 'none'; // Hide the buttons
+        }
+    });
+
+</script>

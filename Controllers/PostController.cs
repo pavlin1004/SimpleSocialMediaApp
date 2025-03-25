@@ -39,17 +39,17 @@ namespace SimpleSocialApp.Controllers
             _commentService = commentService;
         }
 
-        public async Task<IActionResult> Index()
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId != null)
-            {
-                var posts = await _postService.GetAllUserFriendsPostsAsync("a");
+        //public async Task<IActionResult> Index()
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    if (userId != null)
+        //    {
+        //       // var posts = await _postService.GetAllUserFriendsPostsAsync("a");
 
-                return View(posts);
-            }
-            return View();
-        }
+        //        //return View(posts);
+        //    }
+        //    return View();
+        //}
 
         public IActionResult Create()
         {

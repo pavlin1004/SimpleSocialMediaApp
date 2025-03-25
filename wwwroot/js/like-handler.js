@@ -24,7 +24,8 @@
                     console.log("After update: " + updatedText);  // Log the updated text
 
                     // Update the like count text (keeping "Likes:" and just changing the number)
-                    $('#like-count-' + targetId).text(updatedText);
+                    $('#like-count-' + targetId).find('.like-number').text(response.newLikeCount);
+
 
                     // Optionally: Toggle the icon's color
                     if (response.isLiked) {

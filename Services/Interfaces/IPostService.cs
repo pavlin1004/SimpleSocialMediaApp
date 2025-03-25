@@ -6,7 +6,7 @@ namespace SimpleSocialApp.Services.Interfaces
     public interface IPostService
     {
         public Task<Post?> GetPostByIdAsync(string id);
-        public Task<ICollection<Post>> GetAllUserPostsAsync(string userId);
+        public Task<ICollection<Post>> GetAllUserPostsAsync(string userId, int size, int count);
         public Task<ICollection<Post>> GetAllUserFriendsPostsAsync(string userId);
         public Task AddPostAsync(Post post);
         public Task UpdatePostAsync(Post post);
@@ -19,5 +19,7 @@ namespace SimpleSocialApp.Services.Interfaces
         public Task AddPostsAsync(List<Post> posts);
         public Task<bool> AnyAsync();
         public Task<List<Post>> GetAllAsync();
+
+        public Task<List<Post>> GetAllAsync(int size, int count);
     }
 }
