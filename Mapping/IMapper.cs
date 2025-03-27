@@ -5,7 +5,7 @@ namespace SimpleSocialApp.Mapping
 {
     public interface IMapper
     {
-        public ChatViewModel MapToChatViewModel(Chat chat, string friendName);
-        public ChatViewModel MapToChatViewModel(Chat chat);
+        public ChatViewModel MapToChatViewModel(Chat chat, string friendName,int count,int size);
+        public ChatViewModel MapToChatViewModel(Chat chat, int count, int size);
     }
 }

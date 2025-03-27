@@ -1,8 +1,8 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
     var chatId = document.getElementById("chatId").value;
-    //if (chatId != null) {
-    //    throw new Error("Something went wrong!");    }
+    var chatBox = document.getElementById("chatBox");
 
+    var isGroupChat = document.getElementById("isGroupChat").value === "true"; 
     // Create a SignalR connection
     var connection = new signalR.HubConnectionBuilder()
         .withUrl("/chathub")
@@ -16,15 +16,19 @@
 
     // Listen for incoming messages
     connection.on("ReceiveMessage", function (userName, message, timestamp) {
-        var chatBox = document.getElementById("chatBox");
-
         // Create new message element
         var newMessage = document.createElement("div");
-        newMessage.classList.add("message");
-        newMessage.innerHTML = `<strong>${userName}:</strong> <span class="timestamp">${timestamp}</span><p>${message}</p>`;
+        newMessage.classList.add("right-paragraph");
+        newMessage.innerHTML = `
+        ${isGroupChat === true ? `<strong>${userName}:</strong>` : ''}
+        <p class="${userName === 'CurrentUserName' ? 'right-paragraph' : 'left-paragraph'}">${message}</p>
+         `;
 
-        // Append the new message
-        chatBox.appendChild(newMessage);
+        // Prepend the new message at the top
+        chatBox.insertBefore(newMessage, chatBox.firstChild);
+
+        // Scroll to the top of the chat box
+        chatBox.scrollTop = 0;
     });
 
     // Handle message form submission
@@ -34,7 +38,7 @@
         var messageContent = document.getElementById("messageInput").value;
         var chatIdElement = document.getElementById("chatId"); // Get the hidden input
 
-        if (chatIdElement==null) {
+        if (chatIdElement == null) {
             console.error("Chat ID is missing!");
             return;
         }

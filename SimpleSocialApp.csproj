@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Content Remove="Views\Post\_PostPartial.cshtml" />
+    <Content Remove="wwwroot\js\message-loader.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -45,10 +46,12 @@
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Views\Post\_PostPartial.cshtml" />
     <_ContentIncludedByDefault Remove="wwwroot\css\chat.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\js\message-loader.js" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="Views\Shared\Post\_PostPartial.cshtml" />
+    <None Include="wwwroot\js\message-loader.js" />
   </ItemGroup>
 
 </Project>

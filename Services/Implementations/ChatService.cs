@@ -18,10 +18,19 @@ namespace SimpleSocialApp.Services.Implementations
         }
         public async Task<Chat?> GetConversationAsync(string conversationId)
         {
-            return await _context.Chats
+            var chat = await _context.Chats
                 .Include(c => c.Users)
                 .Include(c => c.Messages)
-                .FirstOrDefaultAsync(c => c.Id == conversationId);
+                .Where(c => c.Id == conversationId)
+                .FirstOrDefaultAsync();
+
+            if (chat != null && chat.Messages != null)
+            {
+                // Order messages by CreatedDateTime after fetching
+                chat.Messages = chat.Messages.OrderByDescending(m => m.CreatedDateTime).Reverse().ToList();
+            }
+
+            return chat;
         }
         public async Task<IEnumerable<Chat>> GetConversationsForUserAsync(string userId)
         {

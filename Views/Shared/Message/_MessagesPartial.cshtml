@@ -1,0 +1,18 @@
+﻿@using SimpleSocialApp.Data.Enums
+@using SimpleSocialApp.Data.Models
+@using System.Security.Claims
+@using SimpleSocialApp.Models.ViewModels.Chats
+@model ChatViewModel
+@{
+    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+}
+@foreach (var message in Model.Messages)
+{
+    <div class="@(message.UserId == currentUserId ? "right-paragraph" : "left-paragraph")">
+        @if (Model.Type == ChatType.Group)
+        {
+            <strong>@message.User.FirstName: @message.CreatedDateTime</strong>
+        }
+        <p>@message.Content</p>
+    </div>
+}

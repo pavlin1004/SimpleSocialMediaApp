@@ -26,7 +26,7 @@ namespace SimpleSocialApp.Controllers
 
         }
 
-        public async Task<IActionResult> Index(string chatId)
+        public async Task<IActionResult> Index(string chatId, int count = 0, int size = 5)
         {
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(currentUserId))
@@ -40,12 +40,26 @@ namespace SimpleSocialApp.Controllers
             }
             if (chat.Type == ChatType.Group)
             {
-                return View(_mapper.MapToChatViewModel(chat));
+                if (count == 0)
+                {
+                    return View(_mapper.MapToChatViewModel(chat, count, size));
+                }
+                else
+                {
+                    return PartialView("Message/_MessagesPartial", _mapper.MapToChatViewModel(chat, count, size));
+                }
             }
             else
             {
                 var friendName = _chatService.GetFriendName(chat, currentUserId);
-                return View(_mapper.MapToChatViewModel(chat, friendName));
+                if (count == 0)
+                {
+                    return View(_mapper.MapToChatViewModel(chat, friendName, count, size));
+                }
+                else
+                {
+                    return PartialView("Message/_MessagesPartial", _mapper.MapToChatViewModel(chat, friendName, count, size));
+                }
             }
         }
 
@@ -61,12 +75,12 @@ namespace SimpleSocialApp.Controllers
             {
                 if (chat.Type == ChatType.Group)
                 {
-                    chatViewModelList.Add(_mapper.MapToChatViewModel(chat));
+                    chatViewModelList.Add(_mapper.MapToChatViewModel(chat,0,0));
                 }
                 else
                 {
                     var friendName = _chatService.GetFriendName(chat,userId);
-                    chatViewModelList.Add(_mapper.MapToChatViewModel(chat, friendName));
+                    chatViewModelList.Add(_mapper.MapToChatViewModel(chat, friendName,0,0));
                 }
             }
 

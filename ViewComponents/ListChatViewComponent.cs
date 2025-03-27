@@ -34,12 +34,12 @@ namespace SimpleSocialApp.ViewComponents
             {
                 if (chat.Type == ChatType.Group)
                 {
-                    chatViewModelList.Add(_mapper.MapToChatViewModel(chat));
+                    chatViewModelList.Add(_mapper.MapToChatViewModel(chat,0,0));
                 }
                 else
                 {
                     var friendName = _chatService.GetFriendName(chat, currentUserId);
-                    chatViewModelList.Add(_mapper.MapToChatViewModel(chat, friendName));
+                    chatViewModelList.Add(_mapper.MapToChatViewModel(chat, friendName,0,0));
                 }
             }
             return View(chatViewModelList);
