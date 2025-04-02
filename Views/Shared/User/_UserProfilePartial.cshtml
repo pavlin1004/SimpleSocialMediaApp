@@ -1,30 +1,96 @@
-﻿@using SimpleSocialApp.Models.ViewModels.AppUsers
+﻿@using SimpleSocialApp.Data.Enums
+@using SimpleSocialApp.Models.ViewModels.AppUsers
 @model UserViewModel
 
-<div class="user-card" style="border: 1px solid #ddd; padding: 10px; margin: 10px 0;">
+<div class="user-card">
     <div class="user-info">
-        <!-- You can use the user's profile picture, or a placeholder if it's missing -->
-       @*  @if (string.IsNullOrEmpty(@Model.Media.Url))
-        {
-            <img src="https://via.placeholder.com/50" alt="@Model.FirstName @Model.LastName" class="rounded-circle" />
-        }
-        else
-        {
-            <img src="@Model.Media.Url" alt="@Model.FirstName @Model.LastName" class="rounded-circle" style="width: 50px; height: 50px;" />
-        } *@
-        <div style="display: inline-block; margin-left: 10px;">
+        <img src="@(!string.IsNullOrEmpty(Model.User.Media?.Url) ? Model.User.Media.Url : "/images/profile_default/default_avatar.jpg")" 
+             alt="@Model.User.FirstName @Model.User.LastName" />
+
+        <div class="user-details">
             <h5>@Model.User.FirstName @Model.User.LastName</h5>
-            <p>@Model.User.UserName</p>
         </div>
     </div>
 
-    <!-- Button to go to the user's profile -->
-    <a href="@Url.Action("Profile", "User", new { userId = Model.User.Id })" class="btn btn-primary">Go to Profile</a>
-    @if (!Model.IsFriend)
-    {
-        <form method="post" asp-controller="User" asp-action="SendFriendRequest">
-            <input type="hidden" name="userId" value="@Model.User.Id" />
-            <button type="submit" class="btn btn-primary">Add Friend</button>
-        </form>
-    }
+    <div class="user-actions">
+        <a href="@Url.Action("Profile", "User", new { userId = Model.User.Id })" class="btn btn-primary">Profile</a>
+        
+        @if (Model.Type == null)
+        {
+            <form method="post" asp-controller="User" asp-action="SendFriendRequest">
+                <input type="hidden" name="userId" value="@Model.User.Id" />
+                <button type="submit" class="btn btn-primary">Add Friend</button>
+            </form>
+        }
+        else if(Model.Type == FriendshipType.Pending)
+        {
+            <form method="post" asp-controller="User" asp-action="RemoveFriendship">
+                <input type="hidden" name="userId" value="@Model.User.Id" />
+                <button type="submit" class="btn btn-primary">Cancel Request</button>
+            </form>
+        }
+    </div>
 </div>
+<style>
+.user-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.user-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-info img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+}
+
+.user-details {
+    margin-left: 15px;
+}
+
+.user-details h5 {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+}
+
+.user-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.user-actions .btn {
+    padding: 8px 12px;
+    font-size: 14px;
+    border-radius: 5px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.btn-primary {
+    background-color: #1E3A8A;
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #162d6b;
+}
+</style>

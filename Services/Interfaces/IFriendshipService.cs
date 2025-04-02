@@ -18,7 +18,7 @@ namespace SimpleSocialApp.Services.Interfaces
 
         public Task<List<string>> GetAllFriendsIds(string userId);
 
-        public Task<List<AppUser>> GetNonFriendUsers(string userId);
+        public Task<(List<AppUser>, List<AppUser>)> GetNonFriendUsers(string userId);
         public Task<bool> AnyAsync();
 
         public Task CreateAsync(Friendship f);

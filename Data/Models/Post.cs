@@ -17,7 +17,7 @@ namespace SimpleSocialApp.Data.Models
         public string Id { get; set; }
 
         [MaxLength(1000)]
-        public string Content { get; set; }
+        public string? Content { get; set; }
 
         [Required]
         public DateTime CreatedDateTime { get; set; }

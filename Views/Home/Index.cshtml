@@ -1,5 +1,6 @@
 ﻿@using SimpleSocialApp.Data.Enums
 @using System.Security.Claims
+@using SimpleSocialApp.Models.InputModels
 @model SimpleSocialApp.Models.ViewModels.HomeIndexViewModel
 
 @{
@@ -10,6 +11,9 @@
 @if (isUserLoggedIn)
 {
     <div class="main-content">
+        <div class="create-post">
+            @await Html.PartialAsync("Post/_Create", new ContentInputModel())
+        </div>
         <!-- Posts Section -->
         <div class="posts-section">
             <h3>Posts</h3>

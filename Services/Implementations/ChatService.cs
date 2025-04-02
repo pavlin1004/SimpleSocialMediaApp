@@ -32,7 +32,7 @@ namespace SimpleSocialApp.Services.Implementations
 
             return chat;
         }
-        public async Task<IEnumerable<Chat>> GetConversationsForUserAsync(string userId)
+        public async Task<List<Chat>> GetConversationsForUserAsync(string userId)
         {
             return await _context.Chats
                 .Where(c => c.Users.Any(u => u.Id == userId)) 
@@ -112,6 +112,19 @@ namespace SimpleSocialApp.Services.Implementations
         public async Task<bool> AnyAsync()
         {
             return await _context.Chats.AnyAsync();
+        }
+
+        public async Task<List<Chat>> SearchChat(string userId, string query)
+        {
+            var groupChats = _context.Chats
+                .Where(c => c.Title.Contains(query)); // Title is null in private chats
+
+            var privateChats = _context.Chats
+                .Where(c => c.Type == ChatType.Private
+                         && c.Users.Any(c => c.Id == userId)
+                         && c.Users.Any(u => u.Id != userId && u.UserName.Contains(query)));
+
+            return await privateChats.Union(groupChats).ToListAsync();
         }
     }
 }

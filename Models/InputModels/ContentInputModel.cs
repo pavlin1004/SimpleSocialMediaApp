@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SimpleSocialApp.Models.InputModels
 {
-
+    [EnsureOneRequired("Content", "MediaFiles")]
     public class ContentInputModel
     {    
         public string? Content { get; set; }      

@@ -9,7 +9,7 @@ namespace SimpleSocialApp.Models.ViewModels.Chats
 
         public string? OwnerId { get; set; }
 
-        public string? FriendName { get; set; }
+        public AppUser? Friend { get; set; }
         public required ChatType Type { get; set; }
         public required string ChatId { get; set; }
 

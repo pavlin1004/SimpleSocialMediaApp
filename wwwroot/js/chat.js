@@ -25,10 +25,10 @@
          `;
 
         // Prepend the new message at the top
-        chatBox.insertBefore(newMessage, chatBox.firstChild);
+        chatBox.appendChild(newMessage, chatBox.firstChild);
 
         // Scroll to the top of the chat box
-        chatBox.scrollTop = 0;
+        chatBox.scrollTop = chatBox.scrollHeight;
     });
 
     // Handle message form submission

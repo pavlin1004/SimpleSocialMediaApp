@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Content Remove="Views\Post\_PostPartial.cshtml" />
+    <Content Remove="Views\Shared\User\_EditProfilePicture.cshtml" />
     <Content Remove="wwwroot\js\message-loader.js" />
   </ItemGroup>
 
@@ -45,13 +46,19 @@
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Views\Post\_PostPartial.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Shared\User\_EditProfilePicture.cshtml" />
     <_ContentIncludedByDefault Remove="wwwroot\css\chat.css" />
     <_ContentIncludedByDefault Remove="wwwroot\js\message-loader.js" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="Views\Shared\Post\_PostPartial.cshtml" />
+    <None Include="Views\Shared\User\_EditProfilePicture.cshtml" />
     <None Include="wwwroot\js\message-loader.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Views\Shared\User\_EditProfilePicture.cshtml" />
   </ItemGroup>
 
 </Project>

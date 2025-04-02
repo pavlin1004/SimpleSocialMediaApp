@@ -99,6 +99,7 @@ namespace SimpleSocialApp.Services.Implementations
         public async Task<IEnumerable<AppUser>> SearchUsersByNameAsync(string searchQuery)
         {
             return await _context.Users
+                .Include(u => u.Media)
                 .Where(u => u.FirstName.Contains(searchQuery) || u.LastName.Contains(searchQuery))
                 .ToListAsync();
         }

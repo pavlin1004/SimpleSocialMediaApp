@@ -1,58 +1,54 @@
-﻿let size = 5;  // Number of messages per request
-let count = 1; // Track how many batches of messages have been loaded
+﻿let size = 5;  // Number of posts per request
+let count = 1; // Track how many batches of posts have been loaded
 let isLoading = false; // Prevent multiple simultaneous requests
 
-const chatId = document.getElementById("chatId").value; // Chat ID
-
-// Function to load messages using the provided URL
-function loadMessages(url) {
+// Function to load posts using the provided URL
+function loadPosts(url, userId = null) {
     if (isLoading) return; // Prevent duplicate calls
     isLoading = true;
 
-    // Make a fetch request to load messages (or other content)
-    fetch(`${url}?chatId=${chatId}&size=${size}&count=${count}`)
+    // Construct URL with necessary parameters
+    let requestUrl = `${url}?size=${size}&count=${count}`;
+
+    // If userId is provided, append it to the request
+    if (userId) {
+        requestUrl += `&userId=${userId}`;
+    }
+
+    // Make a fetch request
+    fetch(requestUrl)
         .then(response => response.text())  // Expect HTML (partial view)
         .then(html => {
-            // Append the new messages to the existing chat container
-            document.querySelector('.chat-box').insertAdjacentHTML('beforeend', html);
+            // Append the new posts to the existing posts section
+            document.querySelector('.posts-section').insertAdjacentHTML('beforeend', html);
 
             // Increment count for the next batch
             count++;
 
-            // Allow new requests after messages are added
+            // Allow new requests after posts are added
             isLoading = false;
-
-            // Optionally, hide or remove the "load more" button if there are no more messages
-            if (html.trim() === '') {
-                // No more messages to load, hide the "load more" button
-                const loadMoreTrigger = document.getElementById('load-more-trigger');
-                loadMoreTrigger.style.display = 'none';
-            }
         })
         .catch(error => {
-            console.error('Error loading messages:', error);
+            console.error('Error loading posts:', error);
             isLoading = false;
         });
 }
 
-// Function to check if the user has scrolled near the bottom of the chat box
+// Function to check if the user has scrolled near the bottom of the page
 function isNearBottom() {
-    const chatBox = document.getElementById('chatBox');
-    return chatBox.scrollTop + chatBox.clientHeight >= chatBox.scrollHeight - 100;
+    return window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
 }
 
-// Add scroll event listener to load more messages when near the bottom of the chat box
-document.getElementById('chatBox').addEventListener('scroll', () => {
-    const chatBox = document.getElementById('chatBox');
+window.addEventListener('scroll', () => {
     if (isNearBottom() && !isLoading) {
         const loadMoreUrl = document.getElementById('load-more-trigger').getAttribute('data-url');
-        loadMessages(loadMoreUrl); // Call the function to load more messages
+        const loadUserId = document.getElementById('load-more-trigger').getAttribute('data-userId');
+        loadPosts(loadMoreUrl, loadUserId);  // ✅ Now passing userId
     }
 });
 
-// Initial load of the first batch of messages when the page is loaded
 window.addEventListener('DOMContentLoaded', () => {
-    // Get the URL from the data-url attribute of the load-more-trigger element
     const loadMoreUrl = document.getElementById('load-more-trigger').getAttribute('data-url');
-    loadMessages(loadMoreUrl); // Call the function with the dynamic URL
+    const loadUserId = document.getElementById('load-more-trigger').getAttribute('data-userId');
+    loadPosts(loadMoreUrl, loadUserId);  // ✅ Now passing userId
 });

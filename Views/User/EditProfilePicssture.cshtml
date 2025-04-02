@@ -1,10 +1,17 @@
 ﻿@using System.Security.Claims
+@using SimpleSocialApp.Data.Models
+@model Media?
 @{
     ViewData["Title"] = "Upload Profile Picture";
 }
 
 <h1>Upload Profile Picture</h1>
-
+@if(Model!=null)
+{
+    <div class="profile-picture">
+        <img src="@Model.Url" alt="Profile picture"/>
+    </div>
+}
 <form asp-action="EditProfilePicture" enctype="multipart/form-data">
     <div class="form-group">
         <label for="mediaFile">Select a picture to upload</label>

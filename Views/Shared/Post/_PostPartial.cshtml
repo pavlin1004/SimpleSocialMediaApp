@@ -33,26 +33,47 @@
                     @postModel.Post.Content
                 </p>
 
-                <div class="post-media w-100">
-                    @foreach (var media in @postModel.Post.Media)
+                <div class="post-media w-100 position-relative">
+                    @if (postModel.Post.Media.Any())
                     {
-                        @if (media.Type == MediaOptions.Image)
+                        var firstMedia = postModel.Post.Media.First();
+                        var remainingMedia = postModel.Post.Media.Skip(1).ToList();
+                        var remainingCount = remainingMedia.Count;
+
+                        <div class="media-wrapper position-relative">
+                            <!-- First image (Main) -->
+                            <a href="@firstMedia.Url" class="glightbox" data-gallery="post-gallery-@postModel.Post.Id">
+                                <img src="@firstMedia.Url" alt="Post Image" class="img-fluid rounded shadow-sm main-image" />
+                            </a>
+
+                            @if (remainingMedia.Any())
+                            {
+                                var secondMedia = remainingMedia.First();
+                                var remainingAfterSecond = remainingMedia.ToList();
+
+                                <!-- Second image (Partially Visible Behind) -->
+                                <div class="second-image">
+                                    <img src="@secondMedia.Url" alt="Post Image" class="img-fluid rounded shadow-sm" />
+                                </div>
+
+                                <!-- +X more Indicator -->
+                                @if (remainingAfterSecond.Count > 0)
+                                {
+                                    <div class="more-indicator" onclick="openLightbox('@postModel.Post.Id')">
+                                        <span class="more-text">+@remainingAfterSecond.Count more</span>
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                        <!-- Hidden links for the rest of the images -->
+                        @foreach (var media in remainingMedia)
                         {
-                            <div class="media-item mb-3">
-                                <img src="@media.Url" alt="Post Image" class="img-fluid rounded shadow-sm" />
-                            </div>
-                        }
-                        else if (media.Type == MediaOptions.Video)
-                        {
-                            <div class="media-item mb-3">
-                                <video controls class="w-100 rounded shadow-sm">
-                                    <source src="@media.Url" type="video/mp4" />
-                                    Your browser does not support the video tag.
-                                </video>
-                            </div>
+                            <a href="@media.Url" class="glightbox d-none" data-gallery="post-gallery-@postModel.Post.Id"></a>
                         }
                     }
                 </div>
+
             </div>
         </div>
 
@@ -84,4 +105,77 @@
 }
 <!-- Add Bootstrap Icons -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<!-- GLightbox CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
+<!-- GLightbox JS -->
+<script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const lightbox = GLightbox({
+            selector: ".glightbox",
+            touchNavigation: true,
+            loop: true, // Enables continuous navigation
+            autoplayVideos: true
+        });
+    });
 
+
+</script>
+<style>
+    .media-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+    .main-image {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        display: block;
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Second image stacked behind */
+    .second-image {
+        position: absolute;
+        top: 10px; /* Slight vertical shift */
+        right: -20px; /* Shifted to the right */
+        width: 96%;
+        height: 100%;
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: pointer;
+        z-index: 1;
+        opacity: 0.8;
+    }
+
+        .second-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            filter: brightness(70%); /* Darker to indicate it's behind */
+            transition: 0.3s;
+        }
+
+    /* +X more Indicator */
+    .more-indicator {
+        position: absolute;
+        top: 50%;
+        right: -30px;
+        transform: translateY(-50%);
+        width: 60px;
+        height: 60px;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        z-index: 3;
+    }
+
+</style>

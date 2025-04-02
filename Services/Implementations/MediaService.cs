@@ -18,7 +18,7 @@ namespace SimpleSocialApp.Services.Implementations
         }
         public async Task RemoveUserMediaAsync(string userId)
         {
-            var media = await _context.Media.FirstOrDefaultAsync(x => x.User.Id == userId);
+            var media = await _context.Media.FirstOrDefaultAsync(m => m.UserId == userId);
             if (media != null)
             {
                 _context.Media.Remove(media);

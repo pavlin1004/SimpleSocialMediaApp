@@ -3,131 +3,134 @@
 @using SimpleSocialApp.Models.ViewModels.Chats
 @model List<ChatViewModel>
 
-<div class="chat-list-container">
-    @if (Model.Count != 0)
-    {
-        <h2 class="chat-header">Chats</h2>
-        <div class="chat-list">
-            @foreach (var item in Model)
-            {
-                <div class="chat-list-item mb-2">
-                    <!-- Chat displayed as a div-like link with hover effect -->
-                    <a asp-action="Index" asp-controller="Chat" asp-route-chatId="@item.ChatId" class="chat-link d-block p-3 rounded text-decoration-none">
-                        @if (item.Type == ChatType.Group)
-                        {
-                            <p class="m-0">@item.Title</p> <!-- Changed from h2 to p for paragraph text size -->
-                        }
-                        else if (item.Type == ChatType.Private)
-                        {
-                            <p class="m-0">@item.FriendName</p> <!-- Changed from h2 to p for paragraph text size -->
-                        }
-                    </a>
-                </div>
-            }
+<div id="chatListComponent">
+    <div class="chat-list-container">
+        <div class="create-chat-btn mt-3">
+            <a asp-action="Create" asp-controller="Chat" class="btn btn-success">Create a new chat</a>
         </div>
-    }
-    else
-    {
-        <h3>You participate in no chats yet!</h3>
-    }
-    <div class="create-chat-btn mt-3 text-center">
-        <!-- Center the button in the row -->
-        <a asp-action="Create" asp-controller="Chat" class="btn btn-success">Create a new chat</a>
+        @if (Model.Count != 0)
+        {
+            <h2 class="chat-header">Chats</h2>
+            <div class="chat-list">
+                @foreach (var item in Model)
+                {
+                    <div class="chat-list-item mb-2">
+                        <a asp-action="Index" asp-controller="Chat" asp-route-chatId="@item.ChatId" class="chat-link d-flex align-items-center">
+                            @if (item.Type == ChatType.Group)
+                            {
+                                <p class="m-0">@item.Title</p>
+                            }
+                            else if (item.Type == ChatType.Private)
+                            {
+                                <img src="@(!string.IsNullOrEmpty(@item.Friend.Media?.Url) ? @item.Friend.Media.Url : "/images/profile_default/default_avatar.jpg")"
+                                     alt="@item.Friend.FirstName @item.Friend.LastName" />
+                                <p class="m-0">@item.Friend.FirstName @item.Friend.LastName</p>
+                            }
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <h3>You participate in no chats yet!</h3>
+        }
+        <div class="create-chat-btn mt-3 text-center">
+            <a asp-action="Create" asp-controller="Chat" class="btn btn-success">Create a new chat</a>
+        </div>
     </div>
 </div>
 
 <style>
-    /* Overall container styling (make it full width) */
-    .chat-list-container {
-        position:fixed;
-        flex-direction: column;
-        background-color: #ecf0f1; /* Light Blue background for the container */
+    #chatListComponent .chat-list-container {
+        position: fixed;
+        background-color: #ecf0f1;
         padding: 20px;
         height: 92vh;
         right: 0;
         top: 56px;
         border-radius: 8px;
-        width:250px;
-        max-width: 100%; /* Ensure it takes up the entire width */
+        width: 250px;
+        max-width: 100%;
         box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
     }
 
-    /* Chat header styling (blue text) */
-    .chat-header {
-        color: #1E3A8A; /* Dark Blue text */
-        background-color: white; /* White background */
+    #chatListComponent img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #ddd;
+        margin-right: 10px;
+    }
+
+    #chatListComponent .chat-header {
+        color: #1E3A8A;
+        background-color: white;
         padding: 10px;
         border-radius: 8px;
-        margin-bottom: 20px; /* Space below header */
-        text-align: center; /* Center the header */
+        margin-bottom: 20px;
+        text-align: center;
     }
 
-    /* Flexbox container for the chat list items */
-    .chat-list {
+    #chatListComponent .chat-list {
         display: flex;
         flex-direction: column;
-        align-items: center; /* Center the items horizontally */
-        gap: 2px; /* Space between the items */
+        align-items: center;
+        gap: 2px;
     }
 
-    /* Chat list item styling */
-    .chat-list-item {
-        background-color: transparent; /* Transparent background by default */
-        height: 45px; /* Adjusted height for shorter items */
-        border: 2px solid #1E3A8A; /* Blue border */
-        border-radius: 8px;
-        transition: all 0.3s ease; /* Smooth transition for hover effect */
-        width: 100%; /* Full width for each chat item */
+    #chatListComponent .chat-list-item {
         display: flex;
-        align-items: center; /* Vertically center the text */
-        justify-content: center; /* Horizontally center the text */
-        padding: 0 10px; /* Padding for the content */
-        overflow: hidden; /* Hide any overflow text */
-        text-overflow: ellipsis; /* Show an ellipsis when the text overflows */
-        white-space: nowrap; /* Prevent the text from wrapping */
-    }
-
-        /* Hover effect on chat list item */
-        .chat-list-item:hover {
-            background-color: #1E3A8A; /* Blue background on hover */
-            color: white; /* White text on hover */
-            border-color: white; /* White border on hover */
-        }
-
-    /* Chat link styling */
-    .chat-link {
-        color: #1E3A8A; /* Dark Blue text by default */
-        text-decoration: none; /* Remove underline */
-        display: block;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 10px;
+        padding: 5px 10px;
+        background-color: transparent;
+        height: 45px;
+        border: 2px solid #1E3A8A;
+        border-radius: 8px;
+        transition: all 0.3s ease;
         width: 100%;
-        text-align: center; /* Center the text */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
-        /* Hover effect for the chat link */
-        .chat-link:hover {
-            color: white; /* White text when hovered */
+        #chatListComponent .chat-list-item:hover {
+            background-color: #1E3A8A;
+            color: white;
+            border-color: white;
         }
 
-    /* Hover effect on the entire chat item */
-    .chat-list-item:hover .chat-link {
-        color: white; /* White text when hovered */
+    #chatListComponent .chat-link {
+        display: flex;
+        align-items: center;
+        color: #1E3A8A;
+        text-decoration: none;
+        width: 100%;
     }
 
-    /* Hover effect on individual chat items */
-    .chat-list-item:hover {
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow effect on hover */
+        #chatListComponent .chat-link:hover {
+            color: white;
+        }
+
+    #chatListComponent .chat-list-item:hover .chat-link {
+        color: white;
     }
 
-    /* Button styling for creating a new chat */
-    .create-chat-btn .btn {
-        background-color: #1E3A8A; /* Blue background */
-        color: white; /* White text */
-        border-radius: 8px; /* Rounded corners */
-        transition: background-color 0.3s ease; /* Smooth transition */
+    #chatListComponent .chat-list-item:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-        /* Hover effect for create chat button */
-        .create-chat-btn .btn:hover {
-            background-color: #3B82F6; /* Lighter Blue on hover */
+    #chatListComponent .create-chat-btn .btn {
+        background-color: #1E3A8A;
+        color: white;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+    }
+
+        #chatListComponent .create-chat-btn .btn:hover {
+            background-color: #3B82F6;
         }
 </style>

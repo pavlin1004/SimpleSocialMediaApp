@@ -103,8 +103,22 @@ namespace SimpleSocialApp.Services.Implementations
         // Get all friends for a user based on accepted friendships
         public async Task<List<AppUser>> GetAllFriends(string userId)
         {
-            var friendships = await GetUserAcceptedFriendshipsAsync(userId);
-            return friendships.Select(u => u.SenderId == userId ? u.Receiver : u.Sender).ToList();
+            var friendships = await _context.Friendships
+         .Where(f => f.SenderId == userId || f.ReceiverId == userId)
+         .Where(f => f.Type == FriendshipType.Accepted) 
+         .Include(f => f.Sender) 
+             .ThenInclude(u => u.Media) 
+         .Include(f => f.Receiver) 
+             .ThenInclude(u => u.Media) 
+         .ToListAsync();
+
+
+            var users = friendships
+                .Select(f => f.SenderId == userId ? f.Receiver : f.Sender)
+                .ToList();
+
+            return users;
+
         }
 
         public async Task<List<string>> GetAllFriendsIds(string userId)
@@ -113,18 +127,32 @@ namespace SimpleSocialApp.Services.Implementations
             return friends.Select(f => f.Id).ToList();
         }
 
-        public async Task<List<AppUser>> GetNonFriendUsers(string userId)
+        public async Task<(List<AppUser>,List<AppUser>)> GetNonFriendUsers(string userId)
         {
-            var friends = await _context.Friendships
-                .Where(f => f.SenderId == userId || f.ReceiverId == userId)  // Get friendships where the user is involved
-                .Select(f => f.SenderId == userId ? f.ReceiverId : f.SenderId) // Select the friend's ID
+            var friendIds = await _context.Friendships
+                 .Where(f => (f.SenderId == userId || f.ReceiverId == userId) && f.Type == FriendshipType.Accepted)
+                 .Select(f => f.SenderId == userId ? f.ReceiverId : f.SenderId)
+                 .ToListAsync();
+
+            // Get IDs of Pending Friend Requests
+            var pendingIds = await _context.Friendships
+                .Where(f => (f.SenderId == userId || f.ReceiverId == userId) && f.Type == FriendshipType.Pending)
+                .Select(f => f.SenderId == userId ? f.ReceiverId : f.SenderId)
                 .ToListAsync();
 
+            // Fetch Pending Users with Media
+            var pendingUsers = await _context.Users
+                .Include(u => u.Media)
+                .Where(u => pendingIds.Contains(u.Id))
+                .ToListAsync();
+
+            // Fetch Non-Friends (Exclude Current User, Friends, and Pending Users)
             var nonFriends = await _context.Users
-                .Where(u => u.Id != userId && !friends.Contains(u.Id))  // Exclude current user & their friends
+                .Include(u => u.Media)
+                .Where(u => u.Id != userId && !friendIds.Contains(u.Id) && !pendingIds.Contains(u.Id))
                 .ToListAsync();
 
-            return nonFriends;
+            return (pendingUsers, nonFriends);
         }
 
         public async Task<bool> AnyAsync()

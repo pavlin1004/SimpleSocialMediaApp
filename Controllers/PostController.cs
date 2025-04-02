@@ -13,6 +13,7 @@ using SimpleSocialApp.Data;
 using SimpleSocialApp.Data.Enums;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Models.InputModels;
+using SimpleSocialApp.Models.Validation;
 using SimpleSocialApp.Models.ViewModels;
 using SimpleSocialApp.Models.ViewModels.Posts;
 using SimpleSocialApp.Services.Implementations;
@@ -62,7 +63,7 @@ namespace SimpleSocialApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(model);  // Return the view with validation errors if any
+                RedirectToAction("Index", "Home");
             }
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -79,22 +80,26 @@ namespace SimpleSocialApp.Controllers
                 {
                     p.Content = model.Content;
                 }
-                foreach (var media in model.MediaFiles)
+                if (model.MediaFiles != null && model.MediaFiles.Count != 0)
                 {
-                    var mediaData = await _cloudinaryService.UploadMediaFileAsync(media);
-                    if (mediaData != null)
-                        
+                    foreach (var media in model.MediaFiles)
                     {
-                        p.Media.Add( new Media {
+                        var mediaData = await _cloudinaryService.UploadMediaFileAsync(media);
+                        if (mediaData != null)
+
+                        {
+                            p.Media.Add(new Media
+                            {
                                 Url = mediaData[0],
                                 PublicId = mediaData[1],
                                 Type = mediaData[2] == "Image" ? MediaOptions.Image : MediaOptions.Video
                             });
-                    }
-                    else
-                    {
-                        // Log or throw an error if media URL is empty
-                        Console.WriteLine("Media upload failed for file: " + media.FileName);
+                        }
+                        else
+                        {
+                            // Log or throw an error if media URL is empty
+                            Console.WriteLine("Media upload failed for file: " + media.FileName);
+                        }
                     }
                 }
                 await _postService.AddPostAsync(p);

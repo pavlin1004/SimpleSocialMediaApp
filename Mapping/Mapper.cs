@@ -1,11 +1,13 @@
-﻿using SimpleSocialApp.Data.Models;
+﻿using SimpleSocialApp.Data.Enums;
+using SimpleSocialApp.Data.Models;
+using SimpleSocialApp.Models.ViewModels.AppUsers;
 using SimpleSocialApp.Models.ViewModels.Chats;
 
 namespace SimpleSocialApp.Mapping
 {
     public class Mapper : IMapper
     {
-        public ChatViewModel MapToChatViewModel(Chat chat, string friendName, int count, int size)
+        public ChatViewModel MapToChatViewModel(Chat chat, AppUser? friend, int count, int size)
         {
             return new ChatViewModel
             {
@@ -13,7 +15,7 @@ namespace SimpleSocialApp.Mapping
                 Messages = chat.Messages?.OrderByDescending(c => c.CreatedDateTime).Skip(size * count)
                 .Take(size).ToList() ?? new List<Message>(),
                 Type = chat.Type,
-                FriendName = friendName,
+                Friend = friend,
                 Title = null,
                 OwnerId = null
             };
@@ -26,11 +28,38 @@ namespace SimpleSocialApp.Mapping
                 Messages = chat.Messages?.OrderByDescending(c => c.CreatedDateTime).Skip(size * count)
                 .Take(size).ToList() ?? new List<Message>(),
                 Type = chat.Type,
-                FriendName = null,
+                Friend = null,
                 Title = chat.Title,
                 OwnerId = chat.OwnerId
             };
         }
+
+        public List<UserViewModel> MapToUserViewModel(List<AppUser> pending,List<AppUser> nonFriends)
+        {
+            var pendingUser = pending.Select(u => new UserViewModel
+                { User = u,
+                  Type = FriendshipType.Pending
+                }).ToList();
+            var nonFriendUsers = nonFriends.Select(u => new UserViewModel
+            { User = u,
+              Type = null
+            }).ToList();
+
+            return pendingUser.Concat(nonFriendUsers).ToList();
+        }
+        public FriendViewModel MapToFriendsViewModel(List<AppUser> friends, string userId)
+        {
+            return new FriendViewModel
+            {
+                Friends = friends.Select(user => new UserViewModel
+                {
+                    User = user,
+                    Type = FriendshipType.Accepted
+                }).ToList(),
+                UserId = userId
+            };
+        }
+
 
     }
 }

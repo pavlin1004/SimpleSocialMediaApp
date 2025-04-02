@@ -26,6 +26,13 @@
                 </a>
             </div>
         </li>
+        <li class="sidenav-item">
+            <div class="nav-button active">
+                <a class="nav-link" asp-area="" asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)" asp-controller="User" asp-action="SuggestedUsers">
+                    <span>Suggested Users</span>
+                </a>
+            </div>
+        </li>
     </ul>
 </div>
 

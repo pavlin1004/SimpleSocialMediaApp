@@ -17,7 +17,7 @@
                 }
                 else
                 {
-                    <h2>@Model.FriendName</h2> <!-- Display the other user's name for private chats -->
+                  @*   <h2>@Model.FriendName</h2> *@ <!-- Display the other user's name for private chats -->
                 }
             </div>
 
@@ -56,7 +56,7 @@
             </div>
 
             <div class="more-options">
-                <button id="moreOptionsBtn" class="chat-action-button">...</button>
+                <button id="moreOptionsBtn" class="chat-action-button-options">...</button>
             </div>
 
         </div>
@@ -197,6 +197,28 @@
         flex-direction: column;
     }
 
+    .button-wrapper
+    {
+        width:100%
+        align-items: center;
+        justify-content: center;
+    }
+
+    .chat-action-button
+    {
+        text-align: center;
+        width:100%;
+        background-color: white;
+        color: black;
+        border: none;
+    }
+
+    .chat-action-button:hover
+    {
+        background-color:#1E3A8A;
+        color: white;
+    }
+
     /* Chat Box - Where the chat messages appear */
     .chat-box {
         display: flex;
@@ -204,6 +226,7 @@
         width: 100%;
         max-width: 600px;
         margin: 0 auto;
+        flex-grow: 1;
         padding: 10px;
         background-color: #f5f5f5;
         border-radius: 10px;

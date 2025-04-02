@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SimpleSocialApp.Data.Enums;
 using SimpleSocialApp.Mapping;
 using SimpleSocialApp.Models.ViewModels.Chats;
@@ -11,10 +12,12 @@ namespace SimpleSocialApp.ViewComponents
     public class ListChatViewComponent : ViewComponent
     {
         private readonly IChatService _chatService;
+        private readonly IUserService _userService;
         private readonly IMapper _mapper;
 
-        public ListChatViewComponent(IChatService chatService, IMapper mapper)
+        public ListChatViewComponent(IUserService userService, IChatService chatService, IMapper mapper)
         {
+            _userService = userService;
             _chatService = chatService;
             _mapper = mapper;
         }
@@ -38,8 +41,9 @@ namespace SimpleSocialApp.ViewComponents
                 }
                 else
                 {
-                    var friendName = _chatService.GetFriendName(chat, currentUserId);
-                    chatViewModelList.Add(_mapper.MapToChatViewModel(chat, friendName,0,0));
+                    var friendId = chat.Users.Where(u => u.Id != currentUserId).Select(u => u.Id).First();
+                    var friend = await _userService.GetUserByIdAsync(friendId);
+                    chatViewModelList.Add(_mapper.MapToChatViewModel(chat, friend,0,0));
                 }
             }
             return View(chatViewModelList);

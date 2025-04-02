@@ -51,25 +51,35 @@ namespace SimpleSocialApp.Controllers
             }
             else
             {
-                var friendName = _chatService.GetFriendName(chat, currentUserId);
+                var friendId = chat.Users.Where(u => u.Id != currentUserId).Select(u => u.Id).First();
+                var friend = await _userService.GetUserByIdAsync(friendId);
                 if (count == 0)
                 {
-                    return View(_mapper.MapToChatViewModel(chat, friendName, count, size));
+                    return View(_mapper.MapToChatViewModel(chat, friend, count, size));
                 }
                 else
                 {
-                    return PartialView("Message/_MessagesPartial", _mapper.MapToChatViewModel(chat, friendName, count, size));
+                    return PartialView("Message/_MessagesPartial", _mapper.MapToChatViewModel(chat, friend, count, size));
                 }
             }
         }
 
-        public async Task<IActionResult> ListChat(string userId)
+        [HttpGet]
+        public async Task<IActionResult> ListChat(string userId, string searchQuery = "")
         {
             if(string.IsNullOrEmpty(userId))
             {
                 RedirectToAction("Index", "Home"); 
             }
-            var chats = await _chatService.GetConversationsForUserAsync(userId);
+            var chats = new List<Chat>();
+            if (searchQuery == "")
+            {
+                chats = await _chatService.GetConversationsForUserAsync(userId);
+            }
+            else
+            {
+                chats = await _chatService.SearchChat(userId, searchQuery);
+            }
             var chatViewModelList = new List<ChatViewModel>();
             foreach(var chat in chats)
             {
@@ -79,12 +89,13 @@ namespace SimpleSocialApp.Controllers
                 }
                 else
                 {
-                    var friendName = _chatService.GetFriendName(chat,userId);
-                    chatViewModelList.Add(_mapper.MapToChatViewModel(chat, friendName,0,0));
+                    var friendId = chat.Users.Where(u => u.Id != userId).Select(u => u.Id).First();
+                    var friend = await _userService.GetUserByIdAsync(friendId);
+                    chatViewModelList.Add(_mapper.MapToChatViewModel(chat, friend, 0,0));
                 }
             }
-
             return View(chatViewModelList);           
+
         }
 
         [HttpGet]
