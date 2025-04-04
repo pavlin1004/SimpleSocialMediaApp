@@ -1,13 +1,15 @@
-﻿using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow;
+﻿using CloudinaryDotNet.Actions;
+using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow;
 using Microsoft.EntityFrameworkCore;
 using SimpleSocialApp.Data;
 using SimpleSocialApp.Data.Enums;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Services.Interfaces;
+using System.Security.Claims;
 
 namespace SimpleSocialApp.Services.Implementations
 {
-    public class ChatService :IChatService
+    public class ChatService : IChatService
     {
         private readonly SocialDbContext _context;
         //private readonly IUserService _userService;
@@ -35,7 +37,7 @@ namespace SimpleSocialApp.Services.Implementations
         public async Task<List<Chat>> GetConversationsForUserAsync(string userId)
         {
             return await _context.Chats
-                .Where(c => c.Users.Any(u => u.Id == userId)) 
+                .Where(c => c.Users.Any(u => u.Id == userId))
                 .Include(c => c.Messages)
                 .Include(c => c.Users)
                 .ToListAsync();
@@ -44,13 +46,13 @@ namespace SimpleSocialApp.Services.Implementations
         public async Task<List<AppUser>> GetAllUsers(Chat chat)
         {
             return await _context.Users
-                .Where(u => chat.Users.Select(x => x.Id).Contains(u.Id)) 
+                .Where(u => chat.Users.Select(x => x.Id).Contains(u.Id))
                 .ToListAsync();
         }
 
         public async Task CreateConversationAsync(Chat conversation)
         {
-           _context.Chats.Add(conversation);
+            _context.Chats.Add(conversation);
             await _context.SaveChangesAsync();
         }
 
@@ -63,7 +65,7 @@ namespace SimpleSocialApp.Services.Implementations
                 {
                     CreatedDateTime = DateTime.UtcNow,
                     Type = ChatType.Private,
-                    Users = new HashSet<AppUser> { first, second }
+                    Users = new List<AppUser> { first, second }
                 };
                 _context.Chats.Add(chat);
                 await _context.SaveChangesAsync();
@@ -78,7 +80,7 @@ namespace SimpleSocialApp.Services.Implementations
         public async Task DeleteConversationAsync(string conversationId)
         {
             var conversation = await GetConversationAsync(conversationId);
-            if(conversation == null)
+            if (conversation == null)
             {
                 throw new NullReferenceException("Conversation doesn't exist in the database");
             }
@@ -116,15 +118,51 @@ namespace SimpleSocialApp.Services.Implementations
 
         public async Task<List<Chat>> SearchChat(string userId, string query)
         {
-            var groupChats = _context.Chats
-                .Where(c => c.Title.Contains(query)); // Title is null in private chats
+            query = query.ToLower(); // Make search case-insensitive
 
-            var privateChats = _context.Chats
-                .Where(c => c.Type == ChatType.Private
-                         && c.Users.Any(c => c.Id == userId)
-                         && c.Users.Any(u => u.Id != userId && u.UserName.Contains(query)));
+            var chats = _context.Chats.Include(c => c.Users);
+            // Search Group Chats
+            var groupChats = await chats
+                .Where(c => c.Type == ChatType.Group && c.Title.ToLower().Contains(query) && c.Users.Any(u=>u.Id == userId))
+                .ToListAsync();
 
-            return await privateChats.Union(groupChats).ToListAsync();
+            // Search Private Chats
+            var privateChats = await chats
+                .Where(c => c.Type == ChatType.Private && c.Users.Any(u => u.Id == userId))
+                .ToListAsync();
+
+            // Filter Private Chats by the *other* user's full name
+            var filteredPrivateChats = privateChats
+                .Where(c =>
+                {
+                    var otherUser = c.Users.FirstOrDefault(u => u.Id != userId); // Get the other user
+                    return otherUser != null && ($"{otherUser.FirstName} {otherUser.LastName}").ToString().ToLower().Contains(query);
+                })
+                .ToList();
+
+            // Combine results
+            return filteredPrivateChats.Union(groupChats).ToList();
+        }
+
+        public List<Chat> GetLast(string userId, int count)
+        {
+            // Retrieve chats that have messages and include the messages
+            var chats = _context.Chats
+                .Where(c => c.Users.Any(u => u.Id == userId)) // Ensure the chat contains the specified user
+                .Include(c => c.Messages)
+                .Include(c=> c.Users)// Include related messages
+                .ToList(); // Fetch all relevant chats (you can add pagination or other filtering if needed)
+
+            // Filter chats that have messages and order by the latest message in each chat
+            var orderedChats = chats
+                .Where(c => c.Messages != null && c.Messages.Any()) // Only include chats that have messages
+                .OrderByDescending(c => c.Messages?
+                    .OrderBy(m => m.CreatedDateTime) // Order messages by CreatedDateTime in ascending order
+                    .LastOrDefault()?.CreatedDateTime) // Get the latest message by CreatedDateTime
+                .Take(count) // Take the specified number of chats
+                .ToList();
+
+            return orderedChats;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using SimpleSocialApp.Data.Enums;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Mapping;
@@ -256,6 +257,10 @@ namespace SimpleSocialApp.Controllers
         [HttpPost]
         public async Task<IActionResult> ModifyUsers(string chatId, List<string> userIds, string actionType)
         {              
+            if(userIds == null || userIds.Count==0)
+            {
+                RedirectToAction("Index", "Chat", new { ChatId = chatId });
+            }
             var chat = await _chatService.GetConversationAsync(chatId);
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 

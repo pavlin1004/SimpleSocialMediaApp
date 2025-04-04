@@ -30,7 +30,7 @@ namespace SimpleSocialApp.ViewComponents
             {
                 throw new Exception("1111111111111111111111111111111111111111111111111111111");
             }
-            var chats = await _chatService.GetConversationsForUserAsync(currentUserId);
+            var chats = _chatService.GetLast(currentUserId,10);
 
             var chatViewModelList = new List<ChatViewModel>();
             foreach (var chat in chats)

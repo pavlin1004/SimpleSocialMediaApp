@@ -36,6 +36,8 @@
                     <div class="button-wrapper">
                         <form asp-controller="Chat" asp-action="ModifyUsers" method="get">
                             <input type="hidden" name="chatId" value="@Model.ChatId" />
+                            <input type="hidden" name="userId" value="@currentUserId" />
+                            <input type="hidden" name="actionType" value="Add" />
                             <button type="submit" class="chat-action-button">Add Friend</button>
                         </form>
                     </div>
@@ -43,6 +45,8 @@
                     <div class="button-wrapper">
                         <form asp-controller="Chat" asp-action="ModifyUsers" method="get">
                             <input type="hidden" name="chatId" value="@Model.ChatId" />
+                            <input type="hidden" name="userId" value="@currentUserId" />
+                            <input type="hidden" name="actionType" value="Remove" />
                             <button type="submit" class="chat-action-button">Remove Friend</button>
                         </form>
                     </div>

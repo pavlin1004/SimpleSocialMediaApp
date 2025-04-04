@@ -8,7 +8,8 @@
 }
 <div class="chat-list-container">
     <div class="search-chat">
-        <form method="get" asp-action="ListChat" asp-controller="Chat" asp-route-userId="@currentUserId" class="search-form">
+        <form method="get" asp-action="ListChat" asp-controller="Chat" class="search-form">
+            <input type="hidden" name="userId" value="@currentUserId" />
             <input class="form-control search-bar" type="search" name="searchQuery" placeholder="Search chats" aria-label="Search">
         </form>
     </div>
@@ -124,5 +125,9 @@
         text-align: center;
         font-size: 18px;
         color: #1E3A8A;
+    }
+
+    .chat-list a {
+        width: 100%;
     }
 </style>

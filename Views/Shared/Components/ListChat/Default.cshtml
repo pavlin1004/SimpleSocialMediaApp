@@ -4,13 +4,13 @@
 @model List<ChatViewModel>
 
 <div id="chatListComponent">
-    <div class="chat-list-container">
-        <div class="create-chat-btn mt-3">
+    <div class="chat-list-containerr">
+        <div class="chat-button">
             <a asp-action="Create" asp-controller="Chat" class="btn btn-success">Create a new chat</a>
         </div>
         @if (Model.Count != 0)
         {
-            <h2 class="chat-header">Chats</h2>
+            <h2 class="chat-header">Recent chats</h2> 
             <div class="chat-list">
                 @foreach (var item in Model)
                 {
@@ -35,14 +35,11 @@
         {
             <h3>You participate in no chats yet!</h3>
         }
-        <div class="create-chat-btn mt-3 text-center">
-            <a asp-action="Create" asp-controller="Chat" class="btn btn-success">Create a new chat</a>
-        </div>
     </div>
 </div>
 
 <style>
-    #chatListComponent .chat-list-container {
+    #chatListComponent .chat-list-containerr {
         position: fixed;
         background-color: #ecf0f1;
         padding: 20px;
@@ -123,14 +120,27 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    #chatListComponent .create-chat-btn .btn {
+    #chatListComponent .chat-button{
+        justify-self: center;
+        text-align: center;
+        margin:10px;
         background-color: #1E3A8A;
         color: white;
         border-radius: 8px;
         transition: background-color 0.3s ease;
     }
 
-        #chatListComponent .create-chat-btn .btn:hover {
-            background-color: #3B82F6;
+        #chatListComponent .chat-button:hover {
+            background-color: white;
+            color: #1E3A8A
+        }
+
+        #chatListComponent a:hover{
+        color: #1E3A8A
+        }
+
+        #chatListComponent a{
+            background: none;
+            border: none;
         }
 </style>

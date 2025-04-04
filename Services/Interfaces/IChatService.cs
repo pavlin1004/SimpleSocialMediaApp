@@ -15,6 +15,7 @@ namespace SimpleSocialApp.Services.Interfaces
         public Task<bool> RemoveUserAsync(Chat chat, AppUser user);
         public Task<List<AppUser>> GetAllUsers(Chat chat);
 
+        public List<Chat> GetLast(string userdId, int count);
         public Task<List<Chat>> SearchChat(string userId, string query);
         public string GetFriendName(Chat chat, string currentUserId);
 
