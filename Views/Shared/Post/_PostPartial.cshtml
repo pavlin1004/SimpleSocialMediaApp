@@ -11,7 +11,11 @@
     <div class="post card shadow-sm mb-4 d-flex align-items-center">
         <div class="post-header card-header d-flex justify-content-between align-items-left w-100">
             <div class="post-user">
-                <h5 class="mb-0">@postModel.Post.User.UserName</h5>
+                <div class="post-user-info"> 
+                <img src="@(!string.IsNullOrEmpty(@postModel.Post.User.Media?.Url) ? @postModel.Post.User.Media.Url : "/images/profile_default/default_avatar.jpg")"
+                     alt="@postModel.Post.User.FirstName @postModel.Post.User.LastName" />   
+                <h5 class="mb-0">@postModel.Post.User.FirstName @postModel.Post.User.LastName</h5>
+                </div>
                 <span class="text-muted small">@postModel.Post.CreatedDateTime.ToString("MMM dd, yyyy")</span>
             </div>
             @if (postModel.Post.UserId == currentUserId)
@@ -126,7 +130,24 @@
         position: relative;
         display: inline-block;
     }
-
+    .post-user
+    {
+        display: flex;
+        flex-direction: column;
+    }
+    .post-user-info
+    {
+        display: flex;
+        align-items: center;
+    }
+    .post-user-info img{
+        width: 40px;
+        height: 40px;
+        margin-right: 10px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #ddd;
+    }
     .main-image {
         width: 100%;
         height: auto;

@@ -11,7 +11,6 @@ namespace SimpleSocialApp.Controllers
     {
         private readonly ICommentService _commentService;
         private readonly IPostService _postService;
-
         public CommentController(ICommentService commentService, IPostService postService)
         {
             _commentService = commentService;
@@ -26,7 +25,10 @@ namespace SimpleSocialApp.Controllers
             }
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId)) return Unauthorized();
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
 
             var comment = new Comment
             {
@@ -78,12 +80,9 @@ namespace SimpleSocialApp.Controllers
             if (comment.UserId != currentUserId)
             {
                 return Unauthorized(); 
-            }
-
-     
+            } 
             comment.Content = model.Content;
 
-     
             await _commentService.UpdateCommentAsync(comment);
 
             return RedirectToAction("Details", "Post", new { postId = comment.PostId });

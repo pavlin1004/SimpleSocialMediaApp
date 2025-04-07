@@ -14,14 +14,10 @@ namespace SimpleSocialApp.Services.Implementations
     public class PostService : IPostService
     {
         private readonly SocialDbContext _context;
-        private readonly IMediaService _mediaService;
-        private readonly IUserService _userService;
 
-        public PostService(SocialDbContext context, IMediaService mediaService, IUserService userService, IFriendshipService friendService)
+        public PostService(SocialDbContext context)
         {
             _context = context;
-            _mediaService = mediaService;
-            _userService = userService;
 
         }
         public async Task<Post?> GetPostByIdAsync(string id)
@@ -46,9 +42,8 @@ namespace SimpleSocialApp.Services.Implementations
 
             return friendsPosts.Skip(size * count).Take(size).ToList();
         }
-        public async Task<ICollection<Post>> GetAllUserFriendsPostsAsync(string userId)
+        public async Task<ICollection<Post>> GetAllUserFriendsPostsAsync(string userId, List<AppUser> friends)
         {
-            var friends = await _userService.GetAllUserFriendsAsync(userId);
             var ids = friends.Select(x => x.Id).ToList();
 
             return await _context.Posts.Include(p => p.Media)
@@ -106,6 +101,7 @@ namespace SimpleSocialApp.Services.Implementations
                .Include(p => p.Comments)
                .Include(p => p.Reacts)
                .Include(p => p.User)
+               .ThenInclude(u=> u.Media)
                .Include(p => p.Media)
                .OrderByDescending(p => p.CreatedDateTime)
                .ToListAsync();

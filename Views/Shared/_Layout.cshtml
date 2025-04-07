@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/layout.css"></link>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <title>@ViewData["Title"] - SimpleSocialApp</title>
@@ -35,7 +36,7 @@
                     </main>
                     <div class="col-md-1"></div>
                     <div class="col-md-2 position-fixed end-0">
-                        @await Component.InvokeAsync("ListChat")
+                        @await Component.InvokeAsync("ListChats")
                     </div>
                 </div>
             </div>
@@ -53,43 +54,3 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-
-<style>
-    body, html {
-        margin: 0;
-        padding: 0;
-        padding-bottom: 0; /* Ensures there's no padding at the bottom */
-    }
-
-    /* Navbar Styles */
-    #main-navbar {
-        background-color: #35464d; /* Dark blue background */
-    }
-
-    /* Navbar Brand Styling */
-    .navbar-brand {
-        color: white !important; /* Force white color for brand text */
-        font-weight: bold;
-    }
-
-    /* Navbar Link Styling */
-    .navbar-nav .nav-link {
-        color: white !important; /* White text by default */
-        padding-left: 20px;
-        padding-right: 20px;
-        transition: all 0.3s ease; /* Smooth transition */
-    }
-
-        /* Hover Effect for Navbar Items */
-        .navbar-nav .nav-link:hover {
-            color: black !important; /* Black text on hover */
-            background-color: white !important; /* White background on hover */
-        }
-
-    /* Active Link Styling */
-    .navbar-nav .nav-item.active .nav-link {
-        color: black !important; /* Ensure active link stays black */
-        background-color: white !important; /* White background for active link */
-    }
-</style>
-

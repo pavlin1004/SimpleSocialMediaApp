@@ -1,7 +1,7 @@
 ﻿using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Models.ViewModels.Posts;
 
-namespace SimpleSocialApp.Models.ViewModels
+namespace SimpleSociaMedialApp.Models.ViewModels.AppUsers
 {
     public class ProfileViewModel
     {

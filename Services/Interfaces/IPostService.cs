@@ -7,7 +7,7 @@ namespace SimpleSocialApp.Services.Interfaces
     {
         public Task<Post?> GetPostByIdAsync(string id);
         public Task<ICollection<Post>> GetAllUserPostsAsync(string userId, int size, int count);
-        public Task<ICollection<Post>> GetAllUserFriendsPostsAsync(string userId);
+        public Task<ICollection<Post>> GetAllUserFriendsPostsAsync(string userId, List<AppUser> friends);
         public Task AddPostAsync(Post post);
         public Task UpdatePostAsync(Post post);
         public Task DeletePostAsync(string postId);

@@ -9,13 +9,13 @@ using System.Security.Claims;
 
 namespace SimpleSocialApp.ViewComponents
 {
-    public class ListChatViewComponent : ViewComponent
+    public class ListChatsViewComponent : ViewComponent
     {
         private readonly IChatService _chatService;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
 
-        public ListChatViewComponent(IUserService userService, IChatService chatService, IMapper mapper)
+        public ListChatsViewComponent(IUserService userService, IChatService chatService, IMapper mapper)
         {
             _userService = userService;
             _chatService = chatService;
@@ -28,7 +28,7 @@ namespace SimpleSocialApp.ViewComponents
             var currentUserId = (User as ClaimsPrincipal)?.FindFirstValue(ClaimTypes.NameIdentifier);
             if(String.IsNullOrEmpty(currentUserId))
             {
-                throw new Exception("1111111111111111111111111111111111111111111111111111111");
+                throw new Exception();
             }
             var chats = _chatService.GetLast(currentUserId,10);
 

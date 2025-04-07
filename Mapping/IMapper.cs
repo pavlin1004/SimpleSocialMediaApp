@@ -11,5 +11,7 @@ namespace SimpleSocialApp.Mapping
 
         public List<UserViewModel> MapToUserViewModel(List<AppUser> pending, List<AppUser> nonFriends);
         public FriendViewModel MapToFriendsViewModel(List<AppUser> friends, string userId);
+
+        public UserViewModel MapToUserViewModel(AppUser user, Friendship? friendship);
     }
 }

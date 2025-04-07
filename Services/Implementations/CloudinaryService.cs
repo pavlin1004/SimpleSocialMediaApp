@@ -31,10 +31,6 @@ namespace SimpleSocialApp.Services.Implementations
             return null;
         }
 
-
-
-
-
         private async Task<List<string>?> UploadImageAsync(IFormFile image)
         {
             if (image.Length > 0)

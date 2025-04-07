@@ -194,20 +194,20 @@ namespace SimpleSocialApp.Controllers
             }
 
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(currentUserId))
+            if (string.IsNullOrEmpty(currentUserId)|| post.UserId != currentUserId)
             {
                 return Unauthorized();
-            }
-
-            if (post.UserId != currentUserId)
-            {
-                return Unauthorized(); // More appropriate than Unauthorized for permission issues
             }
 
             foreach(var media in post.Media)
             {
                 await _cloudinaryService.DeleteMediaAsync(media.PublicId);
-                await _mediaService.RemoveUserMediaAsync(media.Id);
+            }
+
+            var result = await _mediaService.RemoveMediaForPostAsync(post);
+            if(result == false)
+            {
+                return BadRequest();
             }
             // Perform deletion
             await _postService.DeletePostAsync(postId);

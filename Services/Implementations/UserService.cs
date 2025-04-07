@@ -13,18 +13,10 @@ namespace SimpleSocialApp.Services.Implementations
     public class UserService : IUserService
     {
         private readonly SocialDbContext _context;
-        private readonly IMediaService _media;
-        private readonly IFriendshipService _friendships;
-        private readonly IChatService _conversations;
-
-        public UserService(SocialDbContext context, IMediaService media, IFriendshipService friendships, IChatService conversations)
+        public UserService(SocialDbContext context)
         {
             _context = context;
-            _media = media;
-            _friendships = friendships;
-            _conversations = conversations;
         }
-
         public async Task<AppUser?> GetUserByIdAsync(string id)
         {
             return await _context.Users
@@ -59,8 +51,6 @@ namespace SimpleSocialApp.Services.Implementations
             var user = await GetUserByIdAsync(id);
             if (user != null)
             {
-                await _media.RemoveUserMediaAsync(id);
-                //await _friendships.RejectUserFriendshipsAsync(id);
                 _context.Users.Remove(user);
                 await _context.SaveChangesAsync();
             }
@@ -75,14 +65,12 @@ namespace SimpleSocialApp.Services.Implementations
             }
             return await _context.Users.Where(u => u.UserName.Contains(name) && u.Id != currentId).ToListAsync();
         }
-        public async Task<IEnumerable<AppUser>> GetAllUserFriendsAsync(string userId)
+        public async Task<IEnumerable<AppUser>> GetAllUserFriendsAsync(string userId, List<Friendship> friends)
         {
-            var friendships = await _friendships.GetUserAcceptedFriendshipsAsync(userId);
 
-            if (friendships != null && friendships.Any())
+            if (friends != null && friends.Any())
             {
-                
-                var friendIds = friendships.Select(x => x.SenderId != userId ? x.SenderId : x.ReceiverId).ToList();
+                var friendIds = friends.Select(x => x.SenderId != userId ? x.SenderId : x.ReceiverId).ToList();
 
                 return await _context.Users
                     .Where(u => friendIds.Contains(u.Id))
@@ -91,9 +79,9 @@ namespace SimpleSocialApp.Services.Implementations
 
             return Enumerable.Empty<AppUser>();
         }
-        public async Task<IEnumerable<AppUser>> GetAllConversationUsersAsync(string conversationId)
+        public async Task<IEnumerable<AppUser>> GetAllConversationUsersAsync(string chatId)
         {
-            return await _context.Users.Where(u => u.Chats.Any(c => c.Id == conversationId)).ToListAsync();
+            return await _context.Users.Where(u => u.Chats.Any(c => c.Id == chatId)).ToListAsync();
         }
 
         public async Task<IEnumerable<AppUser>> SearchUsersByNameAsync(string searchQuery)

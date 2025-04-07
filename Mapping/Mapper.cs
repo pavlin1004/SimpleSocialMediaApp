@@ -2,6 +2,7 @@
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Models.ViewModels.AppUsers;
 using SimpleSocialApp.Models.ViewModels.Chats;
+using SimpleSocialApp.Models.ViewModels.Posts;
 
 namespace SimpleSocialApp.Mapping
 {
@@ -34,15 +35,18 @@ namespace SimpleSocialApp.Mapping
             };
         }
 
-        public List<UserViewModel> MapToUserViewModel(List<AppUser> pending,List<AppUser> nonFriends)
+        public List<UserViewModel> MapToUserViewModel(List<AppUser> pending, List<AppUser> nonFriends)
         {
             var pendingUser = pending.Select(u => new UserViewModel
-                { User = u,
-                  Type = FriendshipType.Pending
-                }).ToList();
+            {
+                User = u,
+                Type = FriendshipType.Pending
+            }).ToList();
+
             var nonFriendUsers = nonFriends.Select(u => new UserViewModel
-            { User = u,
-              Type = null
+            {
+                User = u,
+                Type = null
             }).ToList();
 
             return pendingUser.Concat(nonFriendUsers).ToList();
@@ -59,7 +63,13 @@ namespace SimpleSocialApp.Mapping
                 UserId = userId
             };
         }
-
-
+        public UserViewModel MapToUserViewModel(AppUser user, Friendship? friendship)
+        {
+            return new UserViewModel
+            {
+                User = user,
+                Type = friendship != null ? friendship.Type : null
+            };
+        }
     }
 }

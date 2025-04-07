@@ -19,12 +19,18 @@ namespace SimpleSocialApp.Services.Implementations
 
         public async Task<Message?> GetMessageByIdAsync(string messageId)
         {
-            return await _context.Messages.Include(m => m.Media).FirstOrDefaultAsync(m => m.Id==messageId);
+            return await _context.Messages
+                .Include(m => m.Media)
+                .FirstOrDefaultAsync(m => m.Id==messageId);
         }
 
         public async Task<IEnumerable<Message>> GetConversationMessagesAsync(string conversationId)
         {
-            return await _context.Messages.Include(m => m.Media).Where(m => m.ChatId==conversationId).OrderBy(m => m.CreatedDateTime).ToListAsync();
+            return await _context.Messages
+                .Include(m => m.Media)
+                .Where(m => m.ChatId==conversationId)
+                .OrderBy(m => m.CreatedDateTime)
+                .ToListAsync();
         }
         public async Task CreateMessageAsync(Message message)
         {
@@ -42,7 +48,7 @@ namespace SimpleSocialApp.Services.Implementations
             var message = await GetMessageByIdAsync(messageId);
             if(message==null)
             {
-                throw new KeyNotFoundException("Message with that keys doesnt exist!");
+                throw new KeyNotFoundException("Message with that keys doesn't exist!");
             }
             _context.Messages.Remove(message);
             await _context.SaveChangesAsync();

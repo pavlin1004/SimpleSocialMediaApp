@@ -64,8 +64,8 @@ namespace SimpleSocialApp.Services.Implementations
 
             if (friendship != null)
             {
-                _context.Friendships.Remove(friendship); // Use Remove instead of RemoveRange for a single entity
-                await _context.SaveChangesAsync(); // Use await here as well to avoid concurrency issues
+                _context.Friendships.Remove(friendship); 
+                await _context.SaveChangesAsync(); 
             }
         }
 
@@ -103,14 +103,15 @@ namespace SimpleSocialApp.Services.Implementations
         // Get all friends for a user based on accepted friendships
         public async Task<List<AppUser>> GetAllFriends(string userId)
         {
+            //All Senders & receivers + Media (profile pictures)
             var friendships = await _context.Friendships
-         .Where(f => f.SenderId == userId || f.ReceiverId == userId)
-         .Where(f => f.Type == FriendshipType.Accepted) 
-         .Include(f => f.Sender) 
-             .ThenInclude(u => u.Media) 
-         .Include(f => f.Receiver) 
-             .ThenInclude(u => u.Media) 
-         .ToListAsync();
+             .Where(f => f.SenderId == userId || f.ReceiverId == userId)
+             .Where(f => f.Type == FriendshipType.Accepted) 
+             .Include(f => f.Sender) 
+                 .ThenInclude(u => u.Media) 
+             .Include(f => f.Receiver) 
+                 .ThenInclude(u => u.Media) 
+             .ToListAsync();
 
 
             var users = friendships

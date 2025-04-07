@@ -127,7 +127,7 @@ namespace SimpleSocialApp.Data
                 .HasOne(c => c.User)
                 .WithMany()
                 .HasForeignKey(c => c.UserId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Restrict); // deleted when post gets deleted
 
             builder.Entity<Comment>()
                 .HasOne(c => c.ParentComment)

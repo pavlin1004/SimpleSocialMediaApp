@@ -85,8 +85,15 @@ namespace SimpleSocialApp.Areas.Identity.Pages.Account
             public bool RememberMe { get; set; }
         }
 
+        
+
         public async Task OnGetAsync(string returnUrl = null)
         {
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                Response.Redirect("/Home/Index"); 
+                return;
+            }
             if (!string.IsNullOrEmpty(ErrorMessage))
             {
                 ModelState.AddModelError(string.Empty, ErrorMessage);

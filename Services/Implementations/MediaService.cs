@@ -33,5 +33,21 @@ namespace SimpleSocialApp.Services.Implementations
 
             return media;
         }
+
+        public async Task<bool> RemoveMediaForPostAsync(Post post)
+        {
+            if(post == null)
+            {
+                return false;
+            }
+            if (post.Media != null || post.Media.Count != 0)
+            {
+                _context.RemoveRange(post.Media);
+                await _context.SaveChangesAsync();
+            }
+            return true;
+          
+        }
+
     }
 }

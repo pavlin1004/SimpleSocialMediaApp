@@ -20,7 +20,6 @@
         var newMessage = document.createElement("div");
         newMessage.classList.add("right-paragraph");
         newMessage.innerHTML = `
-        ${isGroupChat === true ? `<strong>${userName}:</strong>` : ''}
         <p class="${userName === 'CurrentUserName' ? 'right-paragraph' : 'left-paragraph'}">${message}</p>
          `;
 

@@ -36,6 +36,7 @@ namespace SimpleSocialApp.Controllers
             {
                 foreach (var post in friendsPosts)
                 {
+                    //Factory class is optional
                     postViewModels.Add(new PostViewModel
                     {
                         Post = post,
@@ -51,6 +52,7 @@ namespace SimpleSocialApp.Controllers
             }
             else
             {
+                //Unlimited scroll post loading
                 return PartialView("Post/_PostPartial", postViewModels);
             }
         }

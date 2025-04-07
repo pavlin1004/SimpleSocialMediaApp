@@ -35,7 +35,7 @@ namespace SimpleSocialApp.Controllers
                 return Unauthorized();
             }
 
-            var chat = await _chatService.GetConversationAsync(model.ChatId);
+            var chat = await _chatService.GetChatAsync(model.ChatId);
 
             if(chat == null)
             {

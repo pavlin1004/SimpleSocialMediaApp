@@ -34,7 +34,7 @@ namespace SimpleSocialApp.Controllers
             {
                 return Unauthorized();
             }
-            var chat = await _chatService.GetConversationAsync(chatId);
+            var chat = await _chatService.GetChatAsync(chatId);
             if (chat == null)
             {
                 return NotFound();
@@ -54,7 +54,7 @@ namespace SimpleSocialApp.Controllers
             {
                 var friendId = chat.Users.Where(u => u.Id != currentUserId).Select(u => u.Id).First();
                 var friend = await _userService.GetUserByIdAsync(friendId);
-                if (count == 0)
+                if (count == 0) 
                 {
                     return View(_mapper.MapToChatViewModel(chat, friend, count, size));
                 }
@@ -66,7 +66,7 @@ namespace SimpleSocialApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ListChat(string userId, string searchQuery = "")
+        public async Task<IActionResult> ListChats(string userId, string searchQuery = "")
         {
             if(string.IsNullOrEmpty(userId))
             {
@@ -75,11 +75,11 @@ namespace SimpleSocialApp.Controllers
             var chats = new List<Chat>();
             if (searchQuery == "")
             {
-                chats = await _chatService.GetConversationsForUserAsync(userId);
+                chats = await _chatService.GetChatsForUserAsync(userId);
             }
             else
             {
-                chats = await _chatService.SearchChat(userId, searchQuery);
+                chats = await _chatService.SearchChatAsync(userId, searchQuery);
             }
             var chatViewModelList = new List<ChatViewModel>();
             foreach(var chat in chats)
@@ -158,14 +158,14 @@ namespace SimpleSocialApp.Controllers
             }   
             chat.Users.Add(currentUser);
          
-            await _chatService.CreateConversationAsync(chat);
+            await _chatService.CreateChatAsync(chat);
 
             return RedirectToAction("ListChat", new { userId = currentUserId});
         }
         [HttpGet]
         public async Task<IActionResult> ModifyUsers(string chatId, string userId, string actionType)
         {
-            var chat = await _chatService.GetConversationAsync(chatId);
+            var chat = await _chatService.GetChatAsync(chatId);
             if(chat == null)
             {
                 return BadRequest();
@@ -185,7 +185,7 @@ namespace SimpleSocialApp.Controllers
             //}
             if (actionType == "Remove")
             {
-                var participants = await _chatService.GetAllUsers(chat);
+                var participants = await _chatService.GetAllUsersAsync(chat);
                 var filteredParticipants = participants.Where(p => p.Id != userId).ToList();
                 model = new ModifyChatParticipantViewModel
                 {
@@ -261,7 +261,7 @@ namespace SimpleSocialApp.Controllers
             {
                 RedirectToAction("Index", "Chat", new { ChatId = chatId });
             }
-            var chat = await _chatService.GetConversationAsync(chatId);
+            var chat = await _chatService.GetChatAsync(chatId);
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (chat == null || userIds == null || userIds.Count == 0)
@@ -307,7 +307,7 @@ namespace SimpleSocialApp.Controllers
 
         public async Task<IActionResult> DeleteChat(string chatId)
         {
-            var chat = await _chatService.GetConversationAsync(chatId);
+            var chat = await _chatService.GetChatAsync(chatId);
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (chat == null)
@@ -320,7 +320,7 @@ namespace SimpleSocialApp.Controllers
                 return Unauthorized();
             }
 
-            await _chatService.DeleteConversationAsync(chatId);
+            await _chatService.DeleteChatAsync(chatId);
 
             return RedirectToAction("ListChat", new { userId = currentUserId});
         }
@@ -337,7 +337,7 @@ namespace SimpleSocialApp.Controllers
                 return BadRequest();
             }
 
-            var chat = await _chatService.GetConversationAsync(chatId);
+            var chat = await _chatService.GetChatAsync(chatId);
 
             if (chat == null)
             {

@@ -17,7 +17,11 @@
                 }
                 else
                 {
-                  @*   <h2>@Model.FriendName</h2> *@ <!-- Display the other user's name for private chats -->
+                    <div class="d-flex">
+                        <img src="@(!string.IsNullOrEmpty(Model.Friend.Media?.Url) ? @Model.Friend.Media?.Url : "/images/profile_default/default_avatar.jpg")"
+                             alt="friend_profile_picture"/>
+                        <h2>@Model.Friend.FirstName @Model.Friend.LastName</h2>
+                    </div>
                 }
             </div>
 
@@ -161,6 +165,15 @@
         color: white; /* White text on dark blue background */
     }
 
+    img {
+        margin-right:10px;
+        
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #ddd;
+    }
     /* More options button styles */
     .more-options {
         display: flex;
@@ -203,7 +216,7 @@
 
     .button-wrapper
     {
-        width:100%
+        width:100%;
         align-items: center;
         justify-content: center;
     }

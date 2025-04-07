@@ -37,7 +37,6 @@ namespace SimpleSocialApp.Services.Implementations
                 .Where(c => c.Comments.Any(p =>p.ParentCommentId==commentId))
                 .ToListAsync();
         }
-
         public async Task CreateCommentAsync(Comment comment)
         {
             _context.Comments.Add(comment);
@@ -72,7 +71,6 @@ namespace SimpleSocialApp.Services.Implementations
             }
             return comment;
         }
-
         public async Task<int> GetLikesCountAsync(string commentId)
         {
             return await _context.Reactions.Where(r => r.CommentId == commentId).CountAsync();

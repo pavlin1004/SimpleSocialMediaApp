@@ -7,7 +7,7 @@ namespace SimpleSocialApp.Services.Interfaces
         public Task<AppUser?> GetUserByIdAsync(string userId);
 
         public Task<AppUser?> GetUserWithCommunicationDetailsAsync(string userId);
-        public Task<IEnumerable<AppUser>> GetAllUserFriendsAsync(string userId);
+        public Task<IEnumerable<AppUser>> GetAllUserFriendsAsync(string userId, List<Friendship> friends);
         public Task CreateAsync(AppUser user);
         public Task UpdateAsync(AppUser user);
         public Task RemoveAsync(string id);

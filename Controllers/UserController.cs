@@ -10,6 +10,7 @@ using SimpleSocialApp.Models.ViewModels.AppUsers;
 using SimpleSocialApp.Models.ViewModels.Posts;
 using SimpleSocialApp.Services.Implementations;
 using SimpleSocialApp.Services.Interfaces;
+using SimpleSociaMedialApp.Models.ViewModels.AppUsers;
 using System.Security.Claims;
 using System.Transactions;
 
@@ -228,11 +229,7 @@ namespace SimpleSocialApp.Controllers
             foreach (var user in users)
             {
                 var friendship = await _friendshipService.CheckFriendship(user.Id, currentUser);
-                model.Add(new UserViewModel
-                {
-                    User = user,
-                    Type = friendship != null ? friendship.Type : null
-                }); 
+                model.Add(_mapper.MapToUserViewModel(user, friendship));
             }
 
             return View(model); // Return the view with results
