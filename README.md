@@ -27,7 +27,6 @@ A simple social media platform built with ASP.NET Core and Entity Framework Core
 - **ASP.NET Core MVC** – Core framework for building the web application following the MVC architectural pattern.
 - **Entity Framework Core (EF Core)** – ORM for data access with:
   - **Code-First Approach** – Database schema is created from models.
-  - **Lazy Loading** – Navigation properties are loaded only when accessed.
   - **Migrations** – Database changes are tracked and updated incrementally.
   - **Microsoft SQL Server** – Primary relational database provider.
 
