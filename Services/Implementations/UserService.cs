@@ -57,38 +57,12 @@ namespace SimpleSocialApp.Services.Implementations
 
         }
 
-        public async Task<IEnumerable<AppUser>> SearchUsersByName(string name, string currentId)
-        {
-            if(string.IsNullOrEmpty(name))
-            {
-                return Enumerable.Empty<AppUser>();
-            }
-            return await _context.Users.Where(u => u.UserName.Contains(name) && u.Id != currentId).ToListAsync();
-        }
-        public async Task<IEnumerable<AppUser>> GetAllUserFriendsAsync(string userId, List<Friendship> friends)
-        {
-
-            if (friends != null && friends.Any())
-            {
-                var friendIds = friends.Select(x => x.SenderId != userId ? x.SenderId : x.ReceiverId).ToList();
-
-                return await _context.Users
-                    .Where(u => friendIds.Contains(u.Id))
-                    .ToListAsync();
-            }
-
-            return Enumerable.Empty<AppUser>();
-        }
-        public async Task<IEnumerable<AppUser>> GetAllConversationUsersAsync(string chatId)
-        {
-            return await _context.Users.Where(u => u.Chats.Any(c => c.Id == chatId)).ToListAsync();
-        }
-
         public async Task<IEnumerable<AppUser>> SearchUsersByNameAsync(string searchQuery)
         {
+            searchQuery = searchQuery.ToLower();
             return await _context.Users
                 .Include(u => u.Media)
-                .Where(u => u.FirstName.Contains(searchQuery) || u.LastName.Contains(searchQuery))
+                .Where(u => u.FirstName.ToLower().Contains(searchQuery) || u.LastName.ToLower().Contains(searchQuery))
                 .ToListAsync();
         }
 
@@ -110,7 +84,6 @@ namespace SimpleSocialApp.Services.Implementations
                 _context.Update(user);
             }
             await _context.SaveChangesAsync();
-
         }
 
 
