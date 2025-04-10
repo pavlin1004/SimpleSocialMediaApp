@@ -579,7 +579,7 @@ namespace SimpleSocialApp.Migrations
                     b.HasOne("SimpleSocialApp.Data.Models.AppUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ParentComment");

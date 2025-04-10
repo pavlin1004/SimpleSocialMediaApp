@@ -124,7 +124,7 @@ namespace SimpleSocialApp.Areas.Identity.Pages.Account
                 user.FirstName = Input.FirstName; // This can be null
                 user.LastName = Input.LastName; // This can be null 
 
-                await _userStore.SetUserNameAsync(user,$"{user.FirstName} {user.LastName}", CancellationToken.None);
+                await _userStore.SetUserNameAsync(user,user.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                       
                 var result = await _userManager.CreateAsync(user, Input.Password);
