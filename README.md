@@ -34,7 +34,7 @@ A simple social media platform built with ASP.NET Core and Entity Framework Core
 - **Models** – Represent users, posts, comments, media, friendships, chats, etc.
 - **Custom Seeder** – Seeds initial data like posts and users.
 - **Bogus** – Generates realistic fake data (e.g., names).
-- **Genderize API** – Determines gender based on first name for seeding.
+- **Genderize API** – Determines gender based on profile picture.
 
 ### ⚙️ Architecture
 - **Service Layer** – Decouples business logic from controllers.
@@ -49,7 +49,7 @@ A simple social media platform built with ASP.NET Core and Entity Framework Core
 - **Data Validation** – Both client-side and server-side validations implemented.
 
 ### 🧪 Testing
-- **NUnit** 
+- **xUnit** 
 - **Moq** 
 - **In-Memory Database** 
 
