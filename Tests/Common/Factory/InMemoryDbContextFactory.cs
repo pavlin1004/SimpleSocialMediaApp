@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Emgu.CV.Ocl;
+using Microsoft.EntityFrameworkCore;
 using SimpleSocialApp.Data;
 
 namespace SimpleSociaMedialApp.Tests.Common.Factory
@@ -13,6 +14,5 @@ namespace SimpleSociaMedialApp.Tests.Common.Factory
 
             return new SocialDbContext(options);
         }
-
     }
 }

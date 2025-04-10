@@ -7,19 +7,25 @@ using SimpleSociaMedialApp.Tests.Common;
 using SimpleSociaMedialApp.Tests.Common.Factory;
 using SimpleSociaMedialApp.Tests.Data;
 using System.Data;
+using Tests.Common;
+using Tests.Data.Factory;
 using Xunit;
 
 namespace SimpleSociaMedialApp.Tests.ServiceTests
 {
-    public class UserServiceTests
+    public class UserServiceTests : Initialise
     {
+        private readonly UserService userService;
+
+        public UserServiceTests()
+        {
+            userService = new UserService(context);
+        }
         [Fact]
         public async Task GetUserById_ShouldGetUserBasedOnId()
         {
-            var context = InMemoryDbContextFactory.CreateContext();
-            var userService = new UserService(context);
-
             var users = new List<AppUser> { Users.User1 };
+
             await context.SeedAsync(users);
 
             var user = await userService.GetUserByIdAsync(Users.User1.Id);
@@ -33,28 +39,30 @@ namespace SimpleSociaMedialApp.Tests.ServiceTests
         [Fact]
         public async Task Get_ShouldFetchUserAndTheChatsHeIsIn()
         {
-            var context = InMemoryDbContextFactory.CreateContext();
-            var userService = new UserService(context);
 
-            var users = new List<AppUser> { Users.User1, Users.User2, Users.User3, Users.User4, Users.User5 };
-            var chats = new List<Chat> { Chats.Chat1, Chats.Chat2 };
+            var users = AppUserFactory.CreateUsers(5);
+            var chats = new List<Chat>
+            {
+                ChatFactory.CreateChat(new List<AppUser>{users[0],users[1]}, ChatType.Private),
+                ChatFactory.CreateChat(new List<AppUser>{users[0],users[2],users[2],users[3]}, ChatType.Group)
+            };
             await context.SeedAsync(users).SeedAsync(chats);
 
-            var chatShouldBeEmpty = await userService.GetUserWithCommunicationDetailsAsync(Users.User5.Id);
-            var chat_shouldBe1 = await userService.GetUserWithCommunicationDetailsAsync(Users.User4.Id);
-            var chat_shouldBe2 = await userService.GetUserWithCommunicationDetailsAsync(Users.User1.Id);
+            var chatShouldBeEmpty = await userService.GetUserWithCommunicationDetailsAsync(users[4].Id);
+            var chat_shouldBe1 = await userService.GetUserWithCommunicationDetailsAsync(users[3].Id);
+            var chat_shouldBe2 = await userService.GetUserWithCommunicationDetailsAsync(users[0].Id);
 
             Assert.NotNull(chatShouldBeEmpty?.Chats);
             Assert.Empty(chatShouldBeEmpty.Chats);
             Assert.True(chat_shouldBe1?.Chats.Count() == 1);
             Assert.True(chat_shouldBe2?.Chats.Count() == 2);
+
+            context.Database.EnsureDeleted();
         }
 
         [Fact]
         public async Task ShouldAddUserToTheDatabase()
         {
-            var context = InMemoryDbContextFactory.CreateContext();
-            var userService = new UserService(context);
 
             var user = Users.User1;
             var shouldNotBeInBase = await userService.GetUserByIdAsync(user.Id);
@@ -70,9 +78,6 @@ namespace SimpleSociaMedialApp.Tests.ServiceTests
         [Fact]
         public async Task ShouldUpdateFirstNameForUser()
         {
-            var context = InMemoryDbContextFactory.CreateContext();
-            var userService = new UserService(context);
-
             const string email = "myNewEmail@gmail.com";
 
             var user = Users.User1;
@@ -92,9 +97,7 @@ namespace SimpleSociaMedialApp.Tests.ServiceTests
         [Fact]
         public async Task ShouldRemoveUserFromDatabase()
         {
-            var context = InMemoryDbContextFactory.CreateContext();
-            var userService = new UserService(context);
-
+         
             await context.SeedAsync(new List<AppUser> { Users.User1 });
             await userService.RemoveAsync(Users.User1.Id);
 
@@ -106,8 +109,7 @@ namespace SimpleSociaMedialApp.Tests.ServiceTests
         [Fact]
         public async Task UserShouldHaveSpecificSubstringInTheFirstAndLastNameConcatenated()
         {
-            var context = InMemoryDbContextFactory.CreateContext();
-            var userService = new UserService(context);
+    
 
             var users = new List<AppUser>() {Users.User1,Users.User2,Users.User3, Users.User4, Users.User5 };
             await context.SeedAsync(users);
@@ -128,17 +130,11 @@ namespace SimpleSociaMedialApp.Tests.ServiceTests
         [Fact]
         public async Task ShouldReturnFalseIfDbHasNoUsers()
         {
-            var context = InMemoryDbContextFactory.CreateContext();
-            var userService = new UserService(context);
-
             Assert.False(await userService.AnyAsync());
         }
         [Fact]
         public async Task ShouldReturnTrueIfDbHasAnyUsers()
         {
-            var context = InMemoryDbContextFactory.CreateContext();
-            var userService = new UserService(context);
-
             await context.SeedAsync(new List<AppUser> { Users.User1 });
             Assert.True(await userService.AnyAsync());
         }
@@ -146,9 +142,6 @@ namespace SimpleSociaMedialApp.Tests.ServiceTests
         [Fact]
         public async Task ShouldAddProfilePictureForUser()
         {
-            var context = InMemoryDbContextFactory.CreateContext();
-            var userService = new UserService(context);
-
             await context.SeedAsync(new List<AppUser> { Users.User1 });
             var media = Users.User1.Media;
 
@@ -172,14 +165,8 @@ namespace SimpleSociaMedialApp.Tests.ServiceTests
         [Fact]
         public async Task ShouldGetAllUsersCount()
         {
-            var context = InMemoryDbContextFactory.CreateContext();
-            var userService = new UserService(context);
-
-            await context.SeedAsync(new List<AppUser> { Users.User1,Users.User5 });
-
+            await context.SeedAsync(new List<AppUser> {Users.User5, Users.User1 });
             var users = await userService.GetAllAsync();
-            var t = 5;
-
             Assert.True(users.Count == 2);
         }
 

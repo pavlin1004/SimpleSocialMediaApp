@@ -25,7 +25,6 @@ namespace SimpleSociaMedialApp.Tests.Common
                 if (item == null) continue;
                 await context.AddAsync(item);
             }
-
             await context.SaveChangesAsync();
             return context;
         }

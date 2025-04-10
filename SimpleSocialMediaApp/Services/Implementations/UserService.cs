@@ -71,9 +71,9 @@ namespace SimpleSocialApp.Services.Implementations
             return await _context.Users.AnyAsync();
         }
 
-        public Task<List<AppUser>> GetAllAsync()
+        public async Task<List<AppUser>> GetAllAsync()
         {
-            return _context.Users.ToListAsync();
+            return await _context.Users.ToListAsync();
         }
         public async Task AddProfilePictureAsync(AppUser user, Media media)
         {
