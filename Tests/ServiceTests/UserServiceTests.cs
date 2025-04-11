@@ -5,9 +5,9 @@ using SimpleSocialApp.Migrations;
 using SimpleSocialApp.Services.Implementations;
 using SimpleSociaMedialApp.Tests.Common;
 using SimpleSociaMedialApp.Tests.Common.Factory;
-using SimpleSociaMedialApp.Tests.Data;
 using System.Data;
 using Tests.Common;
+using Tests.Data.Custom;
 using Tests.Data.Factory;
 using Xunit;
 
@@ -165,7 +165,7 @@ namespace SimpleSociaMedialApp.Tests.ServiceTests
         [Fact]
         public async Task ShouldGetAllUsersCount()
         {
-            await context.SeedAsync(new List<AppUser> {Users.User5, Users.User1 });
+            await context.SeedAsync(AppUserFactory.CreateUsers(2));
             var users = await userService.GetAllAsync();
             Assert.True(users.Count == 2);
         }

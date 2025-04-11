@@ -1,6 +1,6 @@
 ﻿using SimpleSocialApp.Data.Models;
 
-namespace SimpleSociaMedialApp.Tests.Data
+namespace Tests.Data.Custom
 {
     public static class Friendships
     {

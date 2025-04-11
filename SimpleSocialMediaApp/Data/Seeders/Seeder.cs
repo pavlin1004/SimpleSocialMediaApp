@@ -281,7 +281,7 @@ public class Seeder : ISeeder
     ("A beautiful day in the garden with my plants.", "/images/posts/garden_day.jpeg"),
     ("Celebrating small wins today. Every step counts!", "/images/posts/small_win_celebration.jpeg")
     };
-        var posts = await _postService.GetAllAsync();
+        var posts = await _postService.GetAllAsyncWithUserMediaAsync();
         for (int i = 0; i < postsData.Count; i++)
         {
             posts[i].Content = postsData[i].Content;
@@ -305,10 +305,10 @@ public class Seeder : ISeeder
         foreach (var user in users)
         {
             // Get all friends of the current user
-            var friends = await _friendshipService.GetAllFriendsIds(user.Id);
+            var friendsIds = await _friendshipService.GetAllFriendsIds(user.Id);
 
             // Get all posts of those friends
-            var posts = await _postService.GetAllFriendsPosts(friends);
+            var posts = await _postService.GetAllUserFriendsPostsAsync(friendsIds);
 
             // Shuffle and take 70% of posts
             var postsToLike = faker.Random.ListItems(posts, (int)(posts.Count * 0.7));

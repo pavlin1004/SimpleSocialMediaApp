@@ -2,7 +2,7 @@
 using Microsoft.Identity.Client;
 using SimpleSocialApp.Data.Models;
 
-namespace SimpleSociaMedialApp.Tests.Data
+namespace Tests.Data.Custom
 {
     public static class Users
     {
@@ -19,14 +19,24 @@ namespace SimpleSociaMedialApp.Tests.Data
             LastName = param1,
             Email = param2,
             UserName = $"{param1} {param1}",
-            Posts = new List<Post>() { new() }, 
+            Media = new Media
+            {
+                PublicId = param1,
+                Url = param1,
+            },
+            Posts = new List<Post>() { new() },
         };
         public static readonly AppUser User2 = new AppUser
         {
             FirstName = param2,
             LastName = param2,
             Email = param2,
-            UserName = $"{param2} {param2}"
+            UserName = $"{param2} {param2}",
+            Media = new Media
+            {
+                PublicId = param2,
+                Url = param2,
+            }
         };
         public static readonly AppUser User3 = new AppUser
         {
@@ -42,7 +52,7 @@ namespace SimpleSociaMedialApp.Tests.Data
             LastName = param4,
             Email = param4,
             UserName = $"{param4} {param4}"
-        }; 
+        };
         public static readonly AppUser User5 = new AppUser
         {
             FirstName = param5,

@@ -1,12 +1,12 @@
 ﻿using SimpleSocialApp.Data.Models;
 
-namespace SimpleSociaMedialApp.Tests.Data
+namespace Tests.Data.Custom
 {
     public static class Posts
     {
         public const string postParam1 = "testPost1";
-        public const string postParam2 = "testPost1";
-        public const string postParam3 = "testPost1";
+        public const string postParam2 = "testPost2";
+        public const string postParam3 = "testPost3";
 
         public const string mediaParam1 = "testMedia1";
         public const string mediaParam2 = "testMedia2";
@@ -16,7 +16,7 @@ namespace SimpleSociaMedialApp.Tests.Data
         public static readonly Post Post1 = new Post
         {
             Id = postParam1,
-            Content= postParam1,
+            Content = postParam1,
             User = Users.User2,
             Media = new List<Media>
             {
@@ -35,11 +35,11 @@ namespace SimpleSociaMedialApp.Tests.Data
                 }
             },
             Reacts = new List<Reaction>
-            {  
+            {
                 new Reaction
                 {
                     User = Users.User4
-                }    
+                }
             }
         };
 
@@ -53,8 +53,7 @@ namespace SimpleSociaMedialApp.Tests.Data
                     Id = "testMedia2",
                     Url = "testMedia2",
                     PublicId = "testMedia2"
-                    },
-                new Media()
+                    }
             },
             User = Users.User2
         };

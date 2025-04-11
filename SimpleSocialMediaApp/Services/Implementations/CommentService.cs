@@ -31,12 +31,12 @@ namespace SimpleSocialApp.Services.Implementations
                 ToListAsync();
         }
 
-        public async Task<ICollection<Comment>> GetAllCommentChildComments(string commentId)
-        {
-            return await _context.Comments
-                .Where(c => c.Comments.Any(p =>p.ParentCommentId==commentId))
-                .ToListAsync();
-        }
+        //public async Task<ICollection<Comment>> GetAllCommentChildComments(string commentId)
+        //{
+        //    return await _context.Comments
+        //        .Where(c => c.Comments.Any(p =>p.ParentCommentId==commentId))
+        //        .ToListAsync();
+        //}
         public async Task CreateCommentAsync(Comment comment)
         {
             _context.Comments.Add(comment);
@@ -46,11 +46,6 @@ namespace SimpleSocialApp.Services.Implementations
         {
             _context.Comments.Update(comment);
             await _context.SaveChangesAsync();
-        }
-        public async Task DeleteCommentByIdAsync(string commentId)
-        {
-            var comment = await FindCommentToDelete(commentId);
-            await DeleteCommentAsync(comment);
         }
         public async Task DeleteCommentAsync(Comment comment)
         {       
@@ -62,22 +57,9 @@ namespace SimpleSocialApp.Services.Implementations
             _context.Comments.Remove(comment);
             await _context.SaveChangesAsync();
         }
-        private async Task<Comment> FindCommentToDelete(string commentId)
-        {
-            var comment = await GetCommentAsync(commentId);
-            if(comment == null)
-            {
-                throw new KeyNotFoundException("Comment you are trying to delete doesn't exist!");
-            }
-            return comment;
-        }
         public async Task<int> GetLikesCountAsync(string commentId)
         {
             return await _context.Reactions.Where(r => r.CommentId == commentId).CountAsync();
-        }
-        public async Task<bool> AnyAsync()
-        {
-            return await _context.Comments.AnyAsync();
         }
     }
 }

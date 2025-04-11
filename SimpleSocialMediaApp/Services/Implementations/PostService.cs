@@ -29,7 +29,7 @@ namespace SimpleSocialApp.Services.Implementations
                 .Include(x => x.Media)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
-        public async Task<ICollection<Post>> GetAllUserPostsAsync(string userId, int size, int count=0)
+        public async Task<List<Post>> GetAllUserPostsAsync(string userId, int size=5, int count=0)
         {
             var friendsPosts = await _context.Posts
                 .Include(p => p.Comments)
@@ -42,11 +42,12 @@ namespace SimpleSocialApp.Services.Implementations
 
             return friendsPosts.Skip(size * count).Take(size).ToList();
         }
-        public async Task<ICollection<Post>> GetAllUserFriendsPostsAsync(string userId, List<AppUser> friends)
+        public async Task<List<Post>> GetAllUserFriendsPostsAsync(string userId, List<AppUser> friends)
         {
             var ids = friends.Select(x => x.Id).ToList();
 
-            return await _context.Posts.Include(p => p.Media)
+            return await _context.Posts
+                .Include(p => p.Media)
                 .Where(p => ids.Contains(p.UserId))
                 .OrderByDescending(x => x.CreatedDateTime)
                 .ToListAsync();
@@ -79,14 +80,14 @@ namespace SimpleSocialApp.Services.Implementations
         {
             return await _context.Reactions.Where(r => r.PostId == postId).CountAsync();
         }
-        public async Task<List<Post>> GetAllFriendsPosts(List<string> friends)
+        public async Task<List<Post>> GetAllUserFriendsPostsAsync(List<string> friendsIds)
         {
-            return await _context.Posts.Where(p => friends.Contains(p.UserId)).ToListAsync();
+            return await _context.Posts.Where(p => friendsIds.Contains(p.UserId)).ToListAsync();
         }
 
         public async Task AddPostsAsync(List<Post> posts)
         {
-            _context.Posts.AddRange(posts);
+            await _context.Posts.AddRangeAsync(posts);
             await _context.SaveChangesAsync();
         }
 
@@ -95,7 +96,7 @@ namespace SimpleSocialApp.Services.Implementations
             return await _context.Posts.AnyAsync();
         }
 
-        public async Task<List<Post>> GetAllAsync()
+        public async Task<List<Post>> GetAllAsyncWithUserMediaAsync()
         {
             return await _context.Posts
                .Include(p => p.Comments)
@@ -106,9 +107,9 @@ namespace SimpleSocialApp.Services.Implementations
                .OrderByDescending(p => p.CreatedDateTime)
                .ToListAsync();
         }
-        public async Task<List<Post>> GetAllAsync(int size, int count)
+        public async Task<List<Post>> GetAllAsyncWithUserMediaAsync(int size, int count)
         {
-            var posts = await GetAllAsync();
+            var posts = await GetAllAsyncWithUserMediaAsync();
             return posts.Skip(count*size).Take(size).ToList();
         }
 

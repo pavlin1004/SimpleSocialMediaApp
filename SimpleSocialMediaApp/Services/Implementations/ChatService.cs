@@ -72,12 +72,6 @@ namespace SimpleSocialApp.Services.Implementations
                 await _context.SaveChangesAsync();
             }
         }
-
-        public async Task UpdateChatAsync(Chat conversation)
-        {
-            _context.Chats.Update(conversation);
-            await _context.SaveChangesAsync();
-        }
         public async Task DeleteChatAsync(string chatId)
         {
             var chat = await GetChatAsync(chatId);
@@ -143,14 +137,14 @@ namespace SimpleSocialApp.Services.Implementations
             return filteredPrivateChats.Union(groupChats).ToList();
         }
 
-        public List<Chat> GetLast(string userId, int count)
+        public async Task<List<Chat>> OrderChatsByLastMessages(string userId, int count)
         {
             // Retrieve chats that have messages and include the messages
-            var chats = _context.Chats
+            var chats = await _context.Chats
                 .Where(c => c.Users.Any(u => u.Id == userId))
                 .Include(c => c.Messages)
                 .Include(c => c.Users)
-                .ToList();
+                .ToListAsync();
 
             // Filter chats that have messages and order by the latest message in each chat
             var orderedChats = chats

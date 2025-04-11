@@ -30,7 +30,7 @@ namespace SimpleSocialApp.Controllers
             {
                 return Unauthorized();
             }
-            var friendsPosts = await _postService.GetAllAsync(size, count);
+            var friendsPosts = await _postService.GetAllAsyncWithUserMediaAsync(size, count);
             var postViewModels = new List<PostViewModel>();
             if (!(friendsPosts == null || friendsPosts.Count == 0))
             {

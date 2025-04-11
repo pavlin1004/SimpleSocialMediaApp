@@ -10,7 +10,18 @@ namespace Tests.Data.Factory
 {
     public static class AppUserFactory
     {
+        public static AppUser CreateAsync()
+        {
+            var data = Guid.NewGuid().ToString();
+            return new AppUser
+            {
+                Id = data,
+                Email = data,
+                FirstName = data,
+                LastName = data
+            };
 
+        }
         public static List<AppUser> CreateUsers(int count)
         {
             var users = new List<AppUser>();
