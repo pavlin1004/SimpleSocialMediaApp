@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Emgu.CV.Ocl;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SimpleSocialApp.Data;
 
 namespace SimpleSociaMedialApp.Tests.Common
@@ -28,5 +29,27 @@ namespace SimpleSociaMedialApp.Tests.Common
             await context.SaveChangesAsync();
             return context;
         }
+        public static async Task<SocialDbContext> SeedEntityAsync<T>(this SocialDbContext context, T entity)
+        {
+            if (entity != null)
+            {
+                await context.AddAsync(entity);
+                await context.SaveChangesAsync();
+            }
+            return context;
+        }
+        public static async Task<SocialDbContext> SeedEntityAsync<T>(this Task<SocialDbContext> contextTask, T entity)
+        {
+            var context = await contextTask;
+            if (entity != null)
+            {
+                await context.AddAsync(entity);
+                await context.SaveChangesAsync();
+            }
+
+            return context;
+        }
+       
+
     }
 }

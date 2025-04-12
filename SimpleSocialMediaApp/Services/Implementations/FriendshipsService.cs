@@ -23,7 +23,7 @@ namespace SimpleSocialApp.Services.Implementations
         }
 
         // Get all accepted friendships for a user
-        public async Task<IEnumerable<Friendship>> GetUserAcceptedFriendshipsAsync(string userId)
+        public async Task<List<Friendship>> GetUserAcceptedFriendshipsAsync(string userId)
         {
             return await _context.Friendships
                 .Where(f => (f.SenderId == userId || f.ReceiverId == userId) && f.Type == FriendshipType.Accepted).Include(f => f.Sender).Include(f =>f.Receiver)
@@ -31,7 +31,7 @@ namespace SimpleSocialApp.Services.Implementations
         }
 
         // Get all pending friendships for a user
-        public async Task<IEnumerable<Friendship>> GetUserPendingFriendshipsAsync(string userId)
+        public async Task<List<Friendship>> GetUserPendingFriendshipsAsync(string userId)
         {
             return await _context.Friendships
                 .Where(f => (f.SenderId == userId || f.ReceiverId == userId) && f.Type == FriendshipType.Pending)
@@ -154,11 +154,6 @@ namespace SimpleSocialApp.Services.Implementations
                 .ToListAsync();
 
             return (pendingUsers, nonFriends);
-        }
-
-        public async Task<bool> AnyAsync()
-        {
-            return await _context.Friendships.AnyAsync();
         }
         public async Task CreateAsync(Friendship f)
         {

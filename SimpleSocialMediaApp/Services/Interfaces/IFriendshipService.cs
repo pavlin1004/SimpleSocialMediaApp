@@ -10,8 +10,8 @@ namespace SimpleSocialApp.Services.Interfaces
         public Task RemoveUserFriendshipsAsync(string senderId, string receiverId);
         public Task AcceptUserFriendshipAsync(string senderId, string receiverId);
 
-        public Task<IEnumerable<Friendship>> GetUserAcceptedFriendshipsAsync(string userId);
-        public Task<IEnumerable<Friendship>> GetUserPendingFriendshipsAsync(string userId);
+        public Task<List<Friendship>> GetUserAcceptedFriendshipsAsync(string userId);
+        public Task<List<Friendship>> GetUserPendingFriendshipsAsync(string userId);
 
         public Task<Friendship?> CheckFriendship(string user1Id, string user2Id);
         public Task<List<AppUser>> GetAllFriends(string userId);
@@ -19,7 +19,6 @@ namespace SimpleSocialApp.Services.Interfaces
         public Task<List<string>> GetAllFriendsIds(string userId);
 
         public Task<(List<AppUser>, List<AppUser>)> GetNonFriendUsers(string userId);
-        public Task<bool> AnyAsync();
 
         public Task CreateAsync(Friendship f);
     }
