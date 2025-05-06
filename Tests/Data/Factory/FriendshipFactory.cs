@@ -10,7 +10,7 @@ namespace Tests.Data.Factory
 {
     public static class FriendshipFactory
     {
-        public static Friendship CreatePendingAsync(AppUser user1, AppUser user2)
+        public static Friendship CreatePending(AppUser user1, AppUser user2)
         {
             return new Friendship
             {
@@ -20,7 +20,7 @@ namespace Tests.Data.Factory
             };
         }
 
-        public static Friendship CreateAcceptedAsync(AppUser user1, AppUser user2)
+        public static Friendship CreateAccepted(AppUser user1, AppUser user2)
         {
             return new Friendship
             {

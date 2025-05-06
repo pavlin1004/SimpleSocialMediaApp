@@ -1,11 +1,14 @@
 ﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Identity
+@using SimpleSocialApp.Data.Models
 @using SimpleSocialApp.Models.ViewModels.Posts
 @model PostViewModel
-
+@inject UserManager<AppUser> _userManager
 @{
     ViewData["ShowActions"] = true;
     ViewData["IsCommentView"] = false;
     var list = new List<PostViewModel> { Model };
+    var currentUser = await _userManager.GetUserAsync(User);
 }
 
 <div class="post-details">
@@ -27,7 +30,7 @@
                         <p><strong>@comment.User.FirstName @comment.User.LastName</strong></p>
                         <div class="comment-actions">
                             <span>@comment.CreatedDateTime.ToString("MMM dd, yyyy HH:mm")</span>
-                            @if (comment.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                            @if (comment.UserId == currentUser.Id)
                             {
                                 <a href="@Url.Action("Edit", "Comment", new { commentId = comment.Id })" class="btn btn-outline-secondary">Edit</a>
                                 <a href="@Url.Action("Delete", "Comment", new { commentId = comment.Id })" class="btn btn-outline-danger">Delete</a>

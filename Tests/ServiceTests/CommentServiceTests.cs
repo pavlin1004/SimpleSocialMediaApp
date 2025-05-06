@@ -1,6 +1,6 @@
 ﻿using SimpleSocialApp.Data.Enums;
 using SimpleSocialApp.Data.Models;
-using SimpleSocialApp.Services.Implementations;
+using SimpleSociaMedialApp.Services.Functional.Implementations;
 using SimpleSociaMedialApp.Tests.Common;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using Tests.Data.Factory;
 
 namespace Tests.ServiceTests
 {
-    public class CommentServiceTests : Initialise
+    public class CommentServiceTests : TestBase
     {
         private readonly CommentService commentService;
 
@@ -24,9 +24,9 @@ namespace Tests.ServiceTests
         [Fact]
         public async Task ShouldGetCommentById()
         {
-            var user = AppUserFactory.CreateAsync();
-            var post = PostFactory.CreateAsync(user);
-            var comments = CommentFactory.CreateAsync(post, user, 2);
+            var user = AppUserFactory.CreateSingle();
+            var post = PostFactory.CreateSingle(user);
+            var comments = CommentFactory.CreateList(post, user, 2);
 
             await context.SeedAsync(comments);
 
@@ -38,9 +38,9 @@ namespace Tests.ServiceTests
         [Fact]
         public async Task ShouldGetAllCommentsForAPost()
         {
-            var user = AppUserFactory.CreateAsync();
-            var post = PostFactory.CreateAsync(user);
-            var comments = CommentFactory.CreateAsync(post, user, 2);
+            var user = AppUserFactory.CreateSingle();
+            var post = PostFactory.CreateSingle(user);
+            var comments = CommentFactory.CreateList(post, user, 2);
 
             await context.SeedAsync(comments);
 
@@ -53,9 +53,9 @@ namespace Tests.ServiceTests
         [Fact]
         public async Task ShouldCreateACommentForAPost()
         {
-            var users = AppUserFactory.CreateUsers(1);
-            var posts = PostFactory.CreateAsync(1, users[0]);
-            var comment = CommentFactory.CreateAsync(posts[0], users[0]);
+            var user = AppUserFactory.CreateSingle();
+            var posts = PostFactory.CreateSingle(user);
+            var comment = CommentFactory.CreateSingle(posts, user);
 
             await commentService.CreateCommentAsync(comment);
 
@@ -66,21 +66,21 @@ namespace Tests.ServiceTests
         [Fact]
         public async Task ShouldUpdateCommentContent()
         {
-            var users = AppUserFactory.CreateUsers(1);
-            var posts = PostFactory.CreateAsync(1, users[0]);
-            var comments = CommentFactory.CreateAsync(posts[0], users[0], 1);
+            var user = AppUserFactory.CreateSingle();
+            var post = PostFactory.CreateSingle(user);
+            var comment = CommentFactory.CreateSingle(post, user);
 
-            await context.SeedAsync(comments);
+            await context.SeedEntityAsync(comment);
 
-            var comment = await commentService.GetCommentAsync(comments[0].Id);
+            var testComment = await commentService.GetCommentAsync(comment.Id);
 
-            Assert.NotNull(comment);
+            Assert.NotNull(testComment);
 
-            comment.Content = "updated";
+            testComment.Content = "updated";
 
-            await commentService.UpdateCommentAsync(comment);
+            await commentService.UpdateCommentAsync(testComment);
 
-            var result = await commentService.GetCommentAsync(comment.Id);
+            var result = await commentService.GetCommentAsync(testComment.Id);
 
             Assert.NotNull(result);
             Assert.Equal("updated", result.Content);
@@ -90,26 +90,26 @@ namespace Tests.ServiceTests
 
         public async Task ShouldDeleteCommentFromDatabase()
         {
-            var users = AppUserFactory.CreateUsers(1);
-            var posts = PostFactory.CreateAsync(1, users[0]);
-            var comments = CommentFactory.CreateAsync(posts[0], users[0], 1);
+            var user = AppUserFactory.CreateSingle();
+            var post = PostFactory.CreateSingle(user);
+            var comment = CommentFactory.CreateSingle(post, user);
 
-            await context.SeedAsync(comments);
+            await context.SeedEntityAsync(comment);
 
-            await commentService.DeleteCommentAsync(comments[0]);
+            await commentService.DeleteCommentAsync(comment);
 
-            Assert.True(context.Comments.Count() == 0);
+            Assert.Empty(context.Comments);
         }
 
         [Fact]
 
         public async Task ShouldGetLikesCountForAComment()
         {
-            var users = AppUserFactory.CreateUsers(1);
-            var posts = PostFactory.CreateAsync(1, users[0]);
-            var comments = CommentFactory.CreateAsync(posts[0], users[0], 2);
+            var user = AppUserFactory.CreateSingle();
+            var post = PostFactory.CreateSingle(user);
+            var comments = CommentFactory.CreateList(post, user, 2);
 
-            comments[1].Reacts.Add(new Reaction() { User = users[0], ReactType = ReactType.Like });
+            comments[1].Reacts.Add(new Reaction() { User = user, ReactType = ReactType.Like });
             await context.SeedAsync(comments);
 
             var result1 = await commentService.GetLikesCountAsync(comments[0].Id);
@@ -117,8 +117,6 @@ namespace Tests.ServiceTests
 
             Assert.True(result1 == 0);
             Assert.True(result2 == 1);
-
-
         }
     }
 }

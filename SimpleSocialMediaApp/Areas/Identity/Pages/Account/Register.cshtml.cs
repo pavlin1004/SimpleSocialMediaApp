@@ -121,10 +121,10 @@ namespace SimpleSocialApp.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
-                user.FirstName = Input.FirstName; // This can be null
-                user.LastName = Input.LastName; // This can be null 
-
-                await _userStore.SetUserNameAsync(user,user.Email, CancellationToken.None);
+                user.FirstName = Input.FirstName; 
+                user.LastName = Input.LastName;
+                var username = Guid.NewGuid().ToString();
+                await _userStore.SetUserNameAsync(user,username, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                       
                 var result = await _userManager.CreateAsync(user, Input.Password);

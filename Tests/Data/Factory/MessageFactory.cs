@@ -15,7 +15,7 @@ namespace Tests.Data.Factory
             var range = (end - start).Days;
             return start.AddDays(rand.Next(range)).AddHours(rand.Next(0, 24)).AddMinutes(rand.Next(0, 60));
         }
-        public static List<Message> CreateAsync(AppUser user, int count)
+        public static List<Message> CreateList(AppUser user, int count)
         {
             var messageList = new List<Message>();
             for(int i=0;i<count; i++)

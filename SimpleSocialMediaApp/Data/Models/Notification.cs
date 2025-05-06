@@ -19,9 +19,9 @@ namespace SimpleSocialApp.Data.Models
 
         public NotificationType Type { get; set; }
 
-        public AppUser UserTo { get; set; }
+        public virtual AppUser UserTo { get; set; }
 
-        public AppUser? UserFrom { get; set; }
+        public virtual AppUser? UserFrom { get; set; }
 
         public string UserToId {  get; set; }
 

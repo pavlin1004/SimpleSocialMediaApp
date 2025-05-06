@@ -1,23 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System.Collections.ObjectModel;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using SimpleSocialApp.Data;
 using SimpleSocialApp.Data.Enums;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Models.InputModels;
-using SimpleSocialApp.Models.Validation;
-using SimpleSocialApp.Models.ViewModels;
 using SimpleSocialApp.Models.ViewModels.Posts;
-using SimpleSocialApp.Services.Implementations;
-using SimpleSocialApp.Services.Interfaces;
+using SimpleSociaMedialApp.Services.External.Interfaces;
+using SimpleSociaMedialApp.Services.Functional.Interfaces;
 
 namespace SimpleSocialApp.Controllers
 {
@@ -25,33 +16,19 @@ namespace SimpleSocialApp.Controllers
     public class PostController : Controller
     {
         private readonly IPostService _postService;
-        private readonly IUserService _userService;
         private readonly ICloudinaryService _cloudinaryService;
         private readonly IMediaService _mediaService;
-        private readonly IReactionService _reactionService;
         private readonly ICommentService _commentService;
-        public PostController(IUserService userService, IPostService postService, ICloudinaryService cloudinaryService, IMediaService mediaService, IReactionService reactionService, ICommentService commentService)
+        private readonly UserManager<AppUser> _userManager;
+
+        public PostController( IPostService postService, ICloudinaryService cloudinaryService, IMediaService mediaService, ICommentService commentService, UserManager<AppUser> userManager)
         {
             _postService = postService;
-            _userService = userService;
             _cloudinaryService = cloudinaryService;
             _mediaService = mediaService;
-            _reactionService = reactionService;
             _commentService = commentService;
+            _userManager = userManager;
         }
-
-        //public async Task<IActionResult> Index()
-        //{
-        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        //    if (userId != null)
-        //    {
-        //       // var posts = await _postService.GetAllUserFriendsPostsAsync("a");
-
-        //        //return View(posts);
-        //    }
-        //    return View();
-        //}
-
         public IActionResult Create()
         {
             return View();
@@ -66,56 +43,54 @@ namespace SimpleSocialApp.Controllers
                 RedirectToAction("Index", "Home");
             }
 
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId != null)
+            var user = await _userManager.GetUserAsync(User);
+
+            Post p = new()
             {
-                Post p = new Post
-                {
-                    UserId = userId,
-                    CreatedDateTime = DateTime.UtcNow,
-                    Media = new Collection<Media>(),
-                };
+                UserId = user.Id,
+                CreatedDateTime = DateTime.UtcNow,
+                Media = [],
+            };
 
-                if (!String.IsNullOrEmpty(model.Content))
+            if (!String.IsNullOrEmpty(model.Content))
+            {
+                p.Content = model.Content;
+            }
+            if (model.MediaFiles != null && model.MediaFiles.Count != 0)
+            {
+                foreach (var media in model.MediaFiles)
                 {
-                    p.Content = model.Content;
-                }
-                if (model.MediaFiles != null && model.MediaFiles.Count != 0)
-                {
-                    foreach (var media in model.MediaFiles)
+                    var mediaData = await _cloudinaryService.UploadMediaFileAsync(media);
+                    if (mediaData != null)
+
                     {
-                        var mediaData = await _cloudinaryService.UploadMediaFileAsync(media);
-                        if (mediaData != null)
-
+                        p.Media.Add(new Media
                         {
-                            p.Media.Add(new Media
-                            {
-                                Url = mediaData[0],
-                                PublicId = mediaData[1],
-                                Type = mediaData[2] == "Image" ? MediaOptions.Image : MediaOptions.Video
-                            });
-                        }
-                        else
-                        {
-                            // Log or throw an error if media URL is empty
-                            Console.WriteLine("Media upload failed for file: " + media.FileName);
-                        }
+                            Url = mediaData[0],
+                            PublicId = mediaData[1],
+                            Type = mediaData[2] == "Image" ? MediaOptions.Image : MediaOptions.Video
+                        });
+                    }
+                    else
+                    {
+                        // Log or throw an error if media URL is empty
+                        Console.WriteLine("Media upload failed for file: " + media.FileName);
                     }
                 }
+
                 await _postService.AddPostAsync(p);
             }
             return RedirectToAction("Index", "Home");
         }       
 
         [HttpGet]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Details(string postId)
         {
 
             var post = await _postService.GetPostByIdAsync(postId);
-            if (post == null)
-            {
-                throw new ArgumentNullException("");
-            }
+            if (post == null) return NotFound();
+
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (currentUserId == null)
             {
@@ -136,26 +111,24 @@ namespace SimpleSocialApp.Controllers
         }
         
         [HttpGet]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string postId)
         {
             var post = await _postService.GetPostByIdAsync(postId);
             if (post == null) return NotFound();
 
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (post.UserId != currentUserId)
-            {
-                return Unauthorized(); 
-            }  
             var viewModel = new EditPostViewModel
             {
                 PostId = post.Id,
-                Content = post.Content
+                Content = post.Content ?? ""
             };
             return View(viewModel);
         }
 
         
         [HttpPost]
+        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> Edit(EditPostViewModel model)
         {
             if (!ModelState.IsValid)
@@ -165,12 +138,6 @@ namespace SimpleSocialApp.Controllers
 
             var post = await _postService.GetPostByIdAsync(model.PostId);
             if (post == null) return NotFound();
-
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (post.UserId != currentUserId)
-            {
-                return Unauthorized(); 
-            }
          
             post.Content = model.Content;
 
@@ -192,12 +159,7 @@ namespace SimpleSocialApp.Controllers
             {
                 return NotFound();
             }
-
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(currentUserId)|| post.UserId != currentUserId)
-            {
-                return Unauthorized();
-            }
+            var user = _userManager.GetUserAsync(User);
 
             foreach(var media in post.Media)
             {
@@ -205,15 +167,11 @@ namespace SimpleSocialApp.Controllers
             }
 
             var result = await _mediaService.RemoveMediaForPostAsync(post);
-            if(result == false)
-            {
-                return BadRequest();
-            }
-            // Perform deletion
+            if(result == false) return BadRequest();
+
             await _postService.DeletePostAsync(postId);
 
-            // Redirect back to the home page or user profile (if applicable)
-            return RedirectToAction("Index", "Home", new { userId = currentUserId });
+            return RedirectToAction("Index", "Home", new { userId = user.Id });
         }
     }
 }

@@ -18,45 +18,47 @@ namespace SimpleSocialApp.Data
         public virtual DbSet<Media> Media { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
 
-
-
-
         public SocialDbContext(DbContextOptions<SocialDbContext> options)
             : base(options)
         {
-            //this.Database.EnsureCreated();
-        }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer("YourConnectionStringHere", options =>
-                    options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
-            }
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
-            
+            ConfigureAppUser(builder);
+            ConfigureFriendship(builder);
+            ConfigureNotification(builder);
+            ConfigurePost(builder);
+            ConfigureChat(builder);
+            ConfigureComment(builder);
+            ConfigureReaction(builder);
+            ConfigureMessage(builder);
+        }
+
+        private void ConfigureAppUser(ModelBuilder builder)
+        {
             builder.Entity<AppUser>()
                 .HasMany(u => u.Posts)
                 .WithOne(p => p.User)
                 .HasForeignKey(p => p.UserId)
-                .OnDelete(DeleteBehavior.Cascade);//////////
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<AppUser>()
                 .HasMany(u => u.Chats)
                 .WithMany(c => c.Users)
                 .UsingEntity(j => j.ToTable("UserChat"));
-  
+
             builder.Entity<AppUser>()
                 .HasOne(u => u.Media)
                 .WithOne(m => m.User)
                 .HasForeignKey<Media>(m => m.UserId)
-                .OnDelete(DeleteBehavior.Cascade);  //////////////////
+                .OnDelete(DeleteBehavior.Cascade);
+        }
 
+        private void ConfigureFriendship(ModelBuilder builder)
+        {
             builder.Entity<Friendship>()
                 .HasOne(f => f.Sender)
                 .WithMany(au => au.Friendships)
@@ -72,45 +74,53 @@ namespace SimpleSocialApp.Data
             builder.Entity<Friendship>()
                 .HasIndex(f => new { f.SenderId, f.ReceiverId })
                 .IsUnique();
+        }
 
+        private void ConfigureNotification(ModelBuilder builder)
+        {
             builder.Entity<Notification>()
                 .HasOne(n => n.UserTo)
                 .WithMany(u => u.Notifications)
-                .OnDelete(DeleteBehavior.Cascade);//////////////////
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Notification>()
                 .HasOne(n => n.UserFrom)
                 .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
-            
+        }
+
+        private void ConfigurePost(ModelBuilder builder)
+        {
             builder.Entity<Post>()
                 .HasMany(p => p.Reacts)
                 .WithOne(r => r.Post)
                 .HasForeignKey(r => r.PostId)
-                .OnDelete(DeleteBehavior.Cascade);/////////
+                .OnDelete(DeleteBehavior.Cascade);
 
-            
             builder.Entity<Post>()
                 .HasMany(p => p.Comments)
                 .WithOne(c => c.Post)
                 .HasForeignKey(c => c.PostId)
-                .OnDelete(DeleteBehavior.Cascade);  ///////////////
+                .OnDelete(DeleteBehavior.Cascade);
 
-       
             builder.Entity<Post>()
                 .HasMany(p => p.Media)
                 .WithOne(m => m.Post)
                 .HasForeignKey(m => m.PostId)
-                .OnDelete(DeleteBehavior.Restrict);  
+                .OnDelete(DeleteBehavior.Restrict);
+        }
 
-            
+        private void ConfigureChat(ModelBuilder builder)
+        {
             builder.Entity<Chat>()
                 .HasMany(c => c.Messages)
                 .WithOne(m => m.Chat)
                 .HasForeignKey(m => m.ChatId)
-                .OnDelete(DeleteBehavior.Cascade);/////////////////
+                .OnDelete(DeleteBehavior.Cascade);
+        }
 
-      
+        private void ConfigureComment(ModelBuilder builder)
+        {
             builder.Entity<Comment>()
                 .HasMany(c => c.Reacts)
                 .WithOne(r => r.Comment)
@@ -121,7 +131,7 @@ namespace SimpleSocialApp.Data
                 .HasMany(c => c.Media)
                 .WithOne(m => m.Comment)
                 .HasForeignKey(m => m.CommentId)
-                .OnDelete(DeleteBehavior.Restrict);  
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Comment>()
                 .HasOne(c => c.User)
@@ -133,9 +143,11 @@ namespace SimpleSocialApp.Data
                 .HasOne(c => c.ParentComment)
                 .WithMany(c => c.Comments)
                 .HasForeignKey(c => c.ParentCommentId)
-                .OnDelete(DeleteBehavior.NoAction);  
+                .OnDelete(DeleteBehavior.NoAction);
+        }
 
-            
+        private void ConfigureReaction(ModelBuilder builder)
+        {
             builder.Entity<Reaction>()
                 .HasOne(r => r.User)
                 .WithMany()
@@ -145,7 +157,10 @@ namespace SimpleSocialApp.Data
             builder.Entity<Reaction>()
                 .HasIndex(r => new { r.UserId, r.PostId })
                 .IsUnique();
+        }
 
+        private void ConfigureMessage(ModelBuilder builder)
+        {
             builder.Entity<Message>()
                 .HasMany(m => m.Media)
                 .WithOne(m => m.Message)
@@ -158,8 +173,5 @@ namespace SimpleSocialApp.Data
                 .HasForeignKey(m => m.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
         }
-
-
-
     }
 }

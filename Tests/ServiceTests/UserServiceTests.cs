@@ -2,7 +2,7 @@
 using SimpleSocialApp.Data.Enums;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Migrations;
-using SimpleSocialApp.Services.Implementations;
+using SimpleSociaMedialApp.Services.Functional.Implementations;
 using SimpleSociaMedialApp.Tests.Common;
 using SimpleSociaMedialApp.Tests.Common.Factory;
 using System.Data;
@@ -13,7 +13,7 @@ using Xunit;
 
 namespace SimpleSociaMedialApp.Tests.ServiceTests
 {
-    public class UserServiceTests : Initialise
+    public class UserServiceTests : TestBase
     {
         private readonly UserService userService;
 
@@ -40,11 +40,11 @@ namespace SimpleSociaMedialApp.Tests.ServiceTests
         public async Task Get_ShouldFetchUserAndTheChatsHeIsIn()
         {
 
-            var users = AppUserFactory.CreateUsers(5);
+            var users = AppUserFactory.CreateList(5);
             var chats = new List<Chat>
             {
-                ChatFactory.CreateChat(new List<AppUser>{users[0],users[1]}, ChatType.Private),
-                ChatFactory.CreateChat(new List<AppUser>{users[0],users[2],users[2],users[3]}, ChatType.Group)
+                ChatFactory.CreateSingle([users[0],users[1]], ChatType.Private),
+                ChatFactory.CreateSingle([users[0],users[1],users[2],users[3]], ChatType.Group)
             };
             await context.SeedAsync(users).SeedAsync(chats);
 
@@ -52,10 +52,12 @@ namespace SimpleSociaMedialApp.Tests.ServiceTests
             var chat_shouldBe1 = await userService.GetUserWithCommunicationDetailsAsync(users[3].Id);
             var chat_shouldBe2 = await userService.GetUserWithCommunicationDetailsAsync(users[0].Id);
 
+            Assert.NotNull(chat_shouldBe1);
+            Assert.NotNull(chat_shouldBe2);
             Assert.NotNull(chatShouldBeEmpty?.Chats);
             Assert.Empty(chatShouldBeEmpty.Chats);
-            Assert.True(chat_shouldBe1?.Chats.Count() == 1);
-            Assert.True(chat_shouldBe2?.Chats.Count() == 2);
+            Assert.Single(chat_shouldBe1.Chats);
+            Assert.Equal(2,chat_shouldBe2.Chats.Count());
 
             context.Database.EnsureDeleted();
         }
@@ -111,7 +113,7 @@ namespace SimpleSociaMedialApp.Tests.ServiceTests
         {
     
 
-            var users = new List<AppUser>() {Users.User1,Users.User2,Users.User3, Users.User4, Users.User5 };
+            List<AppUser> users = [Users.User1,Users.User2,Users.User3, Users.User4, Users.User5];
             await context.SeedAsync(users);
 
             const string query1 = "ko";
@@ -122,9 +124,9 @@ namespace SimpleSociaMedialApp.Tests.ServiceTests
             var users_q2 = await userService.SearchUsersByNameAsync(query2);
             var users_q3 = await userService.SearchUsersByNameAsync(query3);
 
-            Assert.True(users_q1.Count() == 2);
-            Assert.True(users_q2.Count() == 1);
-            Assert.True(users_q3.Count() == 3);
+            Assert.Equal(2,users_q1.Count());
+            Assert.Single(users_q2);
+            Assert.Equal(3,users_q3.Count());
         }
 
         [Fact]
@@ -165,9 +167,9 @@ namespace SimpleSociaMedialApp.Tests.ServiceTests
         [Fact]
         public async Task ShouldGetAllUsersCount()
         {
-            await context.SeedAsync(AppUserFactory.CreateUsers(2));
+            await context.SeedAsync(AppUserFactory.CreateList(2));
             var users = await userService.GetAllAsync();
-            Assert.True(users.Count == 2);
+            Assert.Equal(2,users.Count);
         }
 
 

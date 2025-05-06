@@ -2,7 +2,7 @@
 using SimpleSocialApp.Data.Enums;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Migrations;
-using SimpleSocialApp.Services.Implementations;
+using SimpleSociaMedialApp.Services.Functional.Implementations;
 using SimpleSociaMedialApp.Tests.Common;
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ using Tests.Data.Factory;
 
 namespace Tests.ServiceTests
 {
-    public class FriendsipServiceTests : Initialise
+    public class FriendsipServiceTests : TestBase
     {
         private readonly FriendshipsService service;
 
@@ -27,9 +27,9 @@ namespace Tests.ServiceTests
         [Fact]
         public async Task ShouldGetFriendshipForTwoUsers()
         {
-            var users = AppUserFactory.CreateUsers(4);
-            var friendship1 = FriendshipFactory.CreateAcceptedAsync(users[0], users[1]);
-            var friendship2 = FriendshipFactory.CreateAcceptedAsync(users[0], users[2]);
+            var users = AppUserFactory.CreateList(4);
+            var friendship1 = FriendshipFactory.CreateAccepted(users[0], users[1]);
+            var friendship2 = FriendshipFactory.CreateAccepted(users[0], users[2]);
 
             await context.SeedAsync(users).SeedEntityAsync(friendship1).SeedEntityAsync(friendship2);
 
@@ -48,8 +48,8 @@ namespace Tests.ServiceTests
 
         public async Task ShouldAcceptPendingFriendshipAsync()
         {
-            var users = AppUserFactory.CreateUsers(2);
-            var friendship = FriendshipFactory.CreatePendingAsync(users[0], users[1]);
+            var users = AppUserFactory.CreateList(2);
+            var friendship = FriendshipFactory.CreatePending(users[0], users[1]);
 
             await context.SeedAsync(new List<Friendship> { friendship });
 
@@ -64,20 +64,20 @@ namespace Tests.ServiceTests
         [Fact] 
         public async Task ShouldRemoveFriendshipFromDatabase()
         {
-            var users = AppUserFactory.CreateUsers(2);
-            var friendship = FriendshipFactory.CreatePendingAsync(users[0], users[1]);
+            var users = AppUserFactory.CreateList(2);
+            var friendship = FriendshipFactory.CreatePending(users[0], users[1]);
 
             await context.SeedAsync(new List<Friendship> { friendship });
 
             await service.RemoveUserFriendshipsAsync(users[0].Id, users[1].Id);
 
-            Assert.Equal(0, context.Friendships.Count());
+            Assert.Empty(context.Friendships);
         }
 
         [Fact]
         public async Task ShouldCreatePendingRequestIfNoFriendshipExists()
         {
-            var users = AppUserFactory.CreateUsers(2);
+            var users = AppUserFactory.CreateList(2);
             await context.SeedAsync(users);
 
             await service.SendFriendshipRequestAsync(users[0].Id, users[1].Id);
@@ -91,22 +91,22 @@ namespace Tests.ServiceTests
         [Fact]
         public async Task ShouldNotCreateAnyFriendshipRequestIfAlreadyExists()
         {
-            var users = AppUserFactory.CreateUsers(2);
-            await context.SeedAsync(users).SeedAsync(new List<Friendship>() { FriendshipFactory.CreatePendingAsync(users[0], users[1]) });
+            var users = AppUserFactory.CreateList(2);
+            await context.SeedAsync(users).SeedAsync(new List<Friendship>() { FriendshipFactory.CreatePending(users[0], users[1]) });
 
             await service.SendFriendshipRequestAsync(users[0].Id, users[1].Id);
 
             var friendship = await service.GetFriendshipById(users[0].Id, users[1].Id);
 
             Assert.NotNull(friendship);
-            Assert.Equal(1, context.Friendships.Count());
+            Assert.Single(context.Friendships);
         }
 
         [Fact]
         public async Task ShouldCheckFriendshipAndReturnItOrNull()
         {
-            var users = AppUserFactory.CreateUsers(3);
-            var friendship = FriendshipFactory.CreateAcceptedAsync(users[0], users[1]);
+            var users = AppUserFactory.CreateList(3);
+            var friendship = FriendshipFactory.CreateAccepted(users[0], users[1]);
 
             await context.SeedAsync(users).SeedEntityAsync(friendship);
 
@@ -121,9 +121,9 @@ namespace Tests.ServiceTests
         [Fact]
         public async Task ShouldGetAllFriendsForUser()
         {
-            var users = AppUserFactory.CreateUsers(4);
-            var friendship1 = FriendshipFactory.CreateAcceptedAsync(users[0], users[1]);
-            var friendship2 = FriendshipFactory.CreateAcceptedAsync(users[0], users[2]);
+            var users = AppUserFactory.CreateList(4);
+            var friendship1 = FriendshipFactory.CreateAccepted(users[0], users[1]);
+            var friendship2 = FriendshipFactory.CreateAccepted(users[0], users[2]);
 
             await context.SeedAsync(users).SeedEntityAsync(friendship1).SeedEntityAsync(friendship2);
 
@@ -137,9 +137,9 @@ namespace Tests.ServiceTests
         [Fact]
         public async Task ShouldGetAllFriendsIdsForUser()
         {
-            var users = AppUserFactory.CreateUsers(4);
-            var friendship1 = FriendshipFactory.CreateAcceptedAsync(users[0], users[1]);
-            var friendship2 = FriendshipFactory.CreateAcceptedAsync(users[0], users[2]);
+            var users = AppUserFactory.CreateList(4);
+            var friendship1 = FriendshipFactory.CreateAccepted(users[0], users[1]);
+            var friendship2 = FriendshipFactory.CreateAccepted(users[0], users[2]);
 
             await context.SeedAsync(users).SeedEntityAsync(friendship1).SeedEntityAsync(friendship2);
 
@@ -153,18 +153,18 @@ namespace Tests.ServiceTests
         [Fact]
         public async Task ShouldCreateFriendship()
         {
-            var users = AppUserFactory.CreateUsers(2);
-            var friendship = FriendshipFactory.CreatePendingAsync(users[0], users[1]);
+            var users = AppUserFactory.CreateList(2);
+            var friendship = FriendshipFactory.CreatePending(users[0], users[1]);
             await service.CreateAsync(friendship);
-            Assert.Equal(1, context.Friendships.Count());
+            Assert.Single(context.Friendships);
         }
 
         [Fact]
         public async Task ShouldGetAllUsersWithNoAcceptedFriendshipStatus()
         {
-            var users = AppUserFactory.CreateUsers(4);
-            var friendship1 = FriendshipFactory.CreateAcceptedAsync(users[0], users[1]);
-            var friendship2 = FriendshipFactory.CreatePendingAsync(users[0], users[2]);
+            var users = AppUserFactory.CreateList(4);
+            var friendship1 = FriendshipFactory.CreateAccepted(users[0], users[1]);
+            var friendship2 = FriendshipFactory.CreatePending(users[0], users[2]);
 
             await context.SeedAsync(users).SeedEntityAsync(friendship1).SeedEntityAsync(friendship2);
 

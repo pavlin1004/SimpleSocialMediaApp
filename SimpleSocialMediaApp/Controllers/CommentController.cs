@@ -1,20 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Models.InputModels;
 using SimpleSocialApp.Models.ViewModels;
-using SimpleSocialApp.Services.Interfaces;
+using SimpleSociaMedialApp.Services.Functional.Interfaces;
 using System.Security.Claims;
 
 namespace SimpleSocialApp.Controllers
 {
+    [Authorize]
+    [ValidateAntiForgeryToken]
     public class CommentController : Controller
     {
         private readonly ICommentService _commentService;
-        private readonly IPostService _postService;
-        public CommentController(ICommentService commentService, IPostService postService)
+        private readonly UserManager<AppUser> _userManager;
+        public CommentController(ICommentService commentService,UserManager<AppUser> userManager)
         {
             _commentService = commentService;
-            _postService = postService;
+            _userManager = userManager;
         }
         [HttpPost]
         public async Task<IActionResult> AddComment(CommentInputModel inputModel)
@@ -24,15 +28,10 @@ namespace SimpleSocialApp.Controllers
                 return RedirectToAction("PostDetails", "Post", new { postId = inputModel.PostId });
             }
 
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
-
+            var user = await _userManager.GetUserAsync(User);
             var comment = new Comment
             {
-                UserId = userId,
+                UserId = user.Id,
                 PostId = inputModel.PostId,
                 Content = inputModel.Content,
                 CreatedDateTime = DateTime.Now
@@ -48,12 +47,6 @@ namespace SimpleSocialApp.Controllers
         {
             var comment = await _commentService.GetCommentAsync(commentId);
             if (comment == null) return NotFound();
-
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (comment.UserId != currentUserId)
-            {
-                return Unauthorized(); // Only allow the owner to edit
-            }
 
             var viewModel = new EditCommentViewModel
             {
@@ -74,13 +67,9 @@ namespace SimpleSocialApp.Controllers
             }
 
             var comment = await _commentService.GetCommentAsync(model.CommentId);
+
             if (comment == null) return NotFound();
 
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (comment.UserId != currentUserId)
-            {
-                return Unauthorized(); 
-            } 
             comment.Content = model.Content;
 
             await _commentService.UpdateCommentAsync(comment);
@@ -88,17 +77,11 @@ namespace SimpleSocialApp.Controllers
             return RedirectToAction("Details", "Post", new { postId = comment.PostId });
         }
         // Delete Comment (GET)
-        [HttpGet]
+        [HttpGet]     
         public async Task<IActionResult> Delete(string commentId)
         {
             var comment = await _commentService.GetCommentAsync(commentId);
             if (comment == null) return NotFound();
-
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (comment.UserId != currentUserId)
-            {
-                return Unauthorized(); // Only allow the owner to delete
-            }
 
             await _commentService.DeleteCommentAsync(comment);
 

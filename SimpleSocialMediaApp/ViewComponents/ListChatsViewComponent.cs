@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SimpleSocialApp.Data.Enums;
-using SimpleSocialApp.Mapping;
+using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Models.ViewModels.Chats;
-using SimpleSocialApp.Services.Interfaces;
+using SimpleSociaMedialApp.Services.Functional.Interfaces;
+using SimpleSociaMedialApp.Services.Utilities.Interfaces;
 using System.Security.Claims;
 
 namespace SimpleSocialApp.ViewComponents
@@ -14,23 +16,21 @@ namespace SimpleSocialApp.ViewComponents
         private readonly IChatService _chatService;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
+        private readonly UserManager<AppUser> _userManager;
 
-        public ListChatsViewComponent(IUserService userService, IChatService chatService, IMapper mapper)
+        public ListChatsViewComponent(IUserService userService, IChatService chatService, IMapper mapper, UserManager<AppUser> userManager)
         {
             _userService = userService;
             _chatService = chatService;
             _mapper = mapper;
+            _userManager = userManager;
         }
 
         [Authorize]
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var currentUserId = (User as ClaimsPrincipal)?.FindFirstValue(ClaimTypes.NameIdentifier);
-            if(String.IsNullOrEmpty(currentUserId))
-            {
-                throw new Exception();
-            }
-            var chats = await _chatService.OrderChatsByLastMessages(currentUserId,10);
+            var user = await _userManager.GetUserAsync(UserClaimsPrincipal);
+            var chats = await _chatService.OrderChatsByLastMessages(user.Id,10);
 
             var chatViewModelList = new List<ChatViewModel>();
             foreach (var chat in chats)
@@ -41,7 +41,7 @@ namespace SimpleSocialApp.ViewComponents
                 }
                 else
                 {
-                    var friendId = chat.Users.Where(u => u.Id != currentUserId).Select(u => u.Id).First();
+                    var friendId = chat.Users.Where(u => u.Id != user.Id).Select(u => u.Id).First();
                     var friend = await _userService.GetUserByIdAsync(friendId);
                     chatViewModelList.Add(_mapper.MapToChatViewModel(chat, friend,0,0));
                 }

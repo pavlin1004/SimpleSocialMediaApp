@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using SimpleSocialApp.Data.Enums;
 using SimpleSocialApp.Data.Models;
-using SimpleSocialApp.Services.Implementations;
+using SimpleSociaMedialApp.Services.Functional.Implementations;
 using SimpleSociaMedialApp.Tests.Common;
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ using Tests.Data.Factory;
 
 namespace Tests.ServiceTests
 {
-    public class PostServiceTests : Initialise
+    public class PostServiceTests : TestBase
     {
         private readonly PostService postService;
 
@@ -40,43 +40,43 @@ namespace Tests.ServiceTests
         [Fact]
         public async Task ShouldFetchAllPostsForUser()
         {
-            var user = AppUserFactory.CreateAsync();
-            var posts = PostFactory.CreateAsync(5, user);
+            var user = AppUserFactory.CreateSingle();
+            var posts = PostFactory.CreateList(5, user);
 
             await context.SeedAsync(posts);
 
             var fetchedPosts = await postService.GetAllUserPostsAsync(user.Id, 5, 0);
 
             Assert.True(fetchedPosts.Any());
-            Assert.True(fetchedPosts.Count() == 5);
+            Assert.Equal(5,fetchedPosts.Count());
         }
 
         [Fact]
         public async Task ShouldGetPostOrderedByCreatedDateTime()
         {
-            var user = AppUserFactory.CreateAsync();
-            var firstPost = PostFactory.CreateAsync(user);
-            var secondPost = PostFactory.CreateAsync(user);
-            var thirdPost = PostFactory.CreateAsync(user);
+            var user = AppUserFactory.CreateSingle();
+            var firstPost = PostFactory.CreateSingle(user);
+            var secondPost = PostFactory.CreateSingle(user);
+            var thirdPost = PostFactory.CreateSingle(user);
 
-            await context.SeedAsync(new List<Post> { secondPost, thirdPost, firstPost });
+            await context.SeedAsync([secondPost, thirdPost, firstPost]);
 
             var posts = await postService.GetAllUserPostsAsync(user.Id);
 
             Assert.NotNull(posts);
-            Assert.True(thirdPost.CreatedDateTime == posts[0].CreatedDateTime);
-            Assert.True(secondPost.CreatedDateTime == posts[1].CreatedDateTime);
-            Assert.True(firstPost.CreatedDateTime == posts[2].CreatedDateTime);
+            Assert.Equal(thirdPost.CreatedDateTime,posts[0].CreatedDateTime);
+            Assert.Equal(secondPost.CreatedDateTime,posts[1].CreatedDateTime);
+            Assert.Equal(firstPost.CreatedDateTime,posts[2].CreatedDateTime);
         }
 
         [Fact]
         public async Task ShouldGetAllUserFriendsPosts()
         {
-            var users = AppUserFactory.CreateUsers(3);
+            var users = AppUserFactory.CreateList(3);
 
-            var post1 = PostFactory.CreateAsync(users[0]);
-            var post2 = PostFactory.CreateAsync(users[1]);
-            var post3 = PostFactory.CreateAsync(users[2]);
+            var post1 = PostFactory.CreateSingle(users[0]);
+            var post2 = PostFactory.CreateSingle(users[1]);
+            var post3 = PostFactory.CreateSingle(users[2]);
 
             await context.SeedAsync(users)
                 .SeedAsync(new List<Post> { post1, post2, post3 });
@@ -93,27 +93,27 @@ namespace Tests.ServiceTests
         [Fact]
         public async Task ShouldGetAllUserFriendsPosts_PassingFriendsIds()
         {
-            var users = AppUserFactory.CreateUsers(3);
+            var users = AppUserFactory.CreateList(3);
 
-            var post1 = PostFactory.CreateAsync(users[0]);
-            var post2 = PostFactory.CreateAsync(users[1]);
-            var post3 = PostFactory.CreateAsync(users[2]);
+            var post1 = PostFactory.CreateSingle(users[0]);
+            var post2 = PostFactory.CreateSingle(users[1]);
+            var post3 = PostFactory.CreateSingle(users[2]);
 
             await context.SeedAsync(users)
-                .SeedAsync(new List<Post> { post1, post2, post3 });
+                .SeedAsync([post1, post2, post3]);
 
 
-            var testData1 = await postService.GetAllUserFriendsPostsAsync(new List<string> { users[1].Id, users[2].Id } );
-            var testData2 = await postService.GetAllUserFriendsPostsAsync(new List<string> { users[1].Id});
+            var testData1 = await postService.GetAllUserFriendsPostsAsync([users[1].Id, users[2].Id]);
+            var testData2 = await postService.GetAllUserFriendsPostsAsync([users[1].Id]);
 
-            Assert.True(testData1.Count() == 2);
-            Assert.True(testData2.Count() == 1);
+            Assert.Equal(2,testData1.Count());
+            Assert.Single(testData2);
         }
 
         [Fact]
         public async Task ShouldAddPostToTheDatabase()
         {
-            var post = PostFactory.CreateAsync(AppUserFactory.CreateAsync());
+            var post = PostFactory.CreateSingle(AppUserFactory.CreateSingle());
 
             await postService.AddPostAsync(post);
 
@@ -125,7 +125,7 @@ namespace Tests.ServiceTests
         [Fact]
         public async Task ShouldUpdateExistingPostToTheDatabase()
         {
-            var post = PostFactory.CreateAsync(AppUserFactory.CreateAsync());
+            var post = PostFactory.CreateSingle(AppUserFactory.CreateSingle());
 
             await postService.AddPostAsync(post);
 
@@ -144,7 +144,7 @@ namespace Tests.ServiceTests
         [Fact]
         public async Task ShouldDeleteExistingPostFromTheDatabase()
         {
-            await context.SeedAsync(new List<Post> { Posts.Post1 });
+            await context.SeedEntityAsync(Posts.Post1);
             await postService.DeletePostAsync(Posts.Post1.Id);
 
             var tempData = await postService.GetPostByIdAsync(Posts.Post1.Id);
@@ -155,11 +155,11 @@ namespace Tests.ServiceTests
         [Fact]
         public async Task ShouldGetCorrectCommentCountForAPost()
         {
-            await context.SeedAsync(new List<Post> { Posts.Post1 });
+            await context.SeedEntityAsync(Posts.Post1);
 
             var commentCount = await postService.GetCommentsCountAsync(Posts.Post1.Id);
 
-            Assert.True(commentCount == 1);
+            Assert.Equal(1,commentCount);
         }
 
         [Fact]
@@ -200,8 +200,8 @@ namespace Tests.ServiceTests
         [Fact]
         public async Task ShouldGetLikesCountForAPost()
         {
-            var user = AppUserFactory.CreateAsync();
-            var post = PostFactory.CreateAsync(user);
+            var user = AppUserFactory.CreateSingle();
+            var post = PostFactory.CreateSingle(user);
             post.Reacts.Add(new Reaction() { User = user, ReactType = ReactType.Like });
 
             await context.SeedAsync(new List<Post> { post});

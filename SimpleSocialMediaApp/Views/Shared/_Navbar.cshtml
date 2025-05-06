@@ -1,4 +1,11 @@
 ﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Identity
+@using SimpleSocialApp.Data.Models
+@inject UserManager<AppUser> _userManager;
+
+@{
+    var currentUser = _userManager.GetUserAsync(User).Result;
+}
 <!-- Sidebar Navbar -->
 <div class="sidenav">
     <form method="get" asp-action="SearchUsers" asp-controller="User" class="search-form">
@@ -14,21 +21,21 @@
         </li>
         <li class="sidenav-item">
             <div class="nav-button">
-                <a class="nav-link" asp-area="" asp-controller="User" asp-action="Profile" asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)">
+                <a class="nav-link" asp-area="" asp-controller="User" asp-action="Profile" asp-route-userId="@currentUser.Id">
                     <span>Profile</span>
                 </a>
             </div>
         </li>
         <li class="sidenav-item">
             <div class="nav-button active">
-                <a class="nav-link" asp-area="" asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)" asp-controller="Chat" asp-action="ListChats">
+                <a class="nav-link" asp-area="" asp-route-userId="@currentUser.Id" asp-controller="Chat" asp-action="ListChats">
                     <span>Chats</span>
                 </a>
             </div>
         </li>
         <li class="sidenav-item">
             <div class="nav-button active">
-                <a class="nav-link" asp-area="" asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)" asp-controller="User" asp-action="SuggestedUsers">
+                <a class="nav-link" asp-area="" asp-route-userId="@currentUser.Id" asp-controller="User" asp-action="SuggestedUsers">
                     <span>Suggested Users</span>
                 </a>
             </div>

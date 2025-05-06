@@ -6,7 +6,7 @@
 <div id="chatListComponent">
     <div class="chat-list-containerr">
         <div class="chat-button">
-            <a asp-action="Create" asp-controller="Chat" class="btn btn-success">Create a new chat</a>
+            <a href="/Chat/Create" class="btn btn-success">Create a new chat</a>
         </div>
         @if (Model.Count != 0)
         {
@@ -38,109 +38,4 @@
     </div>
 </div>
 
-<style>
-    #chatListComponent .chat-list-containerr {
-        position: fixed;
-        background-color: #ecf0f1;
-        padding: 20px;
-        height: 92vh;
-        right: 0;
-        top: 56px;
-        border-radius: 8px;
-        width: 250px;
-        max-width: 100%;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
-    }
-
-    #chatListComponent img {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 2px solid #ddd;
-        margin-right: 10px;
-    }
-
-    #chatListComponent .chat-header {
-        color: #1E3A8A;
-        background-color: white;
-        padding: 10px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        text-align: center;
-    }
-
-    #chatListComponent .chat-list {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 2px;
-    }
-
-    #chatListComponent .chat-list-item {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        gap: 10px;
-        padding: 5px 10px;
-        background-color: transparent;
-        height: 45px;
-        border: 2px solid #1E3A8A;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        width: 100%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-        #chatListComponent .chat-list-item:hover {
-            background-color: #1E3A8A;
-            color: white;
-            border-color: white;
-        }
-
-    #chatListComponent .chat-link {
-        display: flex;
-        align-items: center;
-        color: #1E3A8A;
-        text-decoration: none;
-        width: 100%;
-    }
-
-        #chatListComponent .chat-link:hover {
-            color: white;
-        }
-
-    #chatListComponent .chat-list-item:hover .chat-link {
-        color: white;
-    }
-
-    #chatListComponent .chat-list-item:hover {
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    #chatListComponent .chat-button{
-        justify-self: center;
-        text-align: center;
-        margin:10px;
-        background-color: #1E3A8A;
-        color: white;
-        border-radius: 8px;
-        transition: background-color 0.3s ease;
-    }
-
-        #chatListComponent .chat-button:hover {
-            background-color: white;
-            color: #1E3A8A
-        }
-
-        #chatListComponent a:hover{
-        color: #1E3A8A
-        }
-
-        #chatListComponent a{
-            background: none;
-            border: none;
-        }
-</style>
+<link rel="stylesheet" href="~/css/partials/components/list-chats-default.css" />

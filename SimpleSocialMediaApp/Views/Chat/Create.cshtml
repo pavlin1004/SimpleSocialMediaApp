@@ -3,7 +3,8 @@
 
 @model CreateChatViewModel
 
-<form asp-action="Create" method="post">
+<form asp-action="Create" asp-controller="Chat" method="post">
+    
     <div class="form-group">
         <label for="Title">Chat Title</label>
         <input type="text" class="form-control" id="Title" name="Title" required />

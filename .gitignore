@@ -10,6 +10,9 @@
 *.userosscache
 *.sln.docstates
 
+#Ignore client-side libraries
+wwwroot/lib
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

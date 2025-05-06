@@ -1,31 +1,18 @@
-﻿@using SimpleSocialApp.Data.Enums
+﻿@using Microsoft.AspNetCore.Identity
+@using SimpleSocialApp.Data.Enums
 @using SimpleSocialApp.Data.Models
 @using System.Security.Claims
 @using SimpleSocialApp.Models.ViewModels.Chats
+
+@inject UserManager<AppUser> _userManager;
+
 @model ChatViewModel
 @{
-    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var currentUser = _userManager.GetUserAsync(User).Result;
 }
 @foreach (var message in Model.Messages)
 {
-    <div class="@(message.UserId == currentUserId ? "right-paragraph" : "left-paragraph")">
+    <div class="@(message.UserId == currentUser.Id ? "right-paragraph" : "left-paragraph")">
             <p>@message.Content</p>
     </div>
 }
-<style>
-
-    .message-elements{
-        display: flex;
-        flex-direction: column;
-        align-items:center;
-    }
-        img {
-        
-        width: 40px;
-        height: 40px;
-        margin-left: 10px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 2px solid #ddd;
-    }
-</style>

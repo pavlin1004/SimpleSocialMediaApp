@@ -9,7 +9,18 @@ namespace Tests.Data.Factory
 {
     public static class PostFactory
     {
-        public static List<Post> CreateAsync(int count, AppUser user)
+        public static Post CreateSingle(AppUser user)
+        {
+            var data = Guid.NewGuid().ToString();
+            return new Post
+            {
+                Id = data,
+                User = user,
+                Content = data,
+                CreatedDateTime = DateTime.Now,
+            };
+        }
+        public static List<Post> CreateList(int count, AppUser user)
         {
             var postList = new List<Post>();
             for(int i=0;i<count; i++)
@@ -25,18 +36,6 @@ namespace Tests.Data.Factory
                );
             }
             return postList;
-        }
-
-        public static Post CreateAsync(AppUser user)
-        {
-            var data = Guid.NewGuid().ToString();
-            return new Post
-            {
-                Id = data,
-                User = user,
-                Content = data,
-                CreatedDateTime = DateTime.Now,
-            };
         }
     }
 }

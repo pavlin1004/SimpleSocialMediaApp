@@ -6,7 +6,7 @@ namespace Tests.Data.Factory
 {
     public static class ChatFactory
     {
-        public static Chat CreateChat(List<AppUser> users, ChatType type = ChatType.Group)
+        public static Chat CreateSingle(List<AppUser> users, ChatType type = ChatType.Group)
         {
             return new Chat
             {
@@ -15,7 +15,7 @@ namespace Tests.Data.Factory
             };
         }
 
-        public static List<Chat> CreateAsync(List<AppUser> users,int count, ChatType type = ChatType.Private)
+        public static List<Chat> CreateList(List<AppUser> users,int count, ChatType type = ChatType.Private)
         {
             var chatList = new List<Chat>();
             for(int i=0;i<count;i++)

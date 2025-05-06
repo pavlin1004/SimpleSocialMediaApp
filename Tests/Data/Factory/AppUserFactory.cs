@@ -10,7 +10,7 @@ namespace Tests.Data.Factory
 {
     public static class AppUserFactory
     {
-        public static AppUser CreateAsync()
+        public static AppUser CreateSingle()
         {
             var data = Guid.NewGuid().ToString();
             return new AppUser
@@ -22,7 +22,7 @@ namespace Tests.Data.Factory
             };
 
         }
-        public static List<AppUser> CreateUsers(int count)
+        public static List<AppUser> CreateList(int count)
         {
             var users = new List<AppUser>();
             for (int i = 0; i < count; i++)

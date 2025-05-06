@@ -1,33 +1,38 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SimpleSocialApp.Services.Interfaces;
-using System.Security.Claims;
 using SimpleSocialApp.Data.Models;
-using Microsoft.Extensions.Hosting;
+using SimpleSociaMedialApp.Services.Functional.Interfaces;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SimpleSocialApp.Controllers
-{ 
+{
     public class ReactionController : Controller
     {
         private readonly IPostService _postService;
         private readonly ICommentService _commentService;
         private readonly IReactionService _reactionService;
+        private readonly UserManager<AppUser> _userManager;
 
-        public ReactionController(IPostService postService, ICommentService commentService, IReactionService reactionService)
+
+        public ReactionController(IPostService postService, 
+            ICommentService commentService,
+            IReactionService reactionService, 
+            UserManager<AppUser> userManager)
         {
             _postService = postService;
             _commentService = commentService;
             _reactionService = reactionService;
+            _userManager = userManager;
         }
        
         [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleLike(string targetType, string targetId)
         {
-           
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(currentUserId))
-                return Unauthorized();
 
-            int newLikeCount = 0;
+            var user = await _userManager.GetUserAsync(User);
+            int newLikeCount;
 
             if (targetType == "Post")
             {
@@ -37,7 +42,7 @@ namespace SimpleSocialApp.Controllers
                     return BadRequest();
                 }
 
-                var existingReaction = await _reactionService.SearchPostReactionAsync(targetId, currentUserId);
+                var existingReaction = await _reactionService.SearchPostReactionAsync(targetId, user.Id);
                 if (existingReaction != null)
                 {
                     await _reactionService.RemoveLikeAsync(existingReaction);
@@ -46,7 +51,7 @@ namespace SimpleSocialApp.Controllers
                 {
                     var reaction = new Reaction
                     {
-                        UserId = currentUserId,
+                        UserId = user.Id,
                         PostId = targetId
                     };
                     await _reactionService.AddLikeAsync(reaction);
@@ -56,10 +61,7 @@ namespace SimpleSocialApp.Controllers
             }
             else if (targetType == "Comment")
             {
-
-                var comment = await _commentService.GetCommentAsync(targetId);
-
-                var existingReaction = await _reactionService.SearchCommentReactionAsync(targetId, currentUserId);
+                var existingReaction = await _reactionService.SearchCommentReactionAsync(targetId, user.Id);
                 if (existingReaction != null)
                 {
                     await _reactionService.RemoveLikeAsync(existingReaction);
@@ -68,7 +70,7 @@ namespace SimpleSocialApp.Controllers
                 {
                     var reaction = new Reaction
                     {
-                        UserId = currentUserId,
+                        UserId = user.Id,
                         CommentId = targetId
                     };
                     await _reactionService.AddLikeAsync(reaction);

@@ -9,7 +9,7 @@ namespace Tests.Data.Factory
 {
     public static class CommentFactory
     {
-        public static Comment CreateAsync(Post post, AppUser user)
+        public static Comment CreateSingle(Post post, AppUser user)
         {
             return new Comment()
             {
@@ -20,7 +20,7 @@ namespace Tests.Data.Factory
                 User = user
             };
         }
-        public static List<Comment> CreateAsync(Post post, AppUser user, int count)
+        public static List<Comment> CreateList(Post post, AppUser user, int count)
         {
             var commentList = new List<Comment>();
             for (int i = 0; i < count; i++)

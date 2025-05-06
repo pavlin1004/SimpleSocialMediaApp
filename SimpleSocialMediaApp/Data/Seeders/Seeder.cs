@@ -2,18 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Data.Seeders;
-using SimpleSocialApp.Data;
-using Microsoft.EntityFrameworkCore;
-using SimpleSocialApp.External.AI;
-using SimpleSocialApp.Services.Interfaces;
-using SimpleSocialApp.Services.Implementations;
-using Microsoft.Identity.Client;
-using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Bogus.DataSets;
-using Microsoft.AspNetCore.Razor.Language;
 using SimpleSocialApp.Data.Enums;
-using System.Security.Policy;
-using CloudinaryDotNet.Actions;
+using SimpleSociaMedialApp.Services.Functional.Interfaces;
+using SimpleSociaMedialApp.Services.External.Interfaces;
 
 
 public class Seeder : ISeeder
@@ -23,28 +15,25 @@ public class Seeder : ISeeder
     private readonly IUserService _userService;
     private readonly IChatService _chatService;
     private readonly IPostService _postService;
-    private readonly ICommentService _commentService;
     private readonly IReactionService _reactionService;
     private readonly IMediaService _mediaService;
     private readonly IFakePersonService _fakePersonService;
 
 
     public Seeder(UserManager<AppUser> userManager,
-                IFriendshipService friendshipService,
-                IUserService userService,
-                IChatService chatService,
-                IPostService postService,
-                ICommentService commentService,
-                IReactionService reactionService,
-                IFakePersonService fakePersonService,
-                IMediaService mediaService)
+                  IFriendshipService friendshipService,
+                  IUserService userService,
+                  IChatService chatService,
+                  IPostService postService,
+                  IReactionService reactionService,
+                  IFakePersonService fakePersonService,
+                  IMediaService mediaService)
     {
         _userManager = userManager;
         _friendshipService = friendshipService;
         _userService = userService;
         _chatService = chatService;
         _postService = postService;
-        _commentService = commentService;
         _reactionService = reactionService;
         _fakePersonService = fakePersonService;
         _mediaService = mediaService;
@@ -64,31 +53,6 @@ public class Seeder : ISeeder
             await SeedRandomPosts();
             await SeedRandomLikesAsync();
         }
-    }
-
-    public async Task SeedCustomUsers()
-    {
-        await _userManager.CreateAsync(new AppUser { UserName = "123", Email ="123@abv.bg"}, "123123Aa.");
-
-        //var users = new List<AppUser>
-        //{
-        //    new AppUser { FirstName = "Pavlin", LastName = "Marinov", Gender = GenderType.Male},
-        //    new AppUser { FirstName = "Olivia", LastName = "Smith", Gender = GenderType.Female},
-        //    new AppUser { FirstName = "Emma", LastName = "Williams", Gender = GenderType.Female},
-        //    new AppUser { FirstName = "Michael", LastName = "Brown", Gender = GenderType.Male},
-        //    new AppUser { FirstName = "Sophia", LastName = "Davis", Gender = GenderType.Female}
-        //};
-
-        //for (int i = 0; i < users.Count; i++)
-        //{
-        //    users[i].UserName = string.Concat($"Username{i}");
-        //    users[i].Email = string.Concat("abv" + $"{i}" + "@abv.bg");
-        //    var result = await _userManager.CreateAsync(users[i], "TestPassword123.");
-        //    if (!result.Succeeded)
-        //    {
-        //        Console.WriteLine($"Error seeding user {users[i].FirstName} {users[i].LastName}");
-        //    }
-        //}
     }
     public async Task SeedRandomUsers()
     {
@@ -210,7 +174,7 @@ public class Seeder : ISeeder
             .RuleFor(p => p.Id, () => Guid.NewGuid().ToString())
             .RuleFor(p => p.UserId, f => f.PickRandom(userIds))
             .RuleFor(p => p.CreatedDateTime, f => f.Date.Past())
-            .RuleFor(p => p.Content, () => "  ").RuleFor(p => p.Media, () => new HashSet<Media>());
+            .RuleFor(p => p.Content, () => "  ").RuleFor(p => p.Media, () => []);
 
         var posts = postFaker.Generate(60);
         await _postService.AddPostsAsync(posts);
@@ -325,13 +289,9 @@ public class Seeder : ISeeder
             }
         }
     }
-    private string SanitizeLastName(string lastName)
+    private static string SanitizeLastName(string lastName)
     {
-        // Replace apostrophes or any other special characters
-        var sanitized = lastName.Replace("'", "_");  // Replace apostrophe with an underscore
-
-        // You can also add more sanitization rules here if needed
-
+        var sanitized = lastName.Replace("'", "_");  
         return sanitized;
     }
 }

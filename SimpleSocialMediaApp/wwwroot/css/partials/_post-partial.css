@@ -1,0 +1,74 @@
+﻿.media-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.post-user {
+    display: flex;
+    flex-direction: column;
+}
+
+.post-user-info {
+    display: flex;
+    align-items: center;
+}
+
+    .post-user-info img {
+        width: 40px;
+        height: 40px;
+        margin-right: 10px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #ddd;
+    }
+
+.main-image {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    display: block;
+    position: relative;
+    z-index: 2;
+}
+
+/* Second image stacked behind */
+.second-image {
+    position: absolute;
+    top: 10px; /* Slight vertical shift */
+    right: -20px; /* Shifted to the right */
+    width: 96%;
+    height: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    z-index: 1;
+    opacity: 0.8;
+}
+
+    .second-image img {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        filter: brightness(70%); /* Darker to indicate it's behind */
+        transition: 0.3s;
+    }
+
+/* +X more Indicator */
+.more-indicator {
+    position: absolute;
+    top: 50%;
+    right: -30px;
+    transform: translateY(-50%);
+    width: 60px;
+    height: 60px;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 3;
+}

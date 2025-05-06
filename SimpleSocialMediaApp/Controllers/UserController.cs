@@ -1,18 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.IdentityModel.Tokens;
-using SimpleSocialApp.Data.Enums;
 using SimpleSocialApp.Data.Models;
-using SimpleSocialApp.Mapping;
-using SimpleSocialApp.Models.ViewModels;
 using SimpleSocialApp.Models.ViewModels.AppUsers;
 using SimpleSocialApp.Models.ViewModels.Posts;
-using SimpleSocialApp.Services.Implementations;
-using SimpleSocialApp.Services.Interfaces;
 using SimpleSociaMedialApp.Models.ViewModels.AppUsers;
-using System.Security.Claims;
-using System.Transactions;
+using SimpleSociaMedialApp.Services.External.Interfaces;
+using SimpleSociaMedialApp.Services.Functional.Interfaces;
+using SimpleSociaMedialApp.Services.Utilities.Interfaces;
 
 namespace SimpleSocialApp.Controllers
 {
@@ -27,8 +22,10 @@ namespace SimpleSocialApp.Controllers
         private readonly IChatService _chatService;
         private readonly ICommentService _commentService;
         private readonly IMapper _mapper;
+        private readonly UserManager<AppUser> _userManager;
 
-        public UserController(IUserService userService, IFriendshipService friendshipService, IPostService postService, IMediaService mediaService, ICloudinaryService cloudinaryService, IChatService chatService, ICommentService commentService,IMapper mapper)
+
+        public UserController(IUserService userService, IFriendshipService friendshipService, IPostService postService, IMediaService mediaService, ICloudinaryService cloudinaryService, IChatService chatService, ICommentService commentService,IMapper mapper, UserManager<AppUser> userManager)
         {
             _userService = userService;
             _friendshipService = friendshipService;
@@ -38,18 +35,16 @@ namespace SimpleSocialApp.Controllers
             _chatService = chatService;
             _commentService = commentService;
             _mapper = mapper;
+            _userManager = userManager;
         }
 
         [HttpGet]
         public async Task<IActionResult> Profile(string userId, int size = 5, int count = 0)
         {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (String.IsNullOrEmpty(currentUserId))
-            {
-                return BadRequest("Could not retrueve user ID");
-            }
+            var currentUser = await _userManager.GetUserAsync(User);
+
             // Fetch user data
-            var user = await _userService.GetUserByIdAsync(userId);
+            var user = await _userService.GetUserByIdAsync(userId); // Profile owner
             if (user == null) return NotFound();
 
             // Fetch posts
@@ -68,8 +63,7 @@ namespace SimpleSocialApp.Controllers
                 });
             }
             // Fetch friendship status or default to "None"
-            Friendship? friendshipStatus = null;
-            friendshipStatus = await _friendshipService.CheckFriendship(currentUserId, userId);
+            Friendship? friendshipStatus = await _friendshipService.CheckFriendship(currentUser.Id, userId);
 
 
             var viewModel = new ProfileViewModel
@@ -77,8 +71,9 @@ namespace SimpleSocialApp.Controllers
                 User = user,
                 Posts = postViewModels,
                 FriendshipStatus = friendshipStatus, // Null if no relationship exists
-                IsCurrentUser = (currentUserId == userId)
+                IsCurrentUser = (user.Id == userId)
             };
+
             if (count == 0)
             {
                 return View(viewModel);
@@ -89,50 +84,33 @@ namespace SimpleSocialApp.Controllers
         [HttpPost]
         public async Task<IActionResult> SendFriendRequest(string userId)
         {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (String.IsNullOrEmpty(currentUserId))
-            {
-                return BadRequest("Could not retrueve user ID");
-            }
+            var user = await _userManager.GetUserAsync(User);
 
-            if (currentUserId == userId) return BadRequest("You cannot send a friend request to yourself.");
+            if (user.Id == userId) return BadRequest("You cannot send a friend request to yourself.");
 
-            await _friendshipService.SendFriendshipRequestAsync(currentUserId, userId); // Use "Pending" as status
+            await _friendshipService.SendFriendshipRequestAsync(user.Id, userId); // Use "Pending" as status
             return RedirectToAction("Profile", new { userId });
         }
         [HttpPost]
         public async Task<IActionResult> AcceptFriendshipRequest(string userId)
         {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (String.IsNullOrEmpty(currentUserId))
-            {
-                return BadRequest("Could not retrueve user ID");
-            }
+            var user = await _userManager.GetUserAsync(User);
 
-            if (currentUserId == userId) return BadRequest("You cannot send a friend request to yourself.");
-
-            var currentUser = await _userService.GetUserByIdAsync(currentUserId);
             var friend = await _userService.GetUserByIdAsync(userId);
-            if (currentUser != null && friend != null)
+            if (user != null && friend != null)
             {
-                await _chatService.CreatePrivateChatAsync(currentUser, friend);
+                await _chatService.CreatePrivateChatAsync(user, friend);
             } 
-            await _friendshipService.AcceptUserFriendshipAsync(currentUserId, userId);
+            await _friendshipService.AcceptUserFriendshipAsync(user.Id, userId);
             return RedirectToAction("Profile", new { userId });
         }
 
         [HttpPost]
         public async Task<IActionResult> RemoveFriendship(string userId)
         {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (String.IsNullOrEmpty(currentUserId))
-            {
-                return BadRequest("Could not retrieve user ID");
-            }
+            var user = await _userManager.GetUserAsync(User);
 
-            if (currentUserId == userId) return BadRequest("You cannot send a friend request to yourself.");
-
-            await _friendshipService.RemoveUserFriendshipsAsync(currentUserId, userId);
+            await _friendshipService.RemoveUserFriendshipsAsync(user.Id, userId);
             return RedirectToAction("Profile", new { userId });
         }
 
@@ -140,18 +118,7 @@ namespace SimpleSocialApp.Controllers
         [HttpGet]
         public async Task<IActionResult> EditProfilePicture()
         {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (String.IsNullOrEmpty(currentUserId))
-            {
-                return Unauthorized();
-            }
-            var user = await _userService.GetUserByIdAsync(currentUserId); // Fetch the user object
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
+            var user = await _userManager.GetUserAsync(User);
             var currentProfilePicture = user.Media;
            
             return View(currentProfilePicture); // Pass the profile picture to the view (if any)
@@ -162,16 +129,7 @@ namespace SimpleSocialApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditProfilePicture(IFormFile mediaFile)
         {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (currentUserId == null || mediaFile == null)
-            {
-                return BadRequest("User or file is missing");
-            }
-            var user = await _userService.GetUserByIdAsync(currentUserId);
-            if(user==null)
-            {
-                return Unauthorized();
-            }
+            var user = await _userManager.GetUserAsync(User);
 
             // Validate the file type (image)
             var validImageTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/bmp" };
@@ -203,18 +161,14 @@ namespace SimpleSocialApp.Controllers
                 await _userService.UpdateAsync(user);
             }
             // Redirect back to the profile
-            return RedirectToAction("Profile", new { userId = currentUserId });
+            return RedirectToAction("Profile", new { userId = user.Id });
         }
 
         [HttpGet]
         public async Task<IActionResult> SearchUsers(string searchQuery)
         {
-            var currentUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentUser = await _userManager.GetUserAsync(User);
 
-            if(String.IsNullOrEmpty(currentUser))
-            {
-                return Unauthorized();
-            }
             // If no query is entered, you can either show an empty result or handle it
             if (string.IsNullOrEmpty(searchQuery))
             {
@@ -228,48 +182,39 @@ namespace SimpleSocialApp.Controllers
             
             foreach (var user in users)
             {
-                var friendship = await _friendshipService.CheckFriendship(user.Id, currentUser);
+                var friendship = await _friendshipService.CheckFriendship(currentUser.Id, user.Id);
                 model.Add(_mapper.MapToUserViewModel(user, friendship));
             }
 
             return View(model); // Return the view with results
         }
         [HttpPost]
-        public async Task<IActionResult> RemoveProfilePicture(string userId)
+        public async Task<IActionResult> RemoveProfilePicture()
         {
-            var user = await _userService.GetUserByIdAsync(userId);
-            if(user==null)
-            {
-                return NotFound();
-            }
-            if(user.Media!= null && user.Media.PublicId != null)
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user.Media!= null && user.Media.PublicId != null)
             {
                 await _cloudinaryService.DeleteMediaAsync(user.Media.PublicId);
-                await _mediaService.RemoveUserMediaAsync(userId);
+                await _mediaService.RemoveUserMediaAsync(user.Id);
             }
 
-            return RedirectToAction("Profile", new { userId = userId });
+            return RedirectToAction("Profile", new { userId = user.Id });
 
         }
         [HttpGet]
-        public async Task<IActionResult> Friends(string userId)
+        public async Task<IActionResult> Friends()
         {
-            if(String.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
-            var friends = await _friendshipService.GetAllFriends(userId);
+            var user = await _userManager.GetUserAsync(User);
+            var friends = await _friendshipService.GetAllFriends(user.Id);
 
-            return View(_mapper.MapToFriendsViewModel(friends, userId));
+            return View(_mapper.MapToFriendsViewModel(friends, user.Id));
         }
         [HttpGet]
-        public async Task<IActionResult> SuggestedUsers(string userId)
+        public async Task<IActionResult> SuggestedUsers()
         {
-            if (String.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
-            var nonFriendsUsers = await _friendshipService.GetNonFriendUsers(userId);
+            var user = await _userManager.GetUserAsync(User);
+            var nonFriendsUsers = await _friendshipService.GetNonFriendUsers(user.Id);
 
             return View(_mapper.MapToUserViewModel(nonFriendsUsers.Item1,nonFriendsUsers.Item2));
         }

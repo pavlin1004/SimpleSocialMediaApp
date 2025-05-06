@@ -1,8 +1,13 @@
 ﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Identity
+@using SimpleSocialApp.Data.Models
 @using SimpleSocialApp.Models.ViewModels.AppUsers
+
+@inject UserManager<AppUser> _userManager;
+
 @model FriendViewModel
 @{
-    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var currentUser = _userManager.GetUserAsync(User).Result;
 }
 @if (Model.Friends != null && Model.Friends.Any())
 {
@@ -16,10 +21,10 @@
 }
 else
 {
-    if(currentUserId == Model.UserId)
+    if(currentUser.Id == Model.UserId)
     {
         <p>You have no friends yet.</p>
-        <a asp-controller="User" asp-action="SuggestedUsers" asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)">Find new friends</a>
+        <a asp-controller="User" asp-action="SuggestedUsers">Find new friends</a>
     }
     else
     {

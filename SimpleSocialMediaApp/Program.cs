@@ -3,21 +3,37 @@ using Microsoft.EntityFrameworkCore;
 using SimpleSocialApp.Data;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Data.Seeders;
-using SimpleSocialApp.External.AI;
-using SimpleSocialApp.Mapping;
-using SimpleSocialApp.Services.Implementations;
-using SimpleSocialApp.Services.Interfaces;
+using SimpleSociaMedialApp.Services.External.Implementations;
+using SimpleSociaMedialApp.Services.External.Interfaces;
+using SimpleSociaMedialApp.Services.Functional.Implementations;
+using SimpleSociaMedialApp.Services.Functional.Interfaces;
+using SimpleSociaMedialApp.Services.Utilities.Implementations;
+using SimpleSociaMedialApp.Services.Utilities.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<SocialDbContext>(
-    options => options.UseSqlServer(connectionString,
-    sqlOptions => sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
+    options =>
+    {
+        options
+        .UseLazyLoadingProxies()
+        .UseSqlServer(connectionString,
+        sqlOptions => sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));   
+    }
+    );
+    
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
 
 var cloudinarySettings = builder.Configuration.GetSection("Cloudinary");
 var cloudinary = new Cloudinary(new Account(
@@ -25,7 +41,9 @@ var cloudinary = new Cloudinary(new Account(
     cloudinarySettings["ApiKey"],
     cloudinarySettings["ApiSecret"]
 ));
-builder.Services.AddHttpClient(); 
+
+builder.Services.AddHttpClient();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSingleton(cloudinary);
 
@@ -45,6 +63,7 @@ builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IMapper, Mapper>();
 builder.Services.AddScoped<ISeeder, Seeder>();
 builder.Services.AddScoped<IFakePersonService, FakePersonService>();
+builder.Services.AddScoped<IUserResolver, UserResolver>();
 builder.Services.AddAuthentication()
     .AddCookie(options =>
     {
@@ -84,8 +103,9 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 
-using (var scope = app.Services.CreateScope())
+if (builder.Environment.IsDevelopment())
 {
+    using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     var dbContext = services.GetRequiredService<SocialDbContext>();
     var seeder = services.GetRequiredService<ISeeder>();

@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Models.InputModels.Messages;
-using SimpleSocialApp.Services.Interfaces;
-using System.Security.Claims;
+using SimpleSociaMedialApp.Services.Functional.Interfaces;
 
 namespace SimpleSocialApp.Controllers
 {
@@ -11,14 +11,14 @@ namespace SimpleSocialApp.Controllers
     {
         private readonly IMessageService _messageService;
         private readonly IChatService _chatService;
-        private readonly IUserService _userService;
         private readonly IHubContext<ChatHub> _hubContext;
-        public MessageController(IMessageService messageService,IChatService chatService, IUserService userService, IHubContext<ChatHub> hubContext)
+        private readonly UserManager<AppUser> _userManager;
+        public MessageController(IMessageService messageService,IChatService chatService, IHubContext<ChatHub> hubContext, UserManager<AppUser> userManager)
         {
             _messageService = messageService;
             _chatService = chatService;
-            _userService = userService;
             _hubContext = hubContext;
+            _userManager = userManager;
         }
 
         [HttpPost]   
@@ -29,12 +29,7 @@ namespace SimpleSocialApp.Controllers
                 return BadRequest(ModelState);
             }
 
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (currentUserId == null)
-            {
-                return Unauthorized();
-            }
-
+            var user = await _userManager.GetUserAsync(User);
             var chat = await _chatService.GetChatAsync(model.ChatId);
 
             if(chat == null)
@@ -43,17 +38,13 @@ namespace SimpleSocialApp.Controllers
             }
             var message = new Message
             {
-                UserId = currentUserId,
+                UserId = user.Id,
                 ChatId = model.ChatId,
                 CreatedDateTime = DateTime.UtcNow,
                 Content = model.Content
-            };
-
-            
-            var user = await  _userService.GetUserByIdAsync(currentUserId);
+            };     
 
             await _messageService.CreateMessageAsync(message);
-
             await _hubContext.Clients.Group(model.ChatId).SendAsync("ReceiveMessage",user.FirstName, message.Content, message.CreatedDateTime.ToString("HH:mm:ss"));
 
             return BadRequest();

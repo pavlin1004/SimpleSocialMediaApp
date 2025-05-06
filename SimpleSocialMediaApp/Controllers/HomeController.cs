@@ -5,31 +5,26 @@ using SimpleSocialApp.Data.Models;
 using SimpleSocialApp.Models;
 using SimpleSocialApp.Models.ViewModels;
 using SimpleSocialApp.Models.ViewModels.Posts;
-using SimpleSocialApp.Services.Interfaces;
+using SimpleSociaMedialApp.Services.Functional.Interfaces;
 using System.Diagnostics;
 using System.Security.Claims;
 
 namespace SimpleSocialApp.Controllers
 {
+    [Authorize]
+
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
         private readonly IPostService _postService;
         private readonly ICommentService _commentService; 
-        public HomeController(ILogger<HomeController> logger, IPostService postService, ICommentService commentService)
+        public HomeController(IPostService postService, ICommentService commentService)
         { 
-            _logger = logger;
             _postService = postService;
             _commentService = commentService; 
         }
-        [Authorize]
+
         public async Task<IActionResult> Index(int size = 5, int count = 0)
         {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(currentUserId))
-            {
-                return Unauthorized();
-            }
             var friendsPosts = await _postService.GetAllAsyncWithUserMediaAsync(size, count);
             var postViewModels = new List<PostViewModel>();
             if (!(friendsPosts == null || friendsPosts.Count == 0))

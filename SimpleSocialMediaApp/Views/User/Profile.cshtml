@@ -1,12 +1,16 @@
 ﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Identity
 @using SimpleSociaMedialApp.Models.ViewModels.AppUsers
 @using SimpleSocialApp.Data.Enums
+@using SimpleSocialApp.Data.Models
 @using SimpleSocialApp.Models.InputModels
+
+@inject UserManager<AppUser> _userManager;
 
 @model ProfileViewModel
 
 @{
-    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var currentUser = _userManager.GetUserAsync(User).Result;
     var userProfilePictureUrl = @Model.User.Media?.Url;
 
     ViewData["ShowActions"] = true;
@@ -40,7 +44,7 @@
                         <h3>@Model.User.FirstName @Model.User.LastName</h3>
                     </div>
 
-                    @if (Model.User.Id == currentUserId)
+                    @if (Model.User.Id == currentUser.Id)
                     {
                         <!-- Edit Profile Picture Modal Trigger Button -->
                         <button type="button" class="btn btn-outline-primary edit-profile-btn" data-bs-toggle="modal" data-bs-target="#editProfilePictureModal">
@@ -79,7 +83,7 @@
                                 <div class="modal-footer">
                                     @if (Model.User.Media != null)
                                     {
-                                        <form method="post" asp-controller="User" asp-action="RemoveProfilePicture" asp-route-userId="@currentUserId">
+                                        <form method="post" asp-controller="User" asp-action="RemoveProfilePicture">
                                             <button type="submit" class="btn btn-danger">Remove</button>
                                         </form>
                                     }
@@ -106,7 +110,7 @@
                                         <button type="submit" class="btn btn-primary">Send Friend Request</button>
                                     </form>
                                 }
-                                else if (Model.FriendshipStatus.Type == FriendshipType.Pending && Model.FriendshipStatus.SenderId != currentUserId)
+                                else if (Model.FriendshipStatus.Type == FriendshipType.Pending && Model.FriendshipStatus.SenderId != currentUser.Id)
                                 {
                                     <form method="post" action="@Url.Action("AcceptFriendshipRequest", "User", new { userId = Model.User.Id })">
                                         <button type="submit" class="btn btn-primary">Accept</button>
@@ -115,7 +119,7 @@
                                         <button type="submit" class="btn btn-primary">Reject</button>
                                     </form>
                                 }
-                                else if (Model.FriendshipStatus.Type == FriendshipType.Pending && Model.FriendshipStatus.SenderId == currentUserId)
+                                else if (Model.FriendshipStatus.Type == FriendshipType.Pending && Model.FriendshipStatus.SenderId == currentUser.Id)
                                 {
                                     <form method="post" action="@Url.Action("RemoveFriendship", "User", new { userId = Model.User.Id })">
                                         <button type="submit" class="btn btn-primary">Cancel Request</button>
@@ -133,9 +137,12 @@
                     </div>
                 </div>
             </div>
-            <div class="create-post">
-                @await Html.PartialAsync("Post/_Create", new ContentInputModel())
-            </div>
+            @if (currentUser.Id == Model.User.Id)
+            {
+                <div class="create-post">
+                    @await Html.PartialAsync("Post/_Create", new ContentInputModel())
+                </div>
+            }
             <!-- User's Posts -->
             <div class="main-content">
                 <div class="posts-section">
@@ -156,5 +163,5 @@
 
 <script type="text/javascript" src="/js/like-handler.js"></script>
 <script type="text/javascript" src="/js/post-loader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript" src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
 <link rel="stylesheet" href="/css/profile.css">

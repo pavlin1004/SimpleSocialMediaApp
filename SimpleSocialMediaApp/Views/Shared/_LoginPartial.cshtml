@@ -3,10 +3,12 @@
 @inject SignInManager<AppUser> SignInManager
 @inject UserManager<AppUser> UserManager
 
+@{
+    var isSignedIn = SignInManager.IsSignedIn(User); 
+}
 <ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
+@if (isSignedIn)
 {
-    var currentUser = await UserManager.GetUserAsync(User);
     <li class="nav-item">
         <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Settings</a>
     </li>

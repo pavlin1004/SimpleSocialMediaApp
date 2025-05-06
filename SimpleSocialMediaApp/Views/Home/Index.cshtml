@@ -1,11 +1,16 @@
-﻿@using SimpleSocialApp.Data.Enums
+﻿@using Microsoft.AspNetCore.Identity
+@using SimpleSocialApp.Data.Enums
 @using System.Security.Claims
+@using SimpleSocialApp.Data.Models
 @using SimpleSocialApp.Models.InputModels
+
+@inject UserManager<AppUser> _userManager;
+
 @model SimpleSocialApp.Models.ViewModels.HomeIndexViewModel
 
 @{
     var isUserLoggedIn = User.Identity.IsAuthenticated;
-    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var currentUser = await _userManager.GetUserAsync(User);
 }
 
 @if (isUserLoggedIn)
