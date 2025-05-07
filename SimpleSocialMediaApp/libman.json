@@ -33,6 +33,11 @@
       "provider": "cdnjs",
       "library": "jquery-validate@1.21.0",
       "destination": "wwwroot/jquery-validate/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "glightbox@3.3.1",
+      "destination": "wwwroot/lib/glightbox/"
     }
   ]
 }

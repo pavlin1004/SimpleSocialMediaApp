@@ -1,7 +1,7 @@
 ﻿[*.cs]
 
 # CS8602: Dereference of a possibly null reference.
-dotnet_diagnostic.CS8602.severity = silent
+dotnet_diagnostic.CS8602.severity = warning
 csharp_indent_labels = no_change
 csharp_using_directive_placement = outside_namespace:silent
 csharp_prefer_simple_using_statement = true:suggestion

@@ -105,19 +105,3 @@
 <script src="~/js/chat.js"></script> 
 <script src="~/js/message-loader.js"></script>
 <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
-<script>
-    // Get the elements
-    const moreOptionsBtn = document.getElementById('moreOptionsBtn');
-    const buttonContainer = document.querySelector('.button-container');
-
-    // Add event listener to toggle visibility
-    moreOptionsBtn.addEventListener('click', function () {
-        // Toggle the display of the button container
-        if (buttonContainer.style.display === 'none' || buttonContainer.style.display === '') {
-            buttonContainer.style.display = 'flex'; // Show the buttons
-        } else {
-            buttonContainer.style.display = 'none'; // Hide the buttons
-        }
-    });
-
-</script>

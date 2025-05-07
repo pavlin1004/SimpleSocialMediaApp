@@ -59,3 +59,16 @@
             .catch(err => console.error("Fetch error:", err));
     });
 });
+// Get the elements
+const moreOptionsBtn = document.getElementById('moreOptionsBtn');
+const buttonContainer = document.querySelector('.button-container');
+
+// Add event listener to toggle visibility
+moreOptionsBtn.addEventListener('click', function () {
+    // Toggle the display of the button container
+    if (buttonContainer.style.display === 'none' || buttonContainer.style.display === '') {
+        buttonContainer.style.display = 'flex'; // Show the buttons
+    } else {
+        buttonContainer.style.display = 'none'; // Hide the buttons
+    }
+});

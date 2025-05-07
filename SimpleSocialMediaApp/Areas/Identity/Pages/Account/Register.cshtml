@@ -46,39 +46,4 @@
     <partial name="_ValidationScriptsPartial" />
 }
 
-<style>
-    .register-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding-top: 8vh;
-        height: 100vh;
-        background-color: #ecf0f1;
-    }
-
-    .register-form-container {
-        max-height: 80vh; /* Prevents form from exceeding 80% of view height */
-        background: white;
-        padding: 30px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        max-width: 400px;
-        overflow-y: auto; /* Enables scrolling when content exceeds max-height */
-    }
-
-    /* Reduce input field height */
-    .form-floating input {
-        padding: 8px;
-        font-size: 14px;
-        height: 38px; /* Lower than the default */
-    }
-
-    /* Reduce button height */
-    #registerSubmit {
-        padding: 8px;
-        font-size: 16px;
-        height: 42px; /* Adjust button height */
-    }
-</style>
+<link rel="stylesheet" href="~/css/identity/register.css"></link>

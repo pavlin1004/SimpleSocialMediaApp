@@ -2,17 +2,15 @@
 
 namespace SimpleSocialApp.Data.Models
 {
-    public class Post
-    {
-        #pragma warning disable CS8618
+    public class Post{
         public Post()
         {
             this.Id = Guid.NewGuid().ToString();
             this.Media = new HashSet<Media>();
             this.Reacts = new HashSet<Reaction>();
             this.Comments = new HashSet<Comment>();
-
         }
+
         [Key]
         public string Id { get; set; }
 
@@ -22,14 +20,14 @@ namespace SimpleSocialApp.Data.Models
         [Required]
         public DateTime CreatedDateTime { get; set; }
 
-        public string UserId { get; set; }
+        public required string UserId { get; set; }
 
-        public virtual AppUser User { get; set; }
+        public virtual AppUser? User { get; set; }
 
-        public virtual ICollection<Media> Media { get; set; }
+        public virtual ICollection<Media>? Media { get; set; }
 
-        public virtual ICollection<Reaction> Reacts { get; set; } 
+        public virtual ICollection<Reaction>? Reacts { get; set; } 
 
-        public virtual ICollection<Comment> Comments { get; set; }
+        public virtual ICollection<Comment>? Comments { get; set; }
     }
 }

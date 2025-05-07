@@ -25,14 +25,5 @@
 
     <button type="submit" class="btn btn-primary">Create Chat</button>
 </form>
-<script>
 
-    function validateForm() {
-        var checkboxes = document.querySelectorAll('input[name="ParticipantsIds"]:checked');
-        if (checkboxes.length === 0) {
-            document.getElementById("error-message").style.display = "block";
-            return false; // Prevent form submission
-        }
-        return true; // Allow form submission
-    }
-</script>
+<script src="~/js/create-chat.js"></script>

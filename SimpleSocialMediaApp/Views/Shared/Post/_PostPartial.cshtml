@@ -112,22 +112,8 @@
     </div>
 
 }
-<!-- Add Bootstrap Icons -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-<!-- GLightbox CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
-<!-- GLightbox JS -->
-<script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const lightbox = GLightbox({
-            selector: ".glightbox",
-            touchNavigation: true,
-            loop: true, // Enables continuous navigation
-            autoplayVideos: true
-        });
-    });
-
-
-</script>
+<link href="~/lib/bootstrap-icons/font/bootstrap-icons.min.css" rel="stylesheet">
 <link rel="stylesheet" href="~/css/partials/_post-partial.css">
+<link rel="stylesheet" href="~/lib/glightbox/dist/css/glightbox.min.css" />
+<script src="~/lib/glightbox/dist/js/glightbox.min.js"></script>
+<script src="~/js/lightbox.js"></script>
